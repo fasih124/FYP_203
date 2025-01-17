@@ -5,6 +5,7 @@ import 'package:fyp_203/screens/splash_screen.dart';
 import 'screens/onboard_1_screen.dart';
 import 'screens/onboard_2_screen.dart';
 import 'screens/onboard_3_screen.dart';
+import 'screens/signup_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Poppins',
       ),
       debugShowCheckedModeBanner: false,
-      home: const Onboard3Screen(),//SplashScreen()
+      home: const HomeScreen()//SignUpScreen(),//SplashScreen()
     );
   }
 }
