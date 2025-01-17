@@ -3,6 +3,8 @@ import 'package:fyp_203/screens/home_screen.dart';
 import 'package:fyp_203/screens/splash_screen.dart';
 
 import 'screens/onboard_1_screen.dart';
+import 'screens/onboard_2_screen.dart';
+import 'screens/onboard_3_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,12 +19,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
+        // colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
         useMaterial3: true,
         fontFamily: 'Poppins',
       ),
       debugShowCheckedModeBanner: false,
-      home: const Onboard1Screen(),
+      home: const Onboard3Screen(),//SplashScreen()
     );
   }
 }

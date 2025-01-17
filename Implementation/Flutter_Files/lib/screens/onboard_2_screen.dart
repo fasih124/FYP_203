@@ -4,8 +4,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
 import 'package:fyp_203/constants/text_constant.dart';
 
-class Onboard1Screen extends StatelessWidget {
-  const Onboard1Screen({super.key});
+class Onboard2Screen extends StatelessWidget {
+  const Onboard2Screen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -31,13 +31,13 @@ class Onboard1Screen extends StatelessWidget {
           ),
           //  Image SVG
           SvgPicture.asset(
-            'assets/images/baby_onboard_screen_1.svg',
+            'assets/images/app_onboard_screen_2.svg',
             width: 196,
             height: 284,
           ),
           //  Text
           SizedBox(
-            width: 309 ,
+            width: 321 ,
             child: Center(
               child: Column(
                 children: [
@@ -46,26 +46,26 @@ class Onboard1Screen extends StatelessWidget {
                     TextSpan(
                       children: [
                         TextSpan(
-                          text: "A  Smarter Way to Care for Your ",
+                          text: "Peace of Mind at Your ",
                           style: AppTextStyle.heading_1
                               .copyWith(color: AppColorCode.primaryColor_500,
-                          height: .8),
+                              height: .8),
                         ),
                         TextSpan(
-                          text: "Baby",
+                          text: "Fingertips ",
                           style: AppTextStyle.heading_1
                               .copyWith(color: AppColorCode.secondaryColor_500),
                         )
                       ],
                     ),
                   ),
-                SizedBox(
-                  height: 12,
-                ),
+                  SizedBox(
+                    height: 12,
+                  ),
                   Text(
-                      textAlign: TextAlign.center,
-                      "Innovative features and environment monitoring make parenting easier and stress-free.",
-                      style: AppTextStyle.sub_heading_1.copyWith(color: AppColorCode.primaryNeutralColor_600),
+                    textAlign: TextAlign.center,
+                    "Easily monitor your baby’s comfort and safety and Stay updated right from your phone.",
+                    style: AppTextStyle.sub_heading_1.copyWith(color: AppColorCode.primaryNeutralColor_600),
                   ),
                 ],
               ),
@@ -75,14 +75,14 @@ class Onboard1Screen extends StatelessWidget {
           ElevatedButton(
             onPressed: () {},
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColorCode.secondaryColor_500,
-              foregroundColor: AppColorCode.White_shade,
-              padding: EdgeInsets.symmetric(vertical: 18,horizontal:120 ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)
-              )
+                backgroundColor: AppColorCode.secondaryColor_500,
+                foregroundColor: AppColorCode.White_shade,
+                padding: EdgeInsets.symmetric(vertical: 18,horizontal:120 ),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)
+                )
             ),
-            child: const Text("Get Started"),
+            child: const Text("Next"),
           )
         ],
       ),
