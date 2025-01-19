@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fyp_203/screens/home_screen.dart';
-import 'package:fyp_203/screens/splash_screen.dart';
+import 'package:fyp_203/constants/colors_constant.dart';
 
+import 'package:fyp_203/screens/home_screen.dart';
+import 'package:fyp_203/screens/signin_screen.dart';
+import 'package:fyp_203/screens/splash_screen.dart';
 import 'screens/onboard_1_screen.dart';
 import 'screens/onboard_2_screen.dart';
 import 'screens/onboard_3_screen.dart';
@@ -19,13 +21,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        // colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
-        useMaterial3: true,
-        fontFamily: 'Poppins',
+      theme: ThemeData(useMaterial3: true).copyWith(
+        scaffoldBackgroundColor: AppColorCode.neutralColor_500
       ),
       debugShowCheckedModeBanner: false,
-      home: const HomeScreen()//SignUpScreen(),//SplashScreen()
+      home: const SignInScreen()//HomeScreen()//SignUpScreen(),//SplashScreen()
     );
   }
 }
