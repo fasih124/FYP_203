@@ -1,85 +1,102 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fyp_203/constants/colors_constant.dart';
+import 'package:fyp_203/constants/text_constant.dart';
 
-class SignUpScreen extends StatelessWidget {
+import '../Component/text_feild_component.dart';
 
-const SignUpScreen({super.key});
+
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
+
   @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
+
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    usernameController.dispose();
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: AppColorCode.neutralColor_500,
         elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            // Back button action
-          },
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: CircleAvatar(
+            backgroundColor: AppColorCode.neutralColor_50,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                  size: 18, color: Colors.black),
+              onPressed: () {
+                // Back button action
+              },
+            ),
+          ),
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
               'Sign up now',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
+              style: AppTextStyle.heading_2
+                  .copyWith(color: AppColorCode.primaryColor_600),
             ),
-            SizedBox(height: 8),
-            Text(
+            const SizedBox(height: 4),
+            const Text(
               'Please fill the details and create account',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
+              style: AppTextStyle.sub_heading_1,
             ),
-            SizedBox(height: 32),
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Full Name',
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+            const SizedBox(height: 32),
+            //user name
+            CustomerTextFeild(
+              textlabel: 'Username',
+              texteditingcontroller: usernameController,
+              isobsure: false,
+            ),
+            const SizedBox(height: 16),
+            //Email
+            CustomerTextFeild(
+              textlabel: 'Email',
+              texteditingcontroller: emailController,
+              isobsure: false,
+            ),
+            const SizedBox(height: 16),
+            //Password
+            CustomerTextFeild(
+              textlabel: 'Password',
+              texteditingcontroller: passwordController,
+              isobsure: true,
+              iconData: Icons.visibility_off_outlined,
+            ),
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton(
+                onPressed: () {},
+                child: Text(
+                  'Password must be 8 character',
+                  style: AppTextStyle.Small_text_1.copyWith(
+                      color: AppColorCode.primaryColor_600),
                 ),
               ),
             ),
-            SizedBox(height: 16),
-            TextField(
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(
-                labelText: 'Email',
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-            SizedBox(height: 16),
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Password',
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                suffixIcon: Icon(Icons.visibility_off),
-              ),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Password must be 8 characters',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-              ),
-            ),
-            SizedBox(height: 32),
+            const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -87,26 +104,32 @@ const SignUpScreen({super.key});
                   // Sign Up button action
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF38B6FF), // Button color
-                  padding: EdgeInsets.symmetric(vertical: 16),
+                  backgroundColor:
+                  AppColorCode.secondaryColor_500, // Button color
+                  padding: const EdgeInsets.symmetric(vertical: 22),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: Text(
-                  'Sign Up',
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+                child: const Text(
+                  'Sign up',
+                  style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w900),
                 ),
               ),
             ),
-            Spacer(),
+            const SizedBox(
+              height: 18,
+            ),
             Center(
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    'Already have an account?',
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
+                  const Text(
+                    'Already have an account',
+                    style: TextStyle(fontSize: 14),
                   ),
                   TextButton(
                     onPressed: () {
@@ -114,10 +137,11 @@ const SignUpScreen({super.key});
                     },
                     child: Text(
                       'Sign in',
-                      style: TextStyle(
-                        color: Color(0xFF38B6FF),
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
+                      style: AppTextStyle.Small_text_1.copyWith(
+                        decoration: TextDecoration.underline,
+                        decorationColor: AppColorCode.primaryColor_600,
+                        decorationThickness: 2.0,
+                        color: AppColorCode.primaryColor_600,
                       ),
                     ),
                   ),

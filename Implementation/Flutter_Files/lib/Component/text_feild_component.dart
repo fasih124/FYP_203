@@ -27,7 +27,7 @@ class CustomerTextFeild extends StatelessWidget {
         filled: true,
         fillColor: Colors.white,
         focusColor: AppColorCode.primaryColor_500,
-        suffixIcon:  Icon(iconData),
+        suffixIcon: iconData==null? Icon(iconData) : InkWell(onTap: (){},child: Icon(iconData)),
         border: OutlineInputBorder(
           borderSide: BorderSide.none,
           borderRadius: BorderRadius.circular(10),
