@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
 
 import 'package:fyp_203/screens/home_screen.dart';
+import 'package:fyp_203/screens/notification_screen.dart';
 import 'package:fyp_203/screens/signin_screen.dart';
 import 'package:fyp_203/screens/splash_screen.dart';
+import 'package:fyp_203/screens/video_stream_screen.dart';
 import 'screens/onboard_1_screen.dart';
 import 'screens/onboard_2_screen.dart';
 import 'screens/onboard_3_screen.dart';
+import 'screens/setting_screen.dart';
 import 'screens/signup_screen.dart';
 
 void main() {
@@ -25,7 +28,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: AppColorCode.neutralColor_500
       ),
       debugShowCheckedModeBanner: false,
-      home: const SignInScreen()//HomeScreen()//SignUpScreen(),//SplashScreen()
+      home: const SettingScreen(),//NotificationScreen(),//HomeScreen(),//SignUpScreen(),//SignInScreen()//HomeScreen() ,SplashScreen()
     );
   }
 }
