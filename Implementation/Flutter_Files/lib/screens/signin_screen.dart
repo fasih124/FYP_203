@@ -4,15 +4,28 @@ import 'package:fyp_203/constants/text_constant.dart';
 
 import '../Component/text_feild_component.dart';
 
-class SignInScreen extends StatelessWidget {
+
+class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
+
+  @override
+  State<SignInScreen> createState() => _SignInScreenState();
+}
+
+class _SignInScreenState extends State<SignInScreen> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
-
-    // dispose
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColorCode.neutralColor_500,
@@ -22,7 +35,7 @@ class SignInScreen extends StatelessWidget {
           child: CircleAvatar(
             backgroundColor: AppColorCode.neutralColor_50,
             child: IconButton(
-              icon: Icon(Icons.arrow_back_ios_new_rounded,
+              icon: const Icon(Icons.arrow_back_ios_new_rounded,
                   size: 18, color: Colors.black),
               onPressed: () {
                 // Back button action
@@ -41,19 +54,19 @@ class SignInScreen extends StatelessWidget {
               style: AppTextStyle.heading_2
                   .copyWith(color: AppColorCode.primaryColor_600),
             ),
-            SizedBox(height: 4),
-            Text(
+            const SizedBox(height: 4),
+            const Text(
               'Please sign in to continue our app',
               style: AppTextStyle.sub_heading_1,
             ),
-            SizedBox(height: 32),
+            const SizedBox(height: 32),
             //Email
             CustomerTextFeild(
               textlabel: 'Email',
               texteditingcontroller: emailController,
               isobsure: false,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             //Password
             CustomerTextFeild(
               textlabel: 'Password',
@@ -61,7 +74,7 @@ class SignInScreen extends StatelessWidget {
               isobsure: true,
               iconData: Icons.visibility_off_outlined,
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
@@ -73,7 +86,7 @@ class SignInScreen extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 32),
+            const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -82,13 +95,13 @@ class SignInScreen extends StatelessWidget {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
-                      AppColorCode.secondaryColor_500, // Button color
-                  padding: EdgeInsets.symmetric(vertical: 22),
+                  AppColorCode.secondaryColor_500, // Button color
+                  padding: const EdgeInsets.symmetric(vertical: 22),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                child: Text(
+                child: const Text(
                   'Sign In',
                   style: TextStyle(
                       fontSize: 16,
@@ -97,14 +110,14 @@ class SignInScreen extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 18,
             ),
             Center(
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
+                  const Text(
                     'Don’t have an account?',
                     style: TextStyle(fontSize: 14),
                   ),
@@ -113,7 +126,7 @@ class SignInScreen extends StatelessWidget {
                       // Sign in action
                     },
                     child: Text(
-                      'Sign in',
+                      'Sign up',
                       style: AppTextStyle.Small_text_1.copyWith(
                         decoration: TextDecoration.underline,
                         decorationColor: AppColorCode.primaryColor_600,
