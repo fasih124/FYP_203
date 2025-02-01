@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
 import 'package:fyp_203/constants/text_constant.dart';
+import 'package:fyp_203/screens/signin_screen.dart';
+
+import 'onboard_3_screen.dart';
 
 class Onboard2Screen extends StatelessWidget {
   const Onboard2Screen({super.key});
@@ -19,7 +22,14 @@ class Onboard2Screen extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.all(16.0),
               child: InkWell(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SignInScreen(),
+                    ),
+                  );
+                },
                 child: Text(
                   "Skip",
                   style: TextStyle(
@@ -73,7 +83,14 @@ class Onboard2Screen extends StatelessWidget {
           ),
           //  Button
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Onboard3Screen(),
+                ),
+              );
+            },
             style: ElevatedButton.styleFrom(
                 backgroundColor: AppColorCode.secondaryColor_500,
                 foregroundColor: AppColorCode.White_shade,

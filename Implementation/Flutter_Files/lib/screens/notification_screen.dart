@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
+import 'package:fyp_203/screens/setting_screen.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -53,7 +54,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           size: 32,
                         ),
                         onPressed: () {
-                          // Settings button action
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (builder) => const SettingScreen(),
+                            ),
+                          );
                         },
                       ),
                     ],

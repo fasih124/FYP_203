@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: AppColorCode.neutralColor_500
       ),
       debugShowCheckedModeBanner: false,
-      home: const SettingScreen(),//NotificationScreen(),//HomeScreen(),//SignUpScreen(),//SignInScreen()//HomeScreen() ,SplashScreen()
+      home: const SplashScreen(),
     );
   }
 }

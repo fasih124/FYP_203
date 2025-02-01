@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
+import 'package:fyp_203/screens/signin_screen.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -15,33 +16,33 @@ class _SettingScreenState extends State<SettingScreen> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-        Container(
-          child: Column(
-            children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: CircleAvatar(
-                  backgroundColor: AppColorCode.neutralColor_50,
-                  child: IconButton(
-                    icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                        size: 18, color: Colors.black),
-                    onPressed: () {
-                      // Back button action
-                    },
+          Container(
+            child: Column(
+              children: [
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: CircleAvatar(
+                    backgroundColor: AppColorCode.neutralColor_50,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                          size: 18, color: Colors.black),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
                   ),
                 ),
-              ),
-              Align(
-                alignment: Alignment.topCenter,
-                child: Text('Setting'),
-              ),
-            ],
+                const Align(
+                  alignment: Alignment.topCenter,
+                  child: Text('Setting'),
+                ),
+              ],
+            ),
           ),
-        ),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
           Container(
-            child: Padding(
-              padding: const EdgeInsets.all(18.0),
+            child: const Padding(
+              padding: EdgeInsets.all(18.0),
               child: Column(
                 children: [
                   ListTile(
@@ -68,12 +69,19 @@ class _SettingScreenState extends State<SettingScreen> {
               ),
             ),
           ),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
           OutlinedButton(
-            onPressed: () {},
-            child: Text('Logout'),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (builder) => const SignInScreen(),
+                ),
+              );
+            },
+            child: const Text('Logout'),
           ),
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
         ],
       ),
     );

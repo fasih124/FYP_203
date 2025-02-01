@@ -2,9 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
 import 'package:fyp_203/constants/text_constant.dart';
+import 'package:fyp_203/screens/signin_screen.dart';
 
 import '../Component/text_feild_component.dart';
-
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -14,7 +14,6 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
@@ -41,7 +40,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               icon: const Icon(Icons.arrow_back_ios_new_rounded,
                   size: 18, color: Colors.black),
               onPressed: () {
-                // Back button action
+                Navigator.pop(context);
               },
             ),
           ),
@@ -87,13 +86,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
             const SizedBox(height: 12),
             Align(
               alignment: Alignment.centerLeft,
-              child: TextButton(
-                onPressed: () {},
-                child: Text(
-                  'Password must be 8 character',
-                  style: AppTextStyle.Small_text_1.copyWith(
-                      color: AppColorCode.primaryColor_600),
-                ),
+              child:  Text(
+                'Password must be 8 character',
+                style: AppTextStyle.Small_text_1.copyWith(
+                    color: AppColorCode.primaryColor_600),
               ),
             ),
             const SizedBox(height: 32),
@@ -101,11 +97,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // Sign Up button action
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (builder) => const SignInScreen(),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
-                  AppColorCode.secondaryColor_500, // Button color
+                      AppColorCode.secondaryColor_500, // Button color
                   padding: const EdgeInsets.symmetric(vertical: 22),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -133,7 +134,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   TextButton(
                     onPressed: () {
-                      // Sign in action
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (builder) => const SignInScreen(),
+                        ),
+                      );
                     },
                     child: Text(
                       'Sign in',

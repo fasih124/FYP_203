@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fyp_203/screens/setting_screen.dart';
 
 import '../constants/colors_constant.dart';
 
@@ -54,7 +55,12 @@ class _VideoStreamScreenState extends State<VideoStreamScreen> {
                           size: 32,
                         ),
                         onPressed: () {
-// Settings button action
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (builder) => const SettingScreen(),
+                            ),
+                          );
                         },
                       ),
                     ],
