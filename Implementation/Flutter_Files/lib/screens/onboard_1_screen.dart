@@ -31,6 +31,7 @@ class Onboard1Screen extends StatelessWidget {
                 child: Text(
                   "Skip",
                   style: TextStyle(
+                      fontWeight:FontWeight.w600,
                       decoration: TextDecoration.underline,
                       color: AppColorCode.primaryColor_500),
                 ),
