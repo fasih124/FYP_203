@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
 import 'package:fyp_203/constants/text_constant.dart';
 import 'package:fyp_203/screens/onboard_1_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'home_screen.dart';
 
@@ -16,12 +17,12 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 50), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const Onboard1Screen()),
-      );
-    });
+    Future.delayed(const Duration(seconds: 3), () {
+       Navigator.pushReplacement(
+         context,
+         MaterialPageRoute(builder: (context) => const Onboard1Screen()),
+       );
+     });
   }
 
   @override
@@ -34,24 +35,19 @@ class _SplashScreenState extends State<SplashScreen> {
           Center(
             child: Text(
               'CareNest',
-              style: AppTextStyle.app_title.copyWith(color: AppColorCode.White_shade),
-              //TextStyle(
-                  //fontSize: 34,
-                  //fontFamily: 'Poppins',
-                 // fontWeight: FontWeight.bold,
-                //color: AppColorCode.White_shade
-              //),
+              style: GoogleFonts.poppins(
+                  fontSize: 34,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white),
             ),
           ),
           Center(
             child: Text(
               'Where Love Meets Technology',
-               style:AppTextStyle.app_sub_title.copyWith(color: AppColorCode.White_shade),
-              // TextStyle(
-              //   fontSize: 16,
-              //   fontFamily: 'Poppins',
-              //     color: AppColorCode.White_shade
-              // ),
+              style:GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.white),
             ),
           ),
         ],

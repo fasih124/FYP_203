@@ -24,11 +24,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(useMaterial3: true).copyWith(
+      theme: ThemeData(useMaterial3: true,fontFamily:'Poppins',).copyWith(
         scaffoldBackgroundColor: AppColorCode.neutralColor_500
       ),
       debugShowCheckedModeBanner: false,
-      home: const SettingScreen(),//NotificationScreen(),//HomeScreen(),//SignUpScreen(),//SignInScreen()//HomeScreen() ,SplashScreen()
+      home: const Onboard1Screen(), // SplashScreen(),
     );
   }
 }

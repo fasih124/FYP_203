@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
 import 'package:fyp_203/constants/text_constant.dart';
+import 'package:fyp_203/screens/bottom_navigation_screen.dart';
+import 'package:fyp_203/screens/signup_screen.dart';
 
 import '../Component/text_feild_component.dart';
-
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -27,27 +28,11 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColorCode.neutralColor_500,
-        elevation: 0,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: CircleAvatar(
-            backgroundColor: AppColorCode.neutralColor_50,
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded,
-                  size: 18, color: Colors.black),
-              onPressed: () {
-                // Back button action
-              },
-            ),
-          ),
-        ),
-      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               'Sign in now',
@@ -91,11 +76,16 @@ class _SignInScreenState extends State<SignInScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // Sign Up button action
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (builder) => const BottomNavigationScreen(),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
-                  AppColorCode.secondaryColor_500, // Button color
+                      AppColorCode.secondaryColor_500, // Button color
                   padding: const EdgeInsets.symmetric(vertical: 22),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -123,7 +113,12 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                   TextButton(
                     onPressed: () {
-                      // Sign in action
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (builder) => const SignUpScreen(),
+                        ),
+                      );
                     },
                     child: Text(
                       'Sign up',

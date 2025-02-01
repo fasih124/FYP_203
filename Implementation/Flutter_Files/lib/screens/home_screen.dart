@@ -1,28 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
+import 'package:fyp_203/screens/setting_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
-  // Text(
-  // 'HOME',
-  // style: TextStyle(
-  // color: Colors.blue[900],
-  // fontSize: 24,
-  // fontWeight: FontWeight.bold,
-  // ),
-  // ),
-
-  // IconButton(
-  // icon: Icon(
-  // Icons.settings,
-  // color: Colors.blue[900],
-  // size: 32,
-  // ),
-  // onPressed: () {
-  // // Settings button action
-  // },
-  // ),
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +52,12 @@ class HomeScreen extends StatelessWidget {
                           size: 32,
                         ),
                         onPressed: () {
-                          // Settings button action
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (builder) => const SettingScreen(),
+                            ),
+                          );
                         },
                       ),
                     ],
@@ -173,48 +160,6 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: (index) {},
-        backgroundColor: AppColorCode.primaryColor_500,
-        selectedItemColor: AppColorCode.White_shade,
-        unselectedItemColor: Colors.grey,
-        items: [
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            label: 'Home',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.play_circle_outline_rounded),
-            label: 'Video',
-          ),
-          BottomNavigationBarItem(
-            icon: Stack(
-              children: [
-                const Icon(Icons.notifications_none),
-                Positioned(
-                  right: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Text(
-                      '3',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            label: 'Notification',
-          ),
-        ],
-      ),
     );
   }
 }
@@ -264,4 +209,3 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-
