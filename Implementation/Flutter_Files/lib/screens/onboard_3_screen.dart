@@ -18,7 +18,7 @@ class Onboard3Screen extends StatelessWidget {
           Align(
             alignment: AlignmentDirectional.topEnd,
             child: Padding(
-              padding: EdgeInsets.fromLTRB(0, 50, 100, 10 ),
+              padding: EdgeInsets.all(16.0),
               child: InkWell(
                 onTap: () {
                   Navigator.push(
@@ -45,7 +45,7 @@ class Onboard3Screen extends StatelessWidget {
           ),
           //  Text
           SizedBox(
-            width: 309 ,
+            width: 339 ,
             child: Center(
               child: Column(
                 children: [
@@ -82,12 +82,7 @@ class Onboard3Screen extends StatelessWidget {
           //  Button
           ElevatedButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SignInScreen(),
-                ),
-              );
+              Navigator.of(context).push(_createRoute());
             },
             style: ElevatedButton.styleFrom(
                 backgroundColor: AppColorCode.secondaryColor_500,
@@ -103,4 +98,24 @@ class Onboard3Screen extends StatelessWidget {
       ),
     );
   }
+}
+
+
+Route _createRoute() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => SignInScreen(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(1.0, 0.0); // Start from right side
+      const end = Offset.zero; // End at original position
+      const curve = Curves.easeInOut; // Smooth transition
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      var offsetAnimation = animation.drive(tween);
+
+      return SlideTransition(
+        position: offsetAnimation,
+        child: child,
+      );
+    },
+  );
 }

@@ -42,7 +42,7 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
         unselectedItemColor: Colors.grey,
         items: [
           const BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
+            icon: Icon(Icons.home_filled),
             label: 'Home',
           ),
           const BottomNavigationBarItem(

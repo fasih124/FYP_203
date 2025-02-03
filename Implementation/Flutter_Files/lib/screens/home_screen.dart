@@ -24,8 +24,7 @@ class HomeScreen extends StatelessWidget {
                   color: Color(0x402E5077), // Shadow color
                   blurRadius: 10, // Softness of the shadow
                   spreadRadius: 2, // Spread of the shadow
-                  offset: Offset(
-                      0, 4), // Shadow offset (horizontal, vertical)
+                  offset: Offset(0, 4), // Shadow offset (horizontal, vertical)
                 ),
               ],
             ),
@@ -45,13 +44,8 @@ class HomeScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.settings,
-                          color: AppColorCode.primaryColor_500,
-                          size: 32,
-                        ),
-                        onPressed: () {
+                      InkWell(
+                        onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -59,6 +53,11 @@ class HomeScreen extends StatelessWidget {
                             ),
                           );
                         },
+                        child: Image.asset(
+                          'assets/icons_img/gear_icon.png',
+                          width: 25,
+                          height: 23,
+                        ),
                       ),
                     ],
                   ),
@@ -77,18 +76,18 @@ class HomeScreen extends StatelessWidget {
                         TextSpan(
                           text: 'Cradle :',
                           style: TextStyle(
-                            color: Colors.blue[900],
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                          ),
+                              color: AppColorCode.primaryColor_500,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'Poppins'),
                         ),
                         const TextSpan(
                           text: ' Modelx-FYP203',
                           style: TextStyle(
-                            color: Colors.brown,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                              color: AppColorCode.primaryNeutralColor_800,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'Poppins'),
                         ),
                       ],
                     ),
@@ -114,47 +113,58 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(
-                    height: 16,
+                    height: 32,
                   ),
                   Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.blue[900]!,width: 2),
+                        border: Border.all(
+                            color: AppColorCode.primaryColor_500, width: 4),
                       ),
                       child: const Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Baby Presence'),
+                          Text(
+                            'Baby Presence',
+                            style: TextStyle(
+                              color: AppColorCode.primaryColor_800,
+                              fontFamily: 'Poppins',
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           Text(
                             'PRESENT',
                             style: TextStyle(
-                              color: Color(0xFF38B6FF),
+                              color: AppColorCode.secondaryColor_500,
+                              fontFamily: 'Poppins',
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
                       )),
-                  const SizedBox(
-                    height: 16,
-                  ),
                 ],
               ),
             ),
           ),
+          const SizedBox(
+            height: 15,
+          ),
           Expanded(
             child: GridView.count(
               crossAxisCount: 2,
+              childAspectRatio: 1.3,
               mainAxisSpacing: 0,
               crossAxisSpacing: 0,
               children: [
-                _buildCard('Temperature', '95°F', Icons.thermostat),
-                _buildCard('Weight', '2 KG', Icons.monitor_weight),
-                _buildCard('Air Quality', '200 AQI', Icons.air),
-                _buildCard('Sound', '500 DB', Icons.music_note),
+                _buildCard('Temperature', '95°F', 'assets/icons_img/temp_Icon.png'),
+                _buildCard('Weight', '2 KG', 'assets/icons_img/weight_icon.png'),
+                _buildCard('Air Quality', '200 AQI','assets/icons_img/aqi_icon.png' ),
+                _buildCard('Sound', '500 DB','assets/icons_img/sound_icon.png' ),
               ],
             ),
           ),
@@ -164,48 +174,70 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-  Widget _buildCard(String title, String value, IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              blurRadius: 5,
-              spreadRadius: 2,
+Widget _buildCard(String title, String value, String path) {
+  return Padding(
+    padding: const EdgeInsets.all(16.0),
+    child: Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            blurRadius: 5,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: AppColorCode.primaryColor_500,
+              borderRadius: BorderRadius.all(
+                Radius.circular(14),
+              ),
             ),
-          ],
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Icon(icon, color: Colors.blue[900]),
-                SizedBox(width: 8),
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: Colors.blue[900],
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    path,
+                    width: 25,
+                    height: 23,
+                  ),// Icon(icon, color: AppColorCode.White_shade),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: AppColorCode.White_shade,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-              ],
+                  SizedBox(width: 8),
+                ],
+              ),
             ),
-            Text(
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Center(
+            child: Text(
               value,
               style: TextStyle(
-                color: Colors.blue[900],
-                fontSize: 20,
+                color: AppColorCode.primaryColor_500,
+                fontSize: 32,
                 fontWeight: FontWeight.bold,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}

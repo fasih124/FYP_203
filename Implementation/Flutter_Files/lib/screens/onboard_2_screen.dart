@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
@@ -47,7 +46,7 @@ class Onboard2Screen extends StatelessWidget {
           ),
           //  Text
           SizedBox(
-            width: 321 ,
+            width: 321,
             child: Center(
               child: Column(
                 children: [
@@ -57,9 +56,8 @@ class Onboard2Screen extends StatelessWidget {
                       children: [
                         TextSpan(
                           text: "Peace of Mind at Your ",
-                          style: AppTextStyle.heading_1
-                              .copyWith(color: AppColorCode.primaryColor_500,
-                              height: .8),
+                          style: AppTextStyle.heading_1.copyWith(
+                              color: AppColorCode.primaryColor_500, height: .8),
                         ),
                         TextSpan(
                           text: "Fingertips ",
@@ -75,7 +73,8 @@ class Onboard2Screen extends StatelessWidget {
                   Text(
                     textAlign: TextAlign.center,
                     "Easily monitor your baby’s comfort and safety and Stay updated right from your phone.",
-                    style: AppTextStyle.sub_heading_1.copyWith(color: AppColorCode.primaryNeutralColor_600),
+                    style: AppTextStyle.sub_heading_1
+                        .copyWith(color: AppColorCode.primaryNeutralColor_600),
                   ),
                 ],
               ),
@@ -84,25 +83,37 @@ class Onboard2Screen extends StatelessWidget {
           //  Button
           ElevatedButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Onboard3Screen(),
-                ),
-              );
+              Navigator.of(context).push(_createRoute());
             },
             style: ElevatedButton.styleFrom(
                 backgroundColor: AppColorCode.secondaryColor_500,
                 foregroundColor: AppColorCode.White_shade,
-                padding: EdgeInsets.symmetric(vertical: 18,horizontal:120 ),
+                padding: EdgeInsets.symmetric(vertical: 18, horizontal: 120),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)
-                )
-            ),
+                    borderRadius: BorderRadius.circular(12))),
             child: const Text("Next"),
           )
         ],
       ),
     );
   }
+}
+
+Route _createRoute() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => Onboard3Screen(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(1.0, 0.0); // Start from right side
+      const end = Offset.zero; // End at original position
+      const curve = Curves.easeInOut; // Smooth transition
+
+      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      var offsetAnimation = animation.drive(tween);
+
+      return SlideTransition(
+        position: offsetAnimation,
+        child: child,
+      );
+    },
+  );
 }

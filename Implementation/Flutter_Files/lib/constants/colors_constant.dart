@@ -13,8 +13,10 @@ class AppColorCode{
   static const Color primaryColor_400 = Color(0xFF3C699C);
   static const Color primaryColor_500 = Color(0xFF2E5077);
   static const Color primaryColor_600 = Color(0xFF284668);
+  static const Color primaryColor_800 = Color(0xFF111E2D);
   //blue-neutral
   static const Color primaryNeutralColor_600 = Color(0xFF687394);
+  static const Color primaryNeutralColor_800 = Color(0xFF726344);
   //secondary
   static const Color secondaryColor_500 = Color(0xFF4DA1A9);
   static const Color secondaryColor_600 = Color(0xFF438D94);

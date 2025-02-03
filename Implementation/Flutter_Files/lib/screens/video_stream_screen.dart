@@ -48,13 +48,8 @@ class _VideoStreamScreenState extends State<VideoStreamScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.settings_outlined,
-                          color: AppColorCode.White_shade,
-                          size: 32,
-                        ),
-                        onPressed: () {
+                      InkWell(
+                        onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -62,6 +57,11 @@ class _VideoStreamScreenState extends State<VideoStreamScreen> {
                             ),
                           );
                         },
+                        child: Image.asset(
+                          'assets/icons_img/gear_2_icon.png',
+                          width: 25,
+                          height: 23,
+                        ),
                       ),
                     ],
                   ),
@@ -74,7 +74,7 @@ class _VideoStreamScreenState extends State<VideoStreamScreen> {
                   const SizedBox(
                     height: 6,
                   ),
-                  Text(
+                  const Text(
                     'Cradle : Modelx-FYP203',
                     style: TextStyle(
                       color: AppColorCode.White_shade,
@@ -89,11 +89,46 @@ class _VideoStreamScreenState extends State<VideoStreamScreen> {
               ),
             ),
           ),
-          Container(
-            child: Expanded(child: Text('data'),
-            ),
+          const SizedBox(
+            height: 150,
           ),
-          Container(),
+          Container(
+            width: 345,
+            height: 165,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              color: const Color(0xFF2F2E41),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x992F2E41), // Shadow color with opacity
+                  spreadRadius: 4, // How much the shadow spreads
+                  blurRadius: 10, // How blurry the shadow is
+                  offset: Offset(0, 4), // Shadow position (x, y)
+                ),
+              ],
+            ),
+            child: Center(
+                child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(50),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x33FFFFFF), // Shadow color with opacity
+                          spreadRadius: 4, // How much the shadow spreads
+                          blurRadius: 10, // How blurry the shadow is
+                          offset: Offset(0, 0), // Shadow position (x, y)
+                        ),
+                      ],
+                    ),
+                    child: InkWell(
+                      onTap: () {},
+                      child: Image.asset(
+                        'assets/icons_img/play_button.png',
+                        width: 95,
+                        height: 89,
+                      ),
+                    ))),
+          ),
         ],
       ),
     );

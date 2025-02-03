@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
+import 'package:fyp_203/screens/bottom_navigation_screen.dart';
 
 import 'package:fyp_203/screens/home_screen.dart';
 import 'package:fyp_203/screens/notification_screen.dart';
@@ -28,7 +29,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: AppColorCode.neutralColor_500
       ),
       debugShowCheckedModeBanner: false,
-      home: const Onboard1Screen(), // SplashScreen(),
+      home: const BottomNavigationScreen()//Onboard1Screen(), // SplashScreen(),
     );
   }
 }

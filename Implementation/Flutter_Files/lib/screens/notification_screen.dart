@@ -47,13 +47,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.settings_outlined,
-                          color: AppColorCode.White_shade,
-                          size: 32,
-                        ),
-                        onPressed: () {
+                      InkWell(
+                        onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -61,6 +56,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
                             ),
                           );
                         },
+                        child: Image.asset(
+                          'assets/icons_img/gear_2_icon.png',
+                          width: 25,
+                          height: 23,
+                        ),
                       ),
                     ],
                   ),
