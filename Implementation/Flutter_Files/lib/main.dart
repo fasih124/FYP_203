@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: AppColorCode.neutralColor_500
       ),
       debugShowCheckedModeBanner: false,
-       home: const BottomNavigationScreen(),//SplashScreen(),//Onboard1Screen(), // ,
+       home: const SplashScreen(),//Onboard1Screen(), // ,
     );
   }
 }
