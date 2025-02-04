@@ -32,50 +32,52 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
 
   
   Widget build(BuildContext context) {
-    return  Scaffold(
-      body: _screens[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        backgroundColor: AppColorCode.primaryColor_500,
-        selectedItemColor: AppColorCode.White_shade,
-        unselectedItemColor: Colors.grey,
-        items: [
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.home_filled),
-            label: 'Home',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.play_circle_outline_rounded),
-            label: 'Video',
-          ),
-          BottomNavigationBarItem(
-            icon: Stack(
-              children: [
-                const Icon(Icons.notifications_none),
-                Positioned(
-                  right: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Text(
-                      '3',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
+    return  SafeArea(
+      child: Scaffold(
+        body: _screens[_selectedIndex],
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          backgroundColor: AppColorCode.primaryColor_500,
+          selectedItemColor: AppColorCode.White_shade,
+          unselectedItemColor: Colors.grey,
+          items: [
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.home_filled),
+              label: 'Home',
+            ),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.play_circle_outline_rounded),
+              label: 'Video',
+            ),
+            BottomNavigationBarItem(
+              icon: Stack(
+                children: [
+                  const Icon(Icons.notifications_none),
+                  Positioned(
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Text(
+                        '3',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
+              label: 'Notification',
             ),
-            label: 'Notification',
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -100,7 +100,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       const SizedBox(height: 16), //Password
                       CustomerTextFeild(
-                        textlabel: 'Conform Password',
+                        textlabel: 'Confirm Password',
                         texteditingcontroller: confirmPasswordController,
                         isobsure: true,
                         iconData: Icons.visibility_off_outlined,

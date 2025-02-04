@@ -73,7 +73,7 @@ class Onboard3Screen extends StatelessWidget {
                   Text(
                     textAlign: TextAlign.center,
                     "Keep track of your baby’s well-being effortlessly. get updates and alerts instantly through your app.",
-                    style: AppTextStyle.sub_heading_1.copyWith(color: AppColorCode.primaryNeutralColor_600),
+                    style: AppTextStyle.sub_heading_1.copyWith(color: AppColorCode.neutralTextColor),
                   ),
                 ],
               ),

@@ -74,7 +74,7 @@ class Onboard2Screen extends StatelessWidget {
                     textAlign: TextAlign.center,
                     "Easily monitor your baby’s comfort and safety and Stay updated right from your phone.",
                     style: AppTextStyle.sub_heading_1
-                        .copyWith(color: AppColorCode.primaryNeutralColor_600),
+                        .copyWith(color: AppColorCode.neutralTextColor),
                   ),
                 ],
               ),

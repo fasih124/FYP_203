@@ -157,7 +157,7 @@ class HomeScreen extends StatelessWidget {
           Expanded(
             child: GridView.count(
               crossAxisCount: 2,
-              childAspectRatio: 1.3,
+              // childAspectRatio: 1.3,
               mainAxisSpacing: 0,
               crossAxisSpacing: 0,
               children: [
@@ -190,6 +190,7 @@ Widget _buildCard(String title, String value, String path) {
         ],
       ),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
             decoration: BoxDecoration(
@@ -223,9 +224,6 @@ Widget _buildCard(String title, String value, String path) {
               ),
             ),
           ),
-          SizedBox(
-            height: 20,
-          ),
           Center(
             child: Text(
               value,
@@ -235,6 +233,9 @@ Widget _buildCard(String title, String value, String path) {
                 fontWeight: FontWeight.bold,
               ),
             ),
+          ),
+          SizedBox(
+            height: 2,
           ),
         ],
       ),

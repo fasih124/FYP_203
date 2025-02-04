@@ -74,7 +74,7 @@ class Onboard1Screen extends StatelessWidget {
                     textAlign: TextAlign.center,
                     "Innovative features and environment monitoring make parenting easier and stress-free.",
                     style: AppTextStyle.sub_heading_1
-                        .copyWith(color: AppColorCode.primaryNeutralColor_600),
+                        .copyWith(color: AppColorCode.neutralTextColor),
                   ),
                 ],
               ),
