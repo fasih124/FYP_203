@@ -67,22 +67,34 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             .copyWith(color: AppColorCode.primaryColor_600),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
-                        'Please fill the details and create account',
-                        style: AppTextStyle.sub_heading_1,
+                      SizedBox(
+
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            textAlign: TextAlign.center,
+                              'Please fill the details and create account',
+                            style: AppTextStyle.sub_heading_1,
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 32),
-//user name
                       CustomerTextFeild(
                         textlabel: 'Email',
                         texteditingcontroller: emailController,
                         isobsure: false,
                       ),
                       const SizedBox(height: 16),
-//Email
                       CustomerTextFeild(
                         textlabel: 'Password',
                         texteditingcontroller: passwordController,
+                        isobsure: true,
+                        iconData: Icons.visibility_off_outlined,
+                      ),
+                      const SizedBox(height: 16), //Password
+                      CustomerTextFeild(
+                        textlabel: 'Confirm Password',
+                        texteditingcontroller: confirmPasswordController,
                         isobsure: true,
                         iconData: Icons.visibility_off_outlined,
                       ),
@@ -98,14 +110,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16), //Password
-                      CustomerTextFeild(
-                        textlabel: 'Confirm Password',
-                        texteditingcontroller: confirmPasswordController,
-                        isobsure: true,
-                        iconData: Icons.visibility_off_outlined,
-                      ),
-
                       const SizedBox(height: 32),
                       SizedBox(
                         width: double.infinity,
@@ -119,8 +123,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             );
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                AppColorCode.secondaryColor_500, // Button color
+                            backgroundColor: AppColorCode.secondaryColor_500, // Button color
                             padding: const EdgeInsets.symmetric(vertical: 22),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),

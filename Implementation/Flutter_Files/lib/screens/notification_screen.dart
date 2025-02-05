@@ -18,6 +18,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
       body: Column(
         children: [
           Container(
+            padding: const EdgeInsets.only(top: 16.0),
             decoration: const BoxDecoration(
               color: AppColorCode.primaryColor_500,
               borderRadius: BorderRadius.only(
@@ -112,7 +113,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                               style: OutlinedButton.styleFrom(
                                 foregroundColor:
                                     AppColorCode.primaryNeutralColor_800,
-                                padding: const EdgeInsets.all(16),
+                                padding: const EdgeInsets.symmetric(vertical: 6,horizontal: 18),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),

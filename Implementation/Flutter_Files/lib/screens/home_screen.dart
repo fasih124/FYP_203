@@ -13,6 +13,7 @@ class HomeScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
+            padding: const EdgeInsets.only(top: 16.0),
             decoration: const BoxDecoration(
               color: AppColorCode.neutralColor_500,
               borderRadius: BorderRadius.only(

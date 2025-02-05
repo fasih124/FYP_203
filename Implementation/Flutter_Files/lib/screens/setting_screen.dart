@@ -12,9 +12,10 @@ class SettingScreen extends StatefulWidget {
 class _SettingScreenState extends State<SettingScreen> {
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Column(
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.only(top: 15.0),
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
@@ -122,34 +123,38 @@ class _SettingScreenState extends State<SettingScreen> {
                 ),
               ),
             ),
-            OutlinedButton(
-              style: ElevatedButton.styleFrom(
-                foregroundColor: AppColorCode.warningColor_500,
-                padding: EdgeInsets.symmetric(vertical: 18, horizontal: 200),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                    12,
+            Container(
+              margin: EdgeInsets.all(24),
+              width: double.infinity,
+              child: OutlinedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (builder) => const SignInScreen(),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: AppColorCode.warningColor_500,
+                   padding: EdgeInsets.symmetric(vertical: 16,),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                      12,
+                    ),
                   ),
+                  side: const BorderSide(
+                      color: AppColorCode.warningColor_500, width: 2),
                 ),
-                side: const BorderSide(
-                    color: AppColorCode.warningColor_500, width: 2),
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (builder) => const SignInScreen(),
+                child: const Text(
+                  'Logout',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'Poppins',
+                    fontSize: 20,
+                    decoration: TextDecoration.underline,
+                    decorationColor: AppColorCode.warningColor_500,
                   ),
-                );
-              },
-              child: const Text(
-                'Logout',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'Poppins',
-                  fontSize: 20,
-                  decoration: TextDecoration.underline,
-                  decorationColor: AppColorCode.warningColor_500,
                 ),
               ),
             ),
