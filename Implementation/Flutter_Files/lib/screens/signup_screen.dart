@@ -97,24 +97,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ),
                       const SizedBox(height: 32),
-                      CustomerTextFeild(
+                      CustomerTextField(
                         textlabel: 'Email',
                         texteditingcontroller: emailController,
-                        isobsure: false,
+                        isPassword: false,
                       ),
                       const SizedBox(height: 16),
-                      CustomerTextFeild(
+                      CustomerTextField(
                         textlabel: 'Password',
                         texteditingcontroller: passwordController,
-                        isobsure: true,
-                        iconData: Icons.visibility_off_outlined,
+                          isPassword:true
                       ),
                       const SizedBox(height: 16), //Password
-                      CustomerTextFeild(
+                      CustomerTextField(
                         textlabel: 'Confirm Password',
                         texteditingcontroller: confirmPasswordController,
-                        isobsure: true,
-                        iconData: Icons.visibility_off_outlined,
+                          isPassword:true
                       ),
                       const SizedBox(height: 12),
                       Align(
