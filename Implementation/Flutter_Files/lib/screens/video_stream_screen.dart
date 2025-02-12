@@ -17,6 +17,7 @@ class _VideoStreamScreenState extends State<VideoStreamScreen> {
       body: Column(
         children: [
           Container(
+            padding: const EdgeInsets.only(top: 16.0),
             decoration: const BoxDecoration(
               color: AppColorCode.primaryColor_500,
               borderRadius: BorderRadius.only(

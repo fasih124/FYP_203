@@ -80,19 +80,23 @@ class Onboard3Screen extends StatelessWidget {
             ),
           ),
           //  Button
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).push(_createRoute());
-            },
-            style: ElevatedButton.styleFrom(
-                backgroundColor: AppColorCode.secondaryColor_500,
-                foregroundColor: AppColorCode.White_shade,
-                padding: EdgeInsets.symmetric(vertical: 18,horizontal:120 ),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)
-                )
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 12),
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).push(_createRoute());
+              },
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColorCode.secondaryColor_500,
+                  foregroundColor: AppColorCode.White_shade,
+                  padding: EdgeInsets.symmetric(vertical: 18,horizontal:120 ),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)
+                  )
+              ),
+              child: const Text("Next"),
             ),
-            child: const Text("Next"),
           )
         ],
       ),

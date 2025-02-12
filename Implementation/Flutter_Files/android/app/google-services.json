@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "971953118995",
+    "project_id": "fpy-203",
+    "storage_bucket": "fpy-203.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:971953118995:android:b4bb3674d8ca9ed79684e6",
+        "android_client_info": {
+          "package_name": "com.example.fyp_203"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDgpAMZvSibox-INAbPeTfOlroY-LTs9eE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
 import 'package:fyp_203/constants/text_constant.dart';
 import 'package:fyp_203/screens/signin_screen.dart';
+import 'package:fyp_203/services/firebase_auth.dart';
 
 import '../Component/text_feild_component.dart';
 
@@ -18,6 +20,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
+
+  bool registerUser(){
+
+    print(emailController.text);
+    print(passwordController.text);
+    print(confirmPasswordController.text);
+    if ((passwordController.text == confirmPasswordController.text) && (passwordController.text.length >= 6)) {
+      Future<User?> user = AuthService().signUp(emailController.text.trim(), passwordController.text.trim());
+      print(user);
+      print('User is register');
+      return true;
+    }else{
+      print('Password not match');
+      return false;
+    }
+
+}
 
   @override
   void dispose() {
@@ -67,24 +86,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             .copyWith(color: AppColorCode.primaryColor_600),
                       ),
                       const SizedBox(height: 4),
-                      const Text(
-                        'Please fill the details and create account',
-                        style: AppTextStyle.sub_heading_1,
+                      SizedBox(
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            textAlign: TextAlign.center,
+                            'Please fill the details and create account',
+                            style: AppTextStyle.sub_heading_1,
+                          ),
+                        ),
                       ),
                       const SizedBox(height: 32),
-//user name
-                      CustomerTextFeild(
+                      CustomerTextField(
                         textlabel: 'Email',
                         texteditingcontroller: emailController,
-                        isobsure: false,
+                        isPassword: false,
                       ),
                       const SizedBox(height: 16),
-//Email
-                      CustomerTextFeild(
+                      CustomerTextField(
                         textlabel: 'Password',
                         texteditingcontroller: passwordController,
-                        isobsure: true,
-                        iconData: Icons.visibility_off_outlined,
+                          isPassword:true
+                      ),
+                      const SizedBox(height: 16), //Password
+                      CustomerTextField(
+                        textlabel: 'Confirm Password',
+                        texteditingcontroller: confirmPasswordController,
+                          isPassword:true
                       ),
                       const SizedBox(height: 12),
                       Align(
@@ -98,25 +126,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16), //Password
-                      CustomerTextFeild(
-                        textlabel: 'Confirm Password',
-                        texteditingcontroller: confirmPasswordController,
-                        isobsure: true,
-                        iconData: Icons.visibility_off_outlined,
-                      ),
-
                       const SizedBox(height: 32),
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
+                            registerUser()?
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (builder) => const SignInScreen(),
                               ),
-                            );
+                            ):print("errot!!! occur");
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
