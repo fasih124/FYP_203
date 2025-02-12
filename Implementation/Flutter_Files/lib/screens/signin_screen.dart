@@ -157,11 +157,13 @@
 //   );
 // }
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
 import 'package:fyp_203/constants/text_constant.dart';
 import 'package:fyp_203/screens/bottom_navigation_screen.dart';
 import 'package:fyp_203/screens/signup_screen.dart';
+import 'package:fyp_203/services/firebase_auth.dart';
 
 import '../Component/text_feild_component.dart';
 
@@ -175,6 +177,23 @@ class SignInScreen extends StatefulWidget {
 class _SignInScreenState extends State<SignInScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+
+  bool loginUser(){
+
+    print(emailController.text);
+    print(passwordController.text);
+    if (passwordController.text.length >= 6) {
+      Future<User?> loginuser = AuthService().signIn(emailController.text.trim(), passwordController.text.trim());
+      print(loginuser);
+      print('User is login');
+      return true;
+    }else{
+      print('invalid email or password');
+      return false;
+    }
+
+  }
 
   @override
   void dispose() {
@@ -246,7 +265,8 @@ class _SignInScreenState extends State<SignInScreen> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          Navigator.of(context).push(_createRoute());
+                          loginUser()?
+                          Navigator.of(context).push(_createRoute()):print("errot!!! occur in signin");
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColorCode.secondaryColor_500,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
 import 'package:fyp_203/screens/signin_screen.dart';
+import 'package:fyp_203/services/firebase_auth.dart';
 
 class SettingScreen extends StatefulWidget {
   const SettingScreen({super.key});
@@ -127,8 +128,9 @@ class _SettingScreenState extends State<SettingScreen> {
               margin: EdgeInsets.all(24),
               width: double.infinity,
               child: OutlinedButton(
-                onPressed: () {
-                  Navigator.push(
+                onPressed: () async {
+                  await AuthService().signOut();
+                  Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (builder) => const SignInScreen(),

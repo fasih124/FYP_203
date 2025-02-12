@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
 import 'package:fyp_203/constants/text_constant.dart';
 import 'package:fyp_203/screens/signin_screen.dart';
+import 'package:fyp_203/services/firebase_auth.dart';
 
 import '../Component/text_feild_component.dart';
 
@@ -18,6 +20,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
+
+  bool registerUser(){
+
+    print(emailController.text);
+    print(passwordController.text);
+    print(confirmPasswordController.text);
+    if ((passwordController.text == confirmPasswordController.text) && (passwordController.text.length >= 6)) {
+      Future<User?> user = AuthService().signUp(emailController.text.trim(), passwordController.text.trim());
+      print(user);
+      print('User is register');
+      return true;
+    }else{
+      print('Password not match');
+      return false;
+    }
+
+}
 
   @override
   void dispose() {
@@ -68,12 +87,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       const SizedBox(height: 4),
                       SizedBox(
-
                         child: Align(
                           alignment: Alignment.center,
                           child: Text(
                             textAlign: TextAlign.center,
-                              'Please fill the details and create account',
+                            'Please fill the details and create account',
                             style: AppTextStyle.sub_heading_1,
                           ),
                         ),
@@ -115,15 +133,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
+                            registerUser()?
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (builder) => const SignInScreen(),
                               ),
-                            );
+                            ):print("errot!!! occur");
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColorCode.secondaryColor_500, // Button color
+                            backgroundColor:
+                                AppColorCode.secondaryColor_500, // Button color
                             padding: const EdgeInsets.symmetric(vertical: 22),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),

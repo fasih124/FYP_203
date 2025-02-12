@@ -20,3 +20,46 @@ rad.json
 *.flf
 #Test results file
 TestResults.xml
+# Ignore Firebase Config
+firebase.json
+lib/firebase_options.dart
+
+# Ignore node_modules
+node_modules/
+package-lock.json
+
+# Flutter Specific Ignored Files
+build/
+.melos/
+.pub-cache/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter-versions
+.metadata
+
+# Android Specific Ignored Files
+android/.gradle/
+android/app/build/
+android/app/.cxx/
+android/app/google-services.json
+
+# iOS Specific Ignored Files
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+
+# macOS Specific Ignored Files
+macos/Flutter/ephemeral/
+macos/Pods/
+
+# VS Code & JetBrains Ignore
+.vscode/
+.idea/
+
+# Ignore logs and temp files
+*.log
+*.temp
+lib/firebase_options.dart
+firebase_options.dart
