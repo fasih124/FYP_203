@@ -1,28 +1,52 @@
 #include <Arduino.h>
+#define MQ135_AnalogPin 4 //ADC Pin
 
-#define MQ135_Pin 4 //ADC Pin
 
-void setup()
+
+//Function to init sensor (pinmode)
+void init_AQI_sensor()
 {
-  Serial.begin(115200);
+   pinMode(MQ135_AnalogPin, INPUT);
 }
 
-void loop ()
+//Function to return raw voltage
+int read_AQI_Voltage()
 {
-  int rawVoltage = analogRead(MQ135_Pin);
-  
-  Serial.print("Voltage value: "); Serial.print(rawVoltage); Serial.print("\t");
-  
-  // The values need calibration in real-time environment
-  
-  if (rawVoltage < 200) Serial.println("Air Quality: Excellent");
-  else if (rawVoltage < 400) Serial.println("Air Quality: Good");
-  else if (rawVoltage < 600) Serial.println("Air Quality: Moderate");
-  else if (rawVoltage < 800) Serial.println("Air Quality: Poor");
-  else Serial.println("Air Quality: Hazardous");
-
-  delay(2000);
+  int aqiValue = analogRead(MQ135_AnalogPin);
+  return aqiValue;
 }
+
+//Function that gets that raw voltage and returns String based on raw value
+String AQI_grade()
+{
+  int aqiResolution = read_AQI_Voltage();
+
+  if (aqiResolution < 200) return "Excellent";
+  else if (aqiResolution < 400) return "Good";
+  else if (aqiResolution < 600) return "Moderate";
+  else if (aqiResolution < 800) return "Poor";
+  else 
+    return "Hazardous";
+
+}
+
+
+// void loop ()
+// {
+//   int rawVoltage = analogRead(MQ135_AnalogPin);
+  
+//   Serial.print("Voltage value: "); Serial.print(rawVoltage); Serial.print("\t");
+  
+//   // The values need calibration in real-time environment
+  
+//   if (rawVoltage < 200) Serial.println("Air Quality: Excellent");
+//   else if (rawVoltage < 400) Serial.println("Air Quality: Good");
+//   else if (rawVoltage < 600) Serial.println("Air Quality: Moderate");
+//   else if (rawVoltage < 800) Serial.println("Air Quality: Poor");
+//   else Serial.println("Air Quality: Hazardous");
+
+//   delay(2000);
+// }
 
 #pragma region  
 /*

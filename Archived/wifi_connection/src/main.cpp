@@ -1,8 +1,8 @@
 #include <Arduino.h>
 #include <WiFi.h>
 
-String ssid = "HUAWEI-7hqx";
-String password = "wifi.access(192.168)";
+String ssid = "";
+String password = "";
 
 
 void setup()
