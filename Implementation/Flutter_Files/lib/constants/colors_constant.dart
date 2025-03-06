@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class AppColorCode{
   // shade
   static const Color White_shade = Color(0xFFFFFFFF);
+  static const Color Black_shade = Color(0xFF333333);
  //neutral
   static const Color neutralColor_50 = Color(0xFFFEFEFE);
   static const Color neutralColor_300 = Color(0xFFF9F8F5);
@@ -24,4 +25,7 @@ class AppColorCode{
   static const Color secondaryColor_600 = Color(0xFF438D94);
   static const Color secondaryColor_700 = Color(0xFF30656A);
   static const Color warningColor_500 = Color(0xFF871818);
+
+  static const Color play_500 = Color(0xFFE4FCDC);
+  static const Color stop_500 = Color(0xFFFCDDDC);
 }
