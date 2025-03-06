@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
+import 'package:fyp_203/screens/about-us-screen.dart';
+import 'package:fyp_203/screens/connect_cradle_screen.dart';
+import 'package:fyp_203/screens/option_screen.dart';
 import 'package:fyp_203/screens/signin_screen.dart';
 import 'package:fyp_203/services/firebase_auth.dart';
 
@@ -83,13 +86,18 @@ class _SettingScreenState extends State<SettingScreen> {
                       thickness: 1,
                     ),
                     ListTile(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                              return const OptionScreen();
+                            }));
+                      },
                       leading: Image.asset(
                         'assets/icons_img/small_gear_icon.png',
                         width: 25,
                         height: 23,
                       ),
-                      title: Text('Notification'),
+                      title: Text('Options'),
                       trailing: Icon(Icons.arrow_forward_ios_rounded),
                     ),
                     Divider(
@@ -97,7 +105,12 @@ class _SettingScreenState extends State<SettingScreen> {
                       thickness: 1,
                     ),
                     ListTile(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                              return const ConnectCradleScreen();
+                            }));
+                      },
                       leading: Image.asset(
                         'assets/icons_img/connect_icon.png',
                         width: 25,
@@ -111,7 +124,12 @@ class _SettingScreenState extends State<SettingScreen> {
                       thickness: 1,
                     ),
                     ListTile(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                          return const AboutUsScreen();
+                        }));
+                      },
                       leading: Image.asset(
                         'assets/icons_img/about_icon.png',
                         width: 25,
@@ -139,7 +157,9 @@ class _SettingScreenState extends State<SettingScreen> {
                 },
                 style: ElevatedButton.styleFrom(
                   foregroundColor: AppColorCode.warningColor_500,
-                   padding: EdgeInsets.symmetric(vertical: 16,),
+                  padding: EdgeInsets.symmetric(
+                    vertical: 16,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(
                       12,

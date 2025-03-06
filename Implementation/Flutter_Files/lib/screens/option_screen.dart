@@ -12,10 +12,10 @@ class OptionScreen extends StatefulWidget {
 
 class _OptionScreenState extends State<OptionScreen> {
    bool isPlaying = false;
-  bool getTemp = false;
-  bool getWeight = false;
-  bool getSound = false;
-  bool getAQI = false;
+  bool getTemp = true;
+  bool getWeight = true;
+  bool getSound = true;
+  bool getAQI = true;
 
   @override
   Widget build(BuildContext context) {

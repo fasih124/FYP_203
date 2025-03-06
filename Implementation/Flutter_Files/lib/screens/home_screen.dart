@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
+import 'package:fyp_203/screens/connect_cradle_screen.dart';
 import 'package:fyp_203/screens/setting_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -72,7 +72,7 @@ class HomeScreen extends StatelessWidget {
                     height: 16,
                   ),
                   RichText(
-                    text: TextSpan(
+                    text: const TextSpan(
                       children: [
                         TextSpan(
                           text: 'Cradle :',
@@ -82,7 +82,7 @@ class HomeScreen extends StatelessWidget {
                               fontWeight: FontWeight.w700,
                               fontFamily: 'Poppins'),
                         ),
-                        const TextSpan(
+                        TextSpan(
                           text: ' Modelx-FYP203',
                           style: TextStyle(
                               color: AppColorCode.primaryNeutralColor_800,
@@ -98,7 +98,10 @@ class HomeScreen extends StatelessWidget {
                   ),
                   ElevatedButton.icon(
                     onPressed: () {
-                      // Connected button action
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                            return const ConnectCradleScreen();
+                          }));
                     },
                     icon: const Icon(Icons.arrow_forward,
                         color: Colors.white, size: 18),
@@ -194,7 +197,7 @@ Widget _buildCard(String title, String value, String path) {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColorCode.primaryColor_500,
               borderRadius: BorderRadius.all(
                 Radius.circular(14),
@@ -214,13 +217,13 @@ Widget _buildCard(String title, String value, String path) {
                   ),// Icon(icon, color: AppColorCode.White_shade),
                   Text(
                     title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: AppColorCode.White_shade,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                 ],
               ),
             ),
@@ -228,14 +231,14 @@ Widget _buildCard(String title, String value, String path) {
           Center(
             child: Text(
               value,
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppColorCode.primaryColor_500,
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 2,
           ),
         ],
