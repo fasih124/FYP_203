@@ -7,6 +7,7 @@ import 'package:fyp_203/screens/bottom_navigation_screen.dart';
 
 import 'package:fyp_203/screens/home_screen.dart';
 import 'package:fyp_203/screens/notification_screen.dart';
+import 'package:fyp_203/screens/option_screen.dart';
 import 'package:fyp_203/screens/signin_screen.dart';
 import 'package:fyp_203/screens/splash_screen.dart';
 import 'package:fyp_203/screens/video_stream_screen.dart';
@@ -55,9 +56,9 @@ class AuthChecker extends StatelessWidget {
           return Center(child: CircularProgressIndicator()); // Show loading
         }
         if (snapshot.hasData) {
-          return const BottomNavigationScreen(); // User is logged in
+         return const OptionScreen();// return const BottomNavigationScreen(); // User is logged in
         } else {
-          return const SplashScreen(); // User is not logged in
+          return const OptionScreen();//return const SplashScreen(); // User is not logged in
         }
       },
     );
