@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
 import 'package:fyp_203/firebase_options.dart';
+import 'package:fyp_203/screens/about-us-screen.dart';
 import 'package:fyp_203/screens/bottom_navigation_screen.dart';
 import 'package:fyp_203/screens/connect_cradle_screen.dart';
 
@@ -28,7 +29,6 @@ void main() async {
   runApp(const MyApp());
 }
 
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -37,35 +37,32 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(useMaterial3: true,fontFamily:'Poppins',).copyWith(
-        scaffoldBackgroundColor: AppColorCode.neutralColor_500
-      ),
+      theme: ThemeData(
+        useMaterial3: true,
+        fontFamily: 'Poppins',
+      ).copyWith(scaffoldBackgroundColor: AppColorCode.neutralColor_500),
       debugShowCheckedModeBanner: false,
-       home:AuthChecker(),
+      home: AuthChecker(),
     );
   }
 }
-
 
 class AuthChecker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(), // Listen to auth changes
+      stream:
+          FirebaseAuth.instance.authStateChanges(), // Listen to auth changes
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator()); // Show loading
         }
         if (snapshot.hasData) {
-         return const ConnectCradleScreen();// return const BottomNavigationScreen(); // User is logged in
+          return const BottomNavigationScreen(); // User is logged in
         } else {
-          return const ConnectCradleScreen();//return const SplashScreen(); // User is not logged in
+          return const SplashScreen(); // User is not logged in
         }
       },
     );
   }
 }
-
-
-
-
