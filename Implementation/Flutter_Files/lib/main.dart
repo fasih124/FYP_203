@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
 import 'package:fyp_203/firebase_options.dart';
 import 'package:fyp_203/screens/bottom_navigation_screen.dart';
+import 'package:fyp_203/screens/connect_cradle_screen.dart';
 
 import 'package:fyp_203/screens/home_screen.dart';
 import 'package:fyp_203/screens/notification_screen.dart';
@@ -56,9 +57,9 @@ class AuthChecker extends StatelessWidget {
           return Center(child: CircularProgressIndicator()); // Show loading
         }
         if (snapshot.hasData) {
-         return const OptionScreen();// return const BottomNavigationScreen(); // User is logged in
+         return const ConnectCradleScreen();// return const BottomNavigationScreen(); // User is logged in
         } else {
-          return const OptionScreen();//return const SplashScreen(); // User is not logged in
+          return const ConnectCradleScreen();//return const SplashScreen(); // User is not logged in
         }
       },
     );

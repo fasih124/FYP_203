@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fyp_203/Component/text_feild_component.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
 import 'package:fyp_203/screens/signin_screen.dart';
 import 'package:fyp_203/services/firebase_auth.dart';
@@ -11,7 +12,13 @@ class ConnectCradleScreen extends StatefulWidget {
 }
 
 class _ConnectCradleScreenState extends State<ConnectCradleScreen> {
-  bool isPlaying = false;
+  final TextEditingController connectController = TextEditingController();
+
+  @override
+  void dispose() {
+    connectController.dispose();
+    super.dispose();
+  }
 
 
   @override
@@ -37,7 +44,7 @@ class _ConnectCradleScreenState extends State<ConnectCradleScreen> {
                     ),
                   ),
                   Text(
-                    'Options'.toUpperCase(),
+                    ' Cradle'.toUpperCase(),
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w700,
@@ -56,6 +63,8 @@ class _ConnectCradleScreenState extends State<ConnectCradleScreen> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(14),
                 color: AppColorCode.neutralColor_50,
+                border:  const Border.fromBorderSide(   BorderSide(
+                    color: AppColorCode.Black_shade, width: 2 ),),
                 boxShadow: const [
                   BoxShadow(
                     color: Color(0x332F2E41), // Shadow color with opacity
@@ -67,105 +76,14 @@ class _ConnectCradleScreenState extends State<ConnectCradleScreen> {
               ),
               margin: EdgeInsets.all(24),
               child: Padding(
-                padding: EdgeInsets.all(18.0),
+                padding: EdgeInsets.all(0.0),
                 child: Column(
                   children:
                   [
-                    ListTile(
-                      onTap: () {},
-                      leading: Image.asset(
-                        'assets/icons_img/temp_Icon.png',
-                        width: 25,
-                        height: 23,
-                        color: AppColorCode.Black_shade,
-                      ),
-                      title: Text('Temperature'),
-                      trailing:   Switch(
-                          value: getTemp,
-                          activeColor: AppColorCode.play_500,
-                          activeTrackColor:  Colors.grey.shade400,
-                          inactiveThumbColor: AppColorCode.stop_500,
-                          inactiveTrackColor:  Colors.grey.shade400,
-                          onChanged: (value) {
-                            setState(() {
-                              getTemp = value;
-                            });
-                          }),
-                    ),
-                    Divider(
-                      color: Colors.grey.shade300, // Line color
-                      thickness: 1,
-                    ),
-                    ListTile(
-                      onTap: () {},
-                      leading: Image.asset(
-                        'assets/icons_img/weight_icon.png',
-                        width: 25,
-                        height: 23,
-                        color: AppColorCode.Black_shade,
-                      ),
-                      title: Text('Weight'),
-                      trailing:Switch(
-                          value: getWeight,
-                          activeColor: AppColorCode.play_500,
-                          activeTrackColor:  Colors.grey.shade400,
-                          inactiveThumbColor: AppColorCode.stop_500,
-                          inactiveTrackColor:  Colors.grey.shade400,
-                          onChanged: (value) {
-                            setState(() {
-                              getWeight = value;
-                            });
-                          }),
-                    ),
-                    Divider(
-                      color: Colors.grey.shade300, // Line color
-                      thickness: 1,
-                    ),
-                    ListTile(
-                      onTap: () {},
-                      leading: Image.asset(
-                        'assets/icons_img/sound_icon.png',
-                        width: 25,
-                        height: 23,
-                        color: AppColorCode.Black_shade,
-                      ),
-                      title: Text('Sound'),
-                      trailing:Switch(
-                          value: getSound,
-                          activeColor: AppColorCode.play_500,
-                          activeTrackColor:  Colors.grey.shade400,
-                          inactiveThumbColor: AppColorCode.stop_500,
-                          inactiveTrackColor:  Colors.grey.shade400,
-                          onChanged: (value) {
-                            setState(() {
-                              getSound = value;
-                            });
-                          }),
-                    ),
-                    Divider(
-                      color: Colors.grey.shade300, // Line color
-                      thickness: 1,
-                    ),
-                    ListTile(
-                      onTap: () {},
-                      leading: Image.asset(
-                        'assets/icons_img/aqi_icon.png',
-                        width: 25,
-                        height: 23,
-                        color: AppColorCode.Black_shade,
-                      ),
-                      title: Text('Air Quality'),
-                      trailing: Switch(
-                          value: getAQI,
-                          activeColor: AppColorCode.play_500,
-                          activeTrackColor:  Colors.grey.shade400,
-                          inactiveThumbColor: AppColorCode.stop_500,
-                          inactiveTrackColor:  Colors.grey.shade400,
-                          onChanged: (value) {
-                            setState(() {
-                              getAQI = value;
-                            });
-                          }),
+                    CustomerTextField(
+                      textlabel: 'Cradle ID',
+                      texteditingcontroller: connectController,
+                      isPassword: false,
                     ),
                   ],
                 ),
@@ -176,18 +94,9 @@ class _ConnectCradleScreenState extends State<ConnectCradleScreen> {
               width: double.infinity,
               child: OutlinedButton(
                 onPressed: () {
-                  setState(() {
-                    if(!isPlaying){
-                      isPlaying=true;
-                    }else{
-                      isPlaying=false;
-                    }
-
-                  });
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                  isPlaying ? AppColorCode.stop_500 : AppColorCode.play_500,
+                  backgroundColor:AppColorCode.secondaryColor_500,
                   foregroundColor: AppColorCode.warningColor_500,
                   padding: EdgeInsets.symmetric(
                     vertical: 16,
@@ -197,28 +106,16 @@ class _ConnectCradleScreenState extends State<ConnectCradleScreen> {
                       12,
                     ),
                   ),
-                  side: const BorderSide(
-                      color: AppColorCode.Black_shade, width: 2),
+
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'assets/icons_img/sound_icon.png',
-                      width: 25,
-                      height: 23,
-                      color: AppColorCode.Black_shade,
-                    ),
-                    const Text(
-                      'Play / Pause lullaby',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontFamily: 'Poppins',
-                        fontSize: 20,
-                        color: AppColorCode.Black_shade,
-                      ),
-                    ),
-                  ],
+                child: const Text(
+                  ' Connect to cradle',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'Poppins',
+                    fontSize: 20,
+                    color: AppColorCode.White_shade,
+                  ),
                 ),
               ),
             ),
