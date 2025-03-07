@@ -2,8 +2,12 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <Firebase_ESP_Client.h>
+
+//Sensor header files
 #include "AQISensor.h"  //AQI Sensor
 #include "MoistureSensor.h" //Moisture sensor
+#include "ProbeSensor.h"  //Probe temperature sensor
+
 
 //Provides the token generation process info
 #include "addons/TokenHelper.h"
@@ -23,13 +27,13 @@
 
 //Debugging LED pin definition
 byte dataPassedLEDPin = 21;  //Green blinks when data is passed to firebase
-byte delayForDataPassedLEDPin = 70;
+int delayForDataPassedLEDPin = 70;
 
 byte intervalWaitLEDPin = 47;  //Yelow blinks when ther is interval wait or intentional program pause
-byte delayForIntervalWaitLEDPin = 70;
+int delayForIntervalWaitLEDPin = 70;
 
 byte dangerBlockLEDPin = 48; //Red blinks when exception block executes representing error
-byte delayForDangerBlockLEDPin = 3000;
+int delayForDangerBlockLEDPin = 3000;
 
 //DB Object
 FirebaseData fbdo;
@@ -40,19 +44,19 @@ FirebaseConfig config;
 //Data sending in parallel execution using time functions
 unsigned long prevTimeAQISentData = 0;  // For AQI
 unsigned long prevTimeMoistureSentData = 0; // For Moisture
+unsigned long prevTimeProbeSentData = 0; //For Probe
 
 
 // Wait intervals for sensors in milliseconds
-byte aqiInterval = 1500; 
-byte moistureInterval = 1500;
+int aqiInterval = 2000; 
+int moistureInterval = 2000;
+int probeInterval = 2000;
 
 
 
 
 //Signup check
 bool signupOK = false;
-
-int count;  //dummy int type data beign pushed to DB
 
 
 void setup()
@@ -61,10 +65,14 @@ void setup()
     delay(100);
 
     pinMode(dataPassedLEDPin, OUTPUT); //DataPush LED Programming
-    
+    pinMode(intervalWaitLEDPin, OUTPUT); //Interval Wait LED Programming
+    pinMode(dangerBlockLEDPin, OUTPUT); //Danger block LED Programming
+
+
     //Sensors initialization
     init_AQI_sensor();
     init_Moisture_Sensor();
+    init_Probe_Sensor();
 
     
     //Wifi Connection
@@ -124,7 +132,7 @@ void setup()
     //Sign Up
     if (Firebase.signUp(&config, &auth, "", ""))   //Args empty for email & password
     {
-        Serial.println("ok");
+        Serial.println("Sign-up check: OK");
         signupOK = true;    //status flag set to OK
     }
     else
@@ -197,7 +205,6 @@ void loop()
     //AQI sensor block end
     
     //Moisture sensor execution block
-    
     #pragma region 
     if(Firebase.ready() && signupOK && (millis() - prevTimeMoistureSentData > moistureInterval || prevTimeMoistureSentData == 0))
     {
@@ -247,6 +254,65 @@ void loop()
     }
     #pragma endregion
     //Moisture sensor block end
+
+
+    //Probe sensor execution block
+    #pragma region 
+    if(Firebase.ready() && signupOK && (millis() - prevTimeProbeSentData > probeInterval || prevTimeProbeSentData == 0))
+    {
+      prevTimeProbeSentData = millis();
+
+      //float type fahrenheit temperature
+      if(Firebase.RTDB.setFloat(&fbdo, "sensors/ProbeTemp", temp_In_Fahrenheit()))
+      {
+        //Bug: Remove delay(), this function may cause program hault
+        //Data passed LED
+        digitalWrite(dataPassedLEDPin, HIGH);
+        delay(delayForDataPassedLEDPin);  //70 milisec
+        digitalWrite(dataPassedLEDPin, LOW);
+
+        Serial.println("Probe temperature pushed!");
+        Serial.print("Path: "); Serial.println(fbdo.dataPath());
+        Serial.print("Type: "); Serial.println(fbdo.dataType());
+        
+      
+      
+      }
+      else
+      {
+        Serial.println("Failed!");
+        Serial.print("Firebase Error: "); Serial.println(fbdo.errorReason());
+
+        //Bug: Remove delay(), this function may cause program hault
+        // Error LED
+        digitalWrite(dangerBlockLEDPin, HIGH);
+        delay(delayForDangerBlockLEDPin); //3 sec
+        digitalWrite(dataPassedLEDPin, LOW);
+
+
+      }
+
+
+    }
+    else
+    {
+
+      //Bug: Remove delay(), this function may cause program hault      
+      // Interval wait LED
+      digitalWrite(intervalWaitLEDPin, HIGH);
+      delay(delayForIntervalWaitLEDPin); //70 milisec
+      digitalWrite(intervalWaitLEDPin, LOW);
+
+      Serial.println("Interval wait!");
+      Serial.print("Firebase Error: ("); Serial.print(fbdo.errorReason()); Serial.println(")");
+      
+      
+
+    }
+    #pragma endregion
+    //Probe sensor block end
+
+
 
 
 }
