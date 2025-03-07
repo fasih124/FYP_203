@@ -3,6 +3,7 @@
 #include <WiFi.h>
 #include <Firebase_ESP_Client.h>
 #include "AQISensor.h"  //AQI Sensor
+#include "MoistureSensor.h" //Moisture sensor
 
 //Provides the token generation process info
 #include "addons/TokenHelper.h"
@@ -20,9 +21,15 @@
 //API key provided by firebase project
 #define API_KEY "AIzaSyAkcfm9OAStI2TGGAaKoO-6ZepYpOU6O9g"
 
-//LED pin definition
-byte dataPassedLEDPin = 6;
+//Debugging LED pin definition
+byte dataPassedLEDPin = 21;  //Green blinks when data is passed to firebase
+byte delayForDataPassedLEDPin = 70;
 
+byte intervalWaitLEDPin = 47;  //Yelow blinks when ther is interval wait or intentional program pause
+byte delayForIntervalWaitLEDPin = 70;
+
+byte dangerBlockLEDPin = 48; //Red blinks when exception block executes representing error
+byte delayForDangerBlockLEDPin = 3000;
 
 //DB Object
 FirebaseData fbdo;
@@ -30,8 +37,19 @@ FirebaseAuth auth;
 FirebaseConfig config;
 
 
-//Data sending in parallel using time functions
-unsigned long sendDataPrevMillis = 0;
+//Data sending in parallel execution using time functions
+unsigned long prevTimeAQISentData = 0;  // For AQI
+unsigned long prevTimeMoistureSentData = 0; // For Moisture
+
+
+// Wait intervals for sensors in milliseconds
+byte aqiInterval = 1500; 
+byte moistureInterval = 1500;
+
+
+
+
+//Signup check
 bool signupOK = false;
 
 int count;  //dummy int type data beign pushed to DB
@@ -43,7 +61,11 @@ void setup()
     delay(100);
 
     pinMode(dataPassedLEDPin, OUTPUT); //DataPush LED Programming
-    init_AQI_sensor();  //Initializes AQI Sensor pinMode
+    
+    //Sensors initialization
+    init_AQI_sensor();
+    init_Moisture_Sensor();
+
     
     //Wifi Connection
     WiFi.mode(WIFI_STA);  //station mode
@@ -123,15 +145,17 @@ void setup()
 
 void loop()
 {
-    
+  
+    //AQI sensor execution block
+    #pragma region 
     //check if firebase is ready, AND signup is ok, AND (time interval is 1.5sec OR prevMillis is still 0)
-    if(Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 1500 || sendDataPrevMillis == 0))
+    if(Firebase.ready() && signupOK && (millis() - prevTimeAQISentData > aqiInterval || prevTimeAQISentData == 0))
     {
         /*current time of execution of this block goes to PrevMillis, 
         keeps incrementing the threshold for next execution 
         (e.g.1500+1500 in two executions)*/
 
-        sendDataPrevMillis = millis();
+        prevTimeAQISentData = millis();
         
         //Writing int number (AQI sensor value here)
         if(Firebase.RTDB.setInt(&fbdo, "sensors/AQIVoltage", read_AQI_Voltage()))
@@ -148,7 +172,7 @@ void loop()
             Serial.print("Type: "); Serial.println(fbdo.dataType());
 
             digitalWrite(dataPassedLEDPin, HIGH);
-            delay(100);
+            delay(delayForDataPassedLEDPin);
             digitalWrite(dataPassedLEDPin, LOW);
             //delay(500);
 
@@ -160,9 +184,6 @@ void loop()
             Serial.print("Firebase Error: "); Serial.println(fbdo.errorReason());
         }
         
-        //count++;
-
-        //Writing string (AQI Quality)
     
     }
     else
@@ -172,8 +193,61 @@ void loop()
         
         delay(1500);  //Error notification delay
     }
-
+    #pragma endregion
+    //AQI sensor block end
     
+    //Moisture sensor execution block
+    
+    #pragma region 
+    if(Firebase.ready() && signupOK && (millis() - prevTimeMoistureSentData > moistureInterval || prevTimeMoistureSentData == 0))
+    {
+      prevTimeMoistureSentData=millis();  //update sent time
+      
+      //String type diaper condition
+      if(Firebase.RTDB.setString(&fbdo, "sensors/DiaperCondition", diaper_Condition()))
+      {
+        Serial.println("Diaper codition pushed!");
+        Serial.print("Path: "); Serial.println(fbdo.dataPath());
+        Serial.print("Type: "); Serial.println(fbdo.dataType());
+        
+        //Bug: Remove delay(), this function may cause program hault
+        //Data passed LED
+        digitalWrite(dataPassedLEDPin, HIGH);
+        delay(delayForDataPassedLEDPin);  //70 milisec
+        digitalWrite(dataPassedLEDPin, LOW);
+
+        
+      }
+      else
+      {
+        Serial.println("Failed!");
+        Serial.print("Firebase Error: "); Serial.println(fbdo.errorReason());
+
+        //Bug: Remove delay(), this function may cause program hault
+        // Error LED
+        digitalWrite(dangerBlockLEDPin, HIGH);
+        delay(delayForDangerBlockLEDPin); //3 sec
+        digitalWrite(dataPassedLEDPin, LOW);
+
+      }
+
+    }
+
+    else
+    {
+      Serial.println("Interval wait!");
+      Serial.print("Firebase Error: ("); Serial.print(fbdo.errorReason()); Serial.println(")");
+      
+      //Bug: Remove delay(), this function may cause program hault      
+      // Interval wait LED
+      digitalWrite(intervalWaitLEDPin, HIGH);
+      delay(delayForIntervalWaitLEDPin); //70 milisec
+      digitalWrite(intervalWaitLEDPin, LOW);
+    
+    }
+    #pragma endregion
+    //Moisture sensor block end
+
 
 }
 
