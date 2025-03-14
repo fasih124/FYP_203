@@ -8,7 +8,6 @@
 #include "MoistureSensor.h" //Moisture sensor
 #include "ProbeSensor.h"  //Probe temperature sensor
 
-
 //Provides the token generation process info
 #include "addons/TokenHelper.h"
 //Provides the RTDB payload printing info and other helper functions
@@ -26,13 +25,13 @@
 #define API_KEY "AIzaSyAkcfm9OAStI2TGGAaKoO-6ZepYpOU6O9g"
 
 //Debugging LED pin definition
-byte dataPassedLEDPin = 21;  //Green blinks when data is passed to firebase
+byte dataPassedLEDPin = 13;  //Green blinks when data is passed to firebase
 int delayForDataPassedLEDPin = 70;
 
-byte intervalWaitLEDPin = 47;  //Yelow blinks when ther is interval wait or intentional program pause
+byte intervalWaitLEDPin = 12;  //Yelow blinks when ther is interval wait or intentional program pause
 int delayForIntervalWaitLEDPin = 70;
 
-byte dangerBlockLEDPin = 48; //Red blinks when exception block executes representing error
+byte dangerBlockLEDPin = 11; //Red blinks when exception block executes representing error
 int delayForDangerBlockLEDPin = 3000;
 
 //DB Object
@@ -168,6 +167,12 @@ void loop()
         //Writing int number (AQI sensor value here)
         if(Firebase.RTDB.setInt(&fbdo, "sensors/AQIVoltage", read_AQI_Voltage()))
         {
+
+            //Data passed LED
+            digitalWrite(dataPassedLEDPin, HIGH);
+            delay(delayForDataPassedLEDPin);  //70 milisec
+            digitalWrite(dataPassedLEDPin, LOW);
+          
             Serial.println("AQI Voltage Pushed");
             Serial.print("Path: "); Serial.println(fbdo.dataPath());
             Serial.print("Type: "); Serial.println(fbdo.dataType());
@@ -190,6 +195,11 @@ void loop()
         {
             Serial.println("FAILED!");
             Serial.print("Firebase Error: "); Serial.println(fbdo.errorReason());
+
+            // Error LED
+            digitalWrite(dangerBlockLEDPin, HIGH);
+            delay(delayForDangerBlockLEDPin); //3 sec
+            digitalWrite(dataPassedLEDPin, LOW);
         }
         
     
@@ -199,6 +209,10 @@ void loop()
         Serial.println("Interval wait!"); 
         Serial.print("Firebase Error: ("); Serial.print(fbdo.errorReason()); Serial.println(")");
         
+        // Interval wait LED
+        digitalWrite(intervalWaitLEDPin, HIGH);
+        delay(delayForIntervalWaitLEDPin); //70 milisec
+        digitalWrite(intervalWaitLEDPin, LOW);
         delay(1500);  //Error notification delay
     }
     #pragma endregion
