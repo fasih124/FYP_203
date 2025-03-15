@@ -12,13 +12,14 @@ void init_Sensors()
 bool BabyDetectionFlag()
 {
     // if both sensors' flags return true, then baby is detected.
+
     if(IRDetectionFlag() /*&& WeightDetectionFlag()*/)
     {
         return true;
     }
     else
     {
-        false;
+        return false;
     }
 
 }

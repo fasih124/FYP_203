@@ -1,9 +1,10 @@
-//Send Data to Firebase
 #include <Arduino.h>
-#include <WiFi.h>
+//#include <WiFi.h>   //Made a separate module
 #include <Firebase_ESP_Client.h>
 
-//Sensor header files
+
+//Custom header files
+#include "WifiConnection.h" //COnnection for wifi
 #include "AQISensor.h"  //AQI Sensor
 #include "MoistureSensor.h" //Moisture sensor
 #include "ProbeSensor.h"  //Probe temperature sensor
@@ -13,10 +14,6 @@
 #include "addons/TokenHelper.h"
 //Provides the RTDB payload printing info and other helper functions
 #include "addons/RTDBHelper.h"
-
-//Network credentials
-#define WIFI_SSID "NightOwl"
-#define WIFI_PASSWORD "nightowl"
 
 
 //DB URL provided by firebase project
@@ -57,7 +54,7 @@ int probeInterval = 2000;
 
 
 //Signup check
-bool signupOK = false;
+bool signupCheck = false;
 
 
 void setup()
@@ -70,60 +67,17 @@ void setup()
     pinMode(dangerBlockLEDPin, OUTPUT); //Danger block LED Programming
 
 
+    //Wifi connection initialization
+    init_Wifi_Connection();
+    
+
     //Sensors initialization
     init_AQI_sensor();
     init_Moisture_Sensor();
     init_Probe_Sensor();
     //init_IRSensor();
 
-    
-    //Wifi Connection
-    WiFi.mode(WIFI_STA);  //station mode
-    WiFi.disconnect();    //ensures smooth connection
-    delay(100);
-    Serial.println("-----------------------------------");
 
-  //Scanning
-  Serial.println("Scanning Wifi...");
-  int numNetworks = WiFi.scanNetworks();  //get numbers of scanned networks
-
-  if(numNetworks == 0)
-  {
-    Serial.println("No networks found!");
-  }
-  else
-  {
-    Serial.println("Available Networks: ");
-    for (int i = 0; i < numNetworks; i++)
-    {
-        Serial.print(String(i+1)); Serial.print(": "); Serial.println(WiFi.SSID(i));
-      //Serial.println(String(i+1) + ":" + WiFi.SSID(i)); //gets the ssid of network in array index
-    }
-  }
-
-  //Connection
-  Serial.print("\nConnecting to wifi...");
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD); //initiates connection based on SSID provided
-
-  int retries = 0;  //loop to try again if connection failed
-  while(WiFi.status() != WL_CONNECTED && retries < 20)  //tries 20 times to connect to wifi
-  {
-    delay(500);
-    Serial.print(".");  //Animation for connection time
-    retries++;
-  }
-
-  if (WiFi.status() == WL_CONNECTED)
-  {
-    Serial.println("\n-----------Connected to Wifi!-----------");
-    Serial.print("IP Address: ");
-    Serial.println(WiFi.localIP()); //prints IP address assigned to controller
-  }
-  else
-  {
-    Serial.println("\n Failed to connect!");
-  }
- 
     //Assigning the API Key
     config.api_key = API_KEY;
 
@@ -131,11 +85,11 @@ void setup()
     config.database_url = DB_URL;
 
 
-    //Sign Up
+    //Sign-up Check
     if (Firebase.signUp(&config, &auth, "", ""))   //Args empty for email & password
     {
         Serial.println("Sign-up check: OK");
-        signupOK = true;    //status flag set to OK
+        signupCheck = true;    //status flag set to OK
     }
     else
     {
@@ -159,7 +113,7 @@ void loop()
     //AQI sensor execution block
     #pragma region 
     //check if firebase is ready, AND signup is ok, AND (time interval is 1.5sec OR prevMillis is still 0)
-    if(Firebase.ready() && signupOK && (millis() - prevTimeAQISentData > aqiInterval || prevTimeAQISentData == 0))
+    if(Firebase.ready() && signupCheck && (millis() - prevTimeAQISentData > aqiInterval || prevTimeAQISentData == 0))
     {
         /*current time of execution of this block goes to PrevMillis, 
         keeps incrementing the threshold for next execution 
@@ -223,7 +177,7 @@ void loop()
     
     //Moisture sensor execution block
     #pragma region 
-    if(Firebase.ready() && signupOK && (millis() - prevTimeMoistureSentData > moistureInterval || prevTimeMoistureSentData == 0))
+    if(Firebase.ready() && signupCheck && (millis() - prevTimeMoistureSentData > moistureInterval || prevTimeMoistureSentData == 0))
     {
       prevTimeMoistureSentData=millis();  //update sent time
       
@@ -275,7 +229,7 @@ void loop()
 
     //Probe sensor execution block
     #pragma region 
-    if(Firebase.ready() && signupOK && (millis() - prevTimeProbeSentData > probeInterval || prevTimeProbeSentData == 0))
+    if(Firebase.ready() && signupCheck && (millis() - prevTimeProbeSentData > probeInterval || prevTimeProbeSentData == 0))
     {
       prevTimeProbeSentData = millis();
 
@@ -329,21 +283,6 @@ void loop()
     #pragma endregion
     //Probe sensor block end
 
-    //IR sensor execution block
-    // #pragma region 
-    // if(Firebase.ready() && signupOK && (millis() - prevTimeIRSentData > irInterval || prevTimeIRSentData == 0))
-    // {
-    //   prevTimeIRSentData = millis();
-
-      
-
-
-
-    // }
-
-
-    // #pragma endregion
-    //IR sensor block end
 
 
 }
