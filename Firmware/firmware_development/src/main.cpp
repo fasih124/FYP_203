@@ -7,6 +7,7 @@
 #include "AQISensor.h"  //AQI Sensor
 #include "MoistureSensor.h" //Moisture sensor
 #include "ProbeSensor.h"  //Probe temperature sensor
+//#include "IRSensor.h" //IR sensor
 
 //Provides the token generation process info
 #include "addons/TokenHelper.h"
@@ -44,13 +45,14 @@ FirebaseConfig config;
 unsigned long prevTimeAQISentData = 0;  // For AQI
 unsigned long prevTimeMoistureSentData = 0; // For Moisture
 unsigned long prevTimeProbeSentData = 0; //For Probe
+//unsigned long prevTimeIRSentData = 0; //For IR sensor
 
 
 // Wait intervals for sensors in milliseconds
 int aqiInterval = 2000; 
 int moistureInterval = 2000;
 int probeInterval = 2000;
-
+//int irInterval = 2000;
 
 
 
@@ -72,6 +74,7 @@ void setup()
     init_AQI_sensor();
     init_Moisture_Sensor();
     init_Probe_Sensor();
+    //init_IRSensor();
 
     
     //Wifi Connection
@@ -326,7 +329,21 @@ void loop()
     #pragma endregion
     //Probe sensor block end
 
+    //IR sensor execution block
+    // #pragma region 
+    // if(Firebase.ready() && signupOK && (millis() - prevTimeIRSentData > irInterval || prevTimeIRSentData == 0))
+    // {
+    //   prevTimeIRSentData = millis();
 
+      
+
+
+
+    // }
+
+
+    // #pragma endregion
+    //IR sensor block end
 
 
 }
