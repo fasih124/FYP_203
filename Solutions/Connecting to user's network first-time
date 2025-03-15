@@ -1,0 +1,44 @@
+Query: 
+
+So, we are working with Flutter, firebase and ESP. 
+The working criteria is,
+
+Flutter ----> Firebase RTDB <----- ESP32
+
+Firebase is acting as relay of communication. If i want to show some data to app, esp sends it to firebase from where flutter fetches that data and shows it user.
+
+But, when esp is deployed in user's space, how would he connect the esp to his network (im using station mode)? ESP would scan the internet, but how would it display the scanned network to user as user is using flutter app and flutter needs data to be on firebase. How would esp push scanned network info. to firebase if it's not connected to wifi.
+it's a circular problem. To connect wifi, it needs to show the scanned networks to user, but to show user the scanned networks, it needs to be connected to wifi.
+
+
+Response:
+
+You're absolutely right—this is a bootstrap problem where ESP32 needs to connect to Wi-Fi to send data to Firebase, but it needs Wi-Fi credentials first.  
+
+Solution: Captive Portal using ESP32 AP Mode
+
+The best way to solve this is by first putting ESP32 in **Access Point (AP) mode** when it's not connected to Wi-Fi. The steps are:  
+
+1. ESP32 starts in AP mode (if no saved credentials).
+2. User connects to ESP32's Wi-Fi (e.g., `ESP_Setup` network) using their phone.
+3. Flutter app connects to ESP32's local IP (192.168.4.1) via HTTP and requests available Wi-Fi networks.
+4. ESP32 scans for networks and sends them to the Flutter app.
+5. User selects a network & enters password, Flutter sends it to ESP32.
+6. ESP32 switches to Station (STA) mode and connects to the selected Wi-Fi.
+7. If successful, ESP32 pushes data to Firebase.
+8. If unsuccessful, it restarts AP mode for the user to try again.  
+
+
+Implementation Steps
+	ESP32 runs a basic web server in AP mode.
+	Flutter sends an HTTP request to ESP32 to get scanned Wi-Fi networks.
+	User selects a network & submits credentials via the Flutter app.
+	ESP32 tries to connect, if successful, it switches to STA mode and updates Firebase.
+
+
+Why This Works?
+ 	ESP32 doesn't need Firebase initially to show networks.  
+	User can connect directly to ESP32 via phone.  
+	Once connected, normal Firebase communication begins.  
+
+This is how smart home devices, IoT gadgets, and even routers handle Wi-Fi provisioning. 
