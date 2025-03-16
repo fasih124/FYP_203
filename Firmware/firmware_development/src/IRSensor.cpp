@@ -9,7 +9,7 @@
 Adafruit_MLX90614 mlx = Adafruit_MLX90614();
 
 
-float IRTempThreshold = 80.5;
+float IRTempThreshold = 78;
 
 
 //Initializing sensor

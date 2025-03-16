@@ -1,6 +1,6 @@
-#ifndef WIFICONNECTION_H
-#define WIFICONNECTION_H
+#ifndef WIFICONNECTIONS_H
+#define WIFICONNECTIONS_H
 
-void init_Wifi_Connection();
+void init_Wifi_Connections();
 
 #endif

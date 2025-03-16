@@ -1,14 +1,23 @@
+/*
+Things to do in main.cpp when integrating a new module:
+    Add Header file
+    Add variable for previous time of execution
+    Add interval variable
+    Init sensor in setup()
+    Write relevant code in loop()
+*/
+
 #include <Arduino.h>
 //#include <WiFi.h>   //Made a separate module
 #include <Firebase_ESP_Client.h>
 
 
 //Custom header files
-#include "WifiConnection.h" //COnnection for wifi
+#include "WifiConnection.h" //Connection for wifi
 #include "AQISensor.h"  //AQI Sensor
 #include "MoistureSensor.h" //Moisture sensor
 #include "ProbeSensor.h"  //Probe temperature sensor
-//#include "IRSensor.h" //IR sensor
+#include "IRSensor.h" //IR sensor
 
 //Provides the token generation process info
 #include "addons/TokenHelper.h"
@@ -38,18 +47,18 @@ FirebaseAuth auth;
 FirebaseConfig config;
 
 
-//Data sending in parallel execution using time functions
+// Variables for previous time of execution. Parallel operations
 unsigned long prevTimeAQISentData = 0;  // For AQI
 unsigned long prevTimeMoistureSentData = 0; // For Moisture
 unsigned long prevTimeProbeSentData = 0; //For Probe
-//unsigned long prevTimeIRSentData = 0; //For IR sensor
+unsigned long prevTimeIRprintedData = 0; //For IR sensor printing data on serial monitor (only for testing purpose)
 
 
 // Wait intervals for sensors in milliseconds
 int aqiInterval = 2000; 
 int moistureInterval = 2000;
 int probeInterval = 2000;
-//int irInterval = 2000;
+int irInterval = 2000;
 
 
 
@@ -67,15 +76,15 @@ void setup()
     pinMode(dangerBlockLEDPin, OUTPUT); //Danger block LED Programming
 
 
-    //Wifi connection initialization
-    init_Wifi_Connection();
+    //Wifi connection initialization both AP and STA
+    init_Wifi_Connections();
     
 
     //Sensors initialization
     init_AQI_sensor();
     init_Moisture_Sensor();
     init_Probe_Sensor();
-    //init_IRSensor();
+    init_IRSensor();  //init for testing purpose and printing output on serial monitor
 
 
     //Assigning the API Key
@@ -282,6 +291,20 @@ void loop()
     }
     #pragma endregion
     //Probe sensor block end
+
+
+
+    //IRSensor output (Not pushing to firebase)
+    #pragma region 
+    if (millis()-prevTimeIRprintedData > irInterval)
+    {
+        prevTimeIRprintedData = millis();
+        Serial.print("IR temp output: "), Serial.println(get_Average_IRTemp());
+        Serial.print("IR flag: "), Serial.println(IRDetectionFlag());
+    }
+
+    #pragma endregion
+    //IRSensor block end (Not pushing to firebase)
 
 
 

@@ -32,10 +32,11 @@ void setup() {
   // Initialize I2C (Use appropriate GPIOs for ESP32-S3)
   Wire.begin(9, 8);  // SDA = GPIO10, SCL = 8 (Change as needed)
 
-  if (!mlx.begin()) {
-    Serial.println("Error connecting to MLX90614!");
-    while (1);
-  }
+  while (!mlx.begin())
+    {
+        Serial.println("Error connecting to MLX90614! Retrying...");
+        delay(1000);  // Wait before retrying
+    }
 
   Serial.println("MLX90614 Ready!");
 }
