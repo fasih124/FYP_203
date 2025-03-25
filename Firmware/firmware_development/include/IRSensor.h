@@ -3,6 +3,6 @@
 
 void init_IRSensor();
 float get_Average_IRTemp();
-bool IRDetectionFlag();
+bool IR_Detection_Flag();
 
 #endif

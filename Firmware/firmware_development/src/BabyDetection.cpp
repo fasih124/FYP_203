@@ -1,19 +1,19 @@
 #include <Arduino.h>
-#include <IRSensor.h>
-//#include <WeightSensor.h>
+#include <IRSensor.h>   // for flag input
+#include <WeightSensor.h>   //for flag input
 
-void init_Sensors()
+void init_Baby_Detection_Sensors()
 {
     init_IRSensor();
-    //init_weightSensor();
+    init_WeightSensor();
 }
 
 
-bool BabyDetectionFlag()
+bool baby_Detection_Flag()
 {
     // if both sensors' flags return true, then baby is detected.
 
-    if(IRDetectionFlag() /*&& WeightDetectionFlag()*/)
+    if(IR_Detection_Flag() && weight_Detection_Flag())
     {
         return true;
     }

@@ -9,7 +9,7 @@
 Adafruit_MLX90614 mlx = Adafruit_MLX90614();
 
 
-float IRTempThreshold = 78;
+float IRTempThreshold = 81;
 
 
 //Initializing sensor
@@ -41,7 +41,7 @@ float get_Average_IRTemp()
 }
 
 
-bool IRDetectionFlag()
+bool IR_Detection_Flag()
 {
     return get_Average_IRTemp() > IRTempThreshold;  //checks the condition and returns true or false
 }
