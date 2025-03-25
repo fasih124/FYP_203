@@ -126,218 +126,282 @@ void setup()
 void loop()
 {
   
-    // //AQI sensor execution block
-    // #pragma region 
-    // //check if firebase is ready, AND signup is ok, AND (time interval is 1.5sec OR prevMillis is still 0)
-    // if(Firebase.ready() && signupCheck && (millis() - prevTimeAQISentData > aqiInterval || prevTimeAQISentData == 0))
-    // {
-    //     /*current time of execution of this block goes to PrevMillis, 
-    //     keeps incrementing the threshold for next execution 
-    //     (e.g.1500+1500 in two executions)*/
+    //AQI sensor execution block
+    #pragma region 
+    //check if firebase is ready, AND signup is ok, AND (time interval is 1.5sec OR prevMillis is still 0)
+    if(Firebase.ready() && signupCheck && (millis() - prevTimeAQISentData > aqiInterval || prevTimeAQISentData == 0))
+    {
+        /*current time of execution of this block goes to PrevMillis, 
+        keeps incrementing the threshold for next execution 
+        (e.g.1500+1500 in two executions)*/
 
-    //     prevTimeAQISentData = millis();
+        prevTimeAQISentData = millis();
         
-    //     //Writing int number (AQI sensor value here)
-    //     if(Firebase.RTDB.setInt(&fbdo, "sensors/AQIVoltage", read_AQI_Voltage()))
-    //     {
+        //Writing int number (AQI sensor value here)
+        if(Firebase.RTDB.setInt(&fbdo, "ignoreValues/AQIVoltage", read_AQI_Voltage()))
+        {
 
-    //         //Data passed LED
-    //         digitalWrite(dataPassedLEDPin, HIGH);
-    //         delay(delayForDataPassedLEDPin);  //70 milisec
-    //         digitalWrite(dataPassedLEDPin, LOW);
+            //Data passed LED
+            digitalWrite(dataPassedLEDPin, HIGH);
+            delay(delayForDataPassedLEDPin);  //70 milisec
+            digitalWrite(dataPassedLEDPin, LOW);
           
-    //         Serial.println("AQI Voltage Pushed");
-    //         Serial.print("Path: "); Serial.println(fbdo.dataPath());
-    //         Serial.print("Type: "); Serial.println(fbdo.dataType());
+            Serial.println("AQI Voltage Pushed");
+            Serial.print("Path: "); Serial.println(fbdo.dataPath());
+            Serial.print("Type: "); Serial.println(fbdo.dataType());
             
 
-    //         //Sending AQI Grade after AQI Voltage
-    //         Firebase.RTDB.setString(&fbdo, "sensors/AQIGrade",AQI_grade());
-    //         Serial.println("AQI Grade Pushed");
-    //         Serial.print("Path: "); Serial.println(fbdo.dataPath());
-    //         Serial.print("Type: "); Serial.println(fbdo.dataType());
+            //Sending AQI Grade after AQI Voltage
+            Firebase.RTDB.setString(&fbdo, "sensors/AQIGrade",AQI_grade());
+            Serial.println("AQI Grade Pushed");
+            Serial.print("Path: "); Serial.println(fbdo.dataPath());
+            Serial.print("Type: "); Serial.println(fbdo.dataType());
 
-    //         digitalWrite(dataPassedLEDPin, HIGH);
-    //         delay(delayForDataPassedLEDPin);
-    //         digitalWrite(dataPassedLEDPin, LOW);
-    //         //delay(500);
+            digitalWrite(dataPassedLEDPin, HIGH);
+            delay(delayForDataPassedLEDPin);
+            digitalWrite(dataPassedLEDPin, LOW);
+            //delay(500);
 
 
-    //     }
-    //     else
-    //     {
-    //         Serial.println("FAILED!");
-    //         Serial.print("Firebase Error: "); Serial.println(fbdo.errorReason());
+        }
+        else
+        {
+            Serial.println("FAILED!");
+            Serial.print("Firebase Error: "); Serial.println(fbdo.errorReason());
 
-    //         // Error LED
-    //         digitalWrite(dangerBlockLEDPin, HIGH);
-    //         delay(delayForDangerBlockLEDPin); //3 sec
-    //         digitalWrite(dataPassedLEDPin, LOW);
-    //     }
+            // Error LED
+            digitalWrite(dangerBlockLEDPin, HIGH);
+            delay(delayForDangerBlockLEDPin); //3 sec
+            digitalWrite(dataPassedLEDPin, LOW);
+        }
         
     
-    // }
-    // else
-    // {
-    //     Serial.println("Interval wait!"); 
-    //     Serial.print("Firebase Error: ("); Serial.print(fbdo.errorReason()); Serial.println(")");
+    }
+    else
+    {
+        Serial.println("Interval wait!"); 
+        Serial.print("Firebase Error: ("); Serial.print(fbdo.errorReason()); Serial.println(")");
         
-    //     // Interval wait LED
-    //     digitalWrite(intervalWaitLEDPin, HIGH);
-    //     delay(delayForIntervalWaitLEDPin); //70 milisec
-    //     digitalWrite(intervalWaitLEDPin, LOW);
-    //     delay(1500);  //Error notification delay
-    // }
-    // #pragma endregion
-    // //AQI sensor block end
+        // Interval wait LED
+        digitalWrite(intervalWaitLEDPin, HIGH);
+        delay(delayForIntervalWaitLEDPin); //70 milisec
+        digitalWrite(intervalWaitLEDPin, LOW);
+        delay(1500);  //Error notification delay
+    }
+    #pragma endregion
+    //AQI sensor block end
     
-    // //Moisture sensor execution block
+    //Moisture sensor execution block
+    #pragma region 
+    if(Firebase.ready() && signupCheck && (millis() - prevTimeMoistureSentData > moistureInterval || prevTimeMoistureSentData == 0))
+    {
+      prevTimeMoistureSentData=millis();  //update sent time
+      
+      //String type diaper condition
+      if(Firebase.RTDB.setString(&fbdo, "sensors/DiaperCondition", diaper_Condition()))
+      {
+        Serial.println("Diaper codition pushed!");
+        Serial.print("Path: "); Serial.println(fbdo.dataPath());
+        Serial.print("Type: "); Serial.println(fbdo.dataType());
+        
+        //Bug: Remove delay(), this function may cause program hault
+        //Data passed LED
+        digitalWrite(dataPassedLEDPin, HIGH);
+        delay(delayForDataPassedLEDPin);  //70 milisec
+        digitalWrite(dataPassedLEDPin, LOW);
+
+        
+      }
+      else
+      {
+        Serial.println("Failed!");
+        Serial.print("Firebase Error: "); Serial.println(fbdo.errorReason());
+
+        //Bug: Remove delay(), this function may cause program hault
+        // Error LED
+        digitalWrite(dangerBlockLEDPin, HIGH);
+        delay(delayForDangerBlockLEDPin); //3 sec
+        digitalWrite(dataPassedLEDPin, LOW);
+
+      }
+
+    }
+
+    else
+    {
+      Serial.println("Interval wait!");
+      Serial.print("Firebase Error: ("); Serial.print(fbdo.errorReason()); Serial.println(")");
+      
+      //Bug: Remove delay(), this function may cause program hault      
+      // Interval wait LED
+      digitalWrite(intervalWaitLEDPin, HIGH);
+      delay(delayForIntervalWaitLEDPin); //70 milisec
+      digitalWrite(intervalWaitLEDPin, LOW);
+    
+    }
+    #pragma endregion
+    //Moisture sensor block end
+
+
+    //Probe sensor execution block
+    #pragma region 
+    if(Firebase.ready() && signupCheck && (millis() - prevTimeProbeSentData > probeInterval || prevTimeProbeSentData == 0))
+    {
+      prevTimeProbeSentData = millis();
+
+      //float type fahrenheit temperature
+      if(Firebase.RTDB.setFloat(&fbdo, "sensors/ProbeTemp", temp_In_Fahrenheit()))
+      {
+        //Bug: Remove delay(), this function may cause program hault
+        //Data passed LED
+        digitalWrite(dataPassedLEDPin, HIGH);
+        delay(delayForDataPassedLEDPin);  //70 milisec
+        digitalWrite(dataPassedLEDPin, LOW);
+
+        Serial.println("Probe temperature pushed!");
+        Serial.print("Path: "); Serial.println(fbdo.dataPath());
+        Serial.print("Type: "); Serial.println(fbdo.dataType());
+        
+      
+      
+      }
+      else
+      {
+        Serial.println("Failed!");
+        Serial.print("Firebase Error: "); Serial.println(fbdo.errorReason());
+
+        //Bug: Remove delay(), this function may cause program hault
+        // Error LED
+        digitalWrite(dangerBlockLEDPin, HIGH);
+        delay(delayForDangerBlockLEDPin); //3 sec
+        digitalWrite(dataPassedLEDPin, LOW);
+
+
+      }
+
+
+    }
+    else
+    {
+
+      //Bug: Remove delay(), this function may cause program hault      
+      // Interval wait LED
+      digitalWrite(intervalWaitLEDPin, HIGH);
+      delay(delayForIntervalWaitLEDPin); //70 milisec
+      digitalWrite(intervalWaitLEDPin, LOW);
+
+      Serial.println("Interval wait!");
+      Serial.print("Firebase Error: ("); Serial.print(fbdo.errorReason()); Serial.println(")");
+      
+      
+
+    }
+    #pragma endregion
+    //Probe sensor block end
+
+
+
+    // // IRSensor output (Not pushing to firebase)
     // #pragma region 
-    // if(Firebase.ready() && signupCheck && (millis() - prevTimeMoistureSentData > moistureInterval || prevTimeMoistureSentData == 0))
+    // if (millis()-prevTimeIRprintedData > irInterval)
     // {
-    //   prevTimeMoistureSentData=millis();  //update sent time
-      
-    //   //String type diaper condition
-    //   if(Firebase.RTDB.setString(&fbdo, "sensors/DiaperCondition", diaper_Condition()))
-    //   {
-    //     Serial.println("Diaper codition pushed!");
-    //     Serial.print("Path: "); Serial.println(fbdo.dataPath());
-    //     Serial.print("Type: "); Serial.println(fbdo.dataType());
-        
-    //     //Bug: Remove delay(), this function may cause program hault
-    //     //Data passed LED
-    //     digitalWrite(dataPassedLEDPin, HIGH);
-    //     delay(delayForDataPassedLEDPin);  //70 milisec
-    //     digitalWrite(dataPassedLEDPin, LOW);
-
-        
-    //   }
-    //   else
-    //   {
-    //     Serial.println("Failed!");
-    //     Serial.print("Firebase Error: "); Serial.println(fbdo.errorReason());
-
-    //     //Bug: Remove delay(), this function may cause program hault
-    //     // Error LED
-    //     digitalWrite(dangerBlockLEDPin, HIGH);
-    //     delay(delayForDangerBlockLEDPin); //3 sec
-    //     digitalWrite(dataPassedLEDPin, LOW);
-
-    //   }
-
+    //     prevTimeIRprintedData = millis();
+    //     Serial.print("IR temp output: "), Serial.println(get_Average_IRTemp());
+    //     Serial.print("IR flag: "), Serial.println(IR_Detection_Flag());
     // }
 
-    // else
-    // {
-    //   Serial.println("Interval wait!");
-    //   Serial.print("Firebase Error: ("); Serial.print(fbdo.errorReason()); Serial.println(")");
-      
-    //   //Bug: Remove delay(), this function may cause program hault      
-    //   // Interval wait LED
-    //   digitalWrite(intervalWaitLEDPin, HIGH);
-    //   delay(delayForIntervalWaitLEDPin); //70 milisec
-    //   digitalWrite(intervalWaitLEDPin, LOW);
-    
-    // }
     // #pragma endregion
-    // //Moisture sensor block end
+    // //IRSensor block end (Not pushing to firebase)
 
 
-    // //Probe sensor execution block
+    // //WeightSensor output (Not pushing to firebase)
     // #pragma region 
-    // if(Firebase.ready() && signupCheck && (millis() - prevTimeProbeSentData > probeInterval || prevTimeProbeSentData == 0))
+    // if (millis()-prevTimeWeightPrintedData > weightInterval)
     // {
-    //   prevTimeProbeSentData = millis();
-
-    //   //float type fahrenheit temperature
-    //   if(Firebase.RTDB.setFloat(&fbdo, "sensors/ProbeTemp", temp_In_Fahrenheit()))
-    //   {
-    //     //Bug: Remove delay(), this function may cause program hault
-    //     //Data passed LED
-    //     digitalWrite(dataPassedLEDPin, HIGH);
-    //     delay(delayForDataPassedLEDPin);  //70 milisec
-    //     digitalWrite(dataPassedLEDPin, LOW);
-
-    //     Serial.println("Probe temperature pushed!");
-    //     Serial.print("Path: "); Serial.println(fbdo.dataPath());
-    //     Serial.print("Type: "); Serial.println(fbdo.dataType());
-        
-      
-      
-    //   }
-    //   else
-    //   {
-    //     Serial.println("Failed!");
-    //     Serial.print("Firebase Error: "); Serial.println(fbdo.errorReason());
-
-    //     //Bug: Remove delay(), this function may cause program hault
-    //     // Error LED
-    //     digitalWrite(dangerBlockLEDPin, HIGH);
-    //     delay(delayForDangerBlockLEDPin); //3 sec
-    //     digitalWrite(dataPassedLEDPin, LOW);
-
-
-    //   }
-
-
+    //     prevTimeWeightPrintedData = millis();
+    //     Serial.print("Weight output: "), Serial.println(measure_WeightChange());
+    //     Serial.print("Weight flag: "), Serial.println(weight_Detection_Flag());
     // }
-    // else
-    // {
-
-    //   //Bug: Remove delay(), this function may cause program hault      
-    //   // Interval wait LED
-    //   digitalWrite(intervalWaitLEDPin, HIGH);
-    //   delay(delayForIntervalWaitLEDPin); //70 milisec
-    //   digitalWrite(intervalWaitLEDPin, LOW);
-
-    //   Serial.println("Interval wait!");
-    //   Serial.print("Firebase Error: ("); Serial.print(fbdo.errorReason()); Serial.println(")");
-      
-      
-
-    // }
+    
     // #pragma endregion
-    // //Probe sensor block end
-
-
-
-    // IRSensor output (Not pushing to firebase)
-    #pragma region 
-    if (millis()-prevTimeIRprintedData > irInterval)
-    {
-        prevTimeIRprintedData = millis();
-        Serial.print("IR temp output: "), Serial.println(get_Average_IRTemp());
-        Serial.print("IR flag: "), Serial.println(IR_Detection_Flag());
-    }
-
-    #pragma endregion
-    //IRSensor block end (Not pushing to firebase)
-
-
-    //WeightSensor output (Not pushing to firebase)
-    #pragma region 
-    if (millis()-prevTimeWeightPrintedData > weightInterval)
-    {
-        prevTimeWeightPrintedData = millis();
-        Serial.print("Weight output: "), Serial.println(measure_WeightChange());
-        Serial.print("Weight flag: "), Serial.println(weight_Detection_Flag());
-    }
-    
-    #pragma endregion
-    //WeightSensor block end (Not pushing to firebase)
+    // //WeightSensor block end (Not pushing to firebase)
     
 
 
-       //Detection module output (Not pushing to firebase)
-    #pragma region 
-    if (millis()-prevTimeBabyDetectionSentData > detectionInterval)
-    {
-        prevTimeBabyDetectionSentData = millis();
-        Serial.print("Detection flag: "), Serial.println(baby_Detection_Flag());
-    }
+    //    //Detection module output (Not pushing to firebase)
+    // #pragma region 
+    // if (millis()-prevTimeBabyDetectionSentData > detectionInterval)
+    // {
+    //     prevTimeBabyDetectionSentData = millis();
+    //     Serial.print("Detection flag: "), Serial.println(baby_Detection_Flag());
+    // }
     
-    #pragma endregion
-    //Detection module block end (Not pushing to firebase)
+    // #pragma endregion
+    // //Detection module block end (Not pushing to firebase)
+
+
+
+        //Baby detection execution block
+        #pragma region 
+        //check if firebase is ready, AND signup is ok, AND (time interval is 1.5sec OR prevMillis is still 0)
+        if(Firebase.ready() && signupCheck && (millis() - prevTimeBabyDetectionSentData > detectionInterval || prevTimeBabyDetectionSentData == 0))
+        {
+    
+            prevTimeBabyDetectionSentData = millis();
+            
+            //Writing bool on database (baby detection flag)
+            if(Firebase.RTDB.setBool(&fbdo, "sensors/BabyDetection", baby_Detection_Flag()))
+            {
+    
+                //Data passed LED
+                digitalWrite(dataPassedLEDPin, HIGH);
+                delay(delayForDataPassedLEDPin);  //70 milisec
+                digitalWrite(dataPassedLEDPin, LOW);
+              
+                Serial.println("Baby Detection Status Pushed");
+                Serial.print("Path: "); Serial.println(fbdo.dataPath());
+                Serial.print("Type: "); Serial.println(fbdo.dataType());
+                
+    
+                //Sending IRtemp(float) and weight reading(int) for debugging purpose
+                
+                //IRTemp reading
+                Firebase.RTDB.setFloat(&fbdo, "ignoreValues/IRTemp",get_Average_IRTemp());
+                Serial.println("IRTemp value pushed");
+                Serial.print("Path: "); Serial.println(fbdo.dataPath());
+                Serial.print("Type: "); Serial.println(fbdo.dataType());
+    
+                //Weight reading
+                Firebase.RTDB.setInt(&fbdo, "ignoreValues/Weight",measure_WeightChange());
+                Serial.println("Weight value pushed");
+                Serial.print("Path: "); Serial.println(fbdo.dataPath());
+                Serial.print("Type: "); Serial.println(fbdo.dataType());
+    
+
+    
+            }
+            else
+            {
+                Serial.println("FAILED!");
+                Serial.print("Firebase Error: "); Serial.println(fbdo.errorReason());
+    
+            }
+            
+        
+        }
+        else
+        {
+            Serial.println("Interval wait!"); 
+            Serial.print("Firebase Error: ("); Serial.print(fbdo.errorReason()); Serial.println(")");
+            
+            // Interval wait LED
+            digitalWrite(intervalWaitLEDPin, HIGH);
+            delay(delayForIntervalWaitLEDPin); //70 milisec
+            digitalWrite(intervalWaitLEDPin, LOW);
+            delay(1500);  //Error notification delay
+        }
+        #pragma endregion
+        //Baby detection block end
 
 
 }
