@@ -1,12 +1,13 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
 import 'package:fyp_203/constants/text_constant.dart';
 import 'package:fyp_203/screens/signin_screen.dart';
-import 'package:fyp_203/services/firebase_auth.dart';
-
 import '../Component/text_feild_component.dart';
+
+import 'package:fyp_203/services/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -17,36 +18,110 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController emailController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
 
-  bool registerUser(){
+  // bool registerUser(){
+  //
+  //     print(emailController.text);
+  //     print(usernameController.text);
+  //     print(passwordController.text);
+  //     print(confirmPasswordController.text);
+  //
+  //     if ((passwordController.text == confirmPasswordController.text) && (passwordController.text.length >= 6)) {
+  //       Future<User?> user = AuthService().signUp(emailController.text.trim(), passwordController.text.trim());
+  //       print(user);
+  //       print('User is register');
+  //       return true;
+  //     }else{
+  //       print('Password not match');
+  //       return false;
+  //     }
+  //
+  //   }
 
+  Future<bool> registerUser(BuildContext context) async {
     print(emailController.text);
+    print(usernameController.text);
     print(passwordController.text);
     print(confirmPasswordController.text);
-    if ((passwordController.text == confirmPasswordController.text) && (passwordController.text.length >= 6)) {
-      Future<User?> user = AuthService().signUp(emailController.text.trim(), passwordController.text.trim());
-      print(user);
-      print('User is register');
-      return true;
-    }else{
-      print('Password not match');
+
+    if ((passwordController.text == confirmPasswordController.text) &&
+        (passwordController.text.length >= 6)) {
+      try {
+        // Register user with email & password
+        User? user = await AuthService().signUp(
+            emailController.text.trim(), passwordController.text.trim());
+
+        if (user != null) {
+          print('User is registered successfully');
+
+          // Store username in Realtime Database under the user's UID
+          DatabaseReference userRef =
+              FirebaseDatabase.instance.ref("parents/${user.uid}");
+          await userRef.set({
+            "username": usernameController.text.trim(),
+            "email": emailController.text.trim(),
+          });
+
+          // Show success Snackbar
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Registration successful!"),
+              backgroundColor: AppColorCode.secondaryColor_500,
+              duration: Duration(seconds: 2),
+            ),
+          );
+
+          return true; // Registration successful
+        } else {
+          print('User registration failed');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Registration failed! Please try again."),
+              backgroundColor: Colors.red,
+              duration: Duration(seconds: 2),
+            ),
+          );
+          return false;
+        }
+      } catch (e) {
+        print('Error: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error: $e"),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return false;
+      }
+    } else {
+      print('Password not match or too short');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Passwords do not match or are too short!"),
+          backgroundColor: Colors.orange,
+          duration: Duration(seconds: 2),
+        ),
+      );
       return false;
     }
-
-}
+  }
 
   @override
   void dispose() {
     // TODO: implement dispose
     super.dispose();
     emailController.dispose();
+    usernameController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
@@ -86,7 +161,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             .copyWith(color: AppColorCode.primaryColor_600),
                       ),
                       const SizedBox(height: 4),
-                      SizedBox(
+                      const SizedBox(
                         child: Align(
                           alignment: Alignment.center,
                           child: Text(
@@ -98,22 +173,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                       const SizedBox(height: 32),
                       CustomerTextField(
+                        textlabel: 'Username',
+                        texteditingcontroller: usernameController,
+                        isPassword: false,
+                      ),
+                      const SizedBox(height: 16),
+                      CustomerTextField(
                         textlabel: 'Email',
                         texteditingcontroller: emailController,
                         isPassword: false,
                       ),
                       const SizedBox(height: 16),
                       CustomerTextField(
-                        textlabel: 'Password',
-                        texteditingcontroller: passwordController,
-                          isPassword:true
-                      ),
+                          textlabel: 'Password',
+                          texteditingcontroller: passwordController,
+                          isPassword: true),
                       const SizedBox(height: 16), //Password
                       CustomerTextField(
-                        textlabel: 'Confirm Password',
-                        texteditingcontroller: confirmPasswordController,
-                          isPassword:true
-                      ),
+                          textlabel: 'Confirm Password',
+                          texteditingcontroller: confirmPasswordController,
+                          isPassword: true),
                       const SizedBox(height: 12),
                       Align(
                         alignment: Alignment.centerLeft,
@@ -130,14 +209,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () {
-                            registerUser()?
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (builder) => const SignInScreen(),
-                              ),
-                            ):print("errot!!! occur");
+                          onPressed: () async {
+                            bool isRegistered = await registerUser(context);
+                            if (isRegistered) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const SignInScreen(),
+                                ),
+                              );
+                            } else {
+                              print("Error occurred!!!");
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor:

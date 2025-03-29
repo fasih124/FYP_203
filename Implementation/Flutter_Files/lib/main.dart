@@ -21,6 +21,8 @@ import 'screens/onboard_3_screen.dart';
 import 'screens/setting_screen.dart';
 import 'screens/signup_screen.dart';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -29,10 +31,35 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool _isConnected = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkInternet();
+    Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> result) {
+      setState(() {
+        _isConnected = result.contains(ConnectivityResult.wifi) ||
+            result.contains(ConnectivityResult.mobile);
+      });
+    });
+  }
+
+  Future<void> _checkInternet() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    setState(() {
+      _isConnected = connectivityResult != ConnectivityResult.none;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -42,7 +69,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Poppins',
       ).copyWith(scaffoldBackgroundColor: AppColorCode.neutralColor_500),
       debugShowCheckedModeBanner: false,
-      home: AuthChecker(),
+      home: _isConnected ? AuthChecker() : NoInternetScreen(),
     );
   }
 }
@@ -51,18 +78,27 @@ class AuthChecker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
-      stream:
-          FirebaseAuth.instance.authStateChanges(), // Listen to auth changes
+      stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator()); // Show loading
+          return Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasData) {
-          return const BottomNavigationScreen(); // User is logged in
+          return const BottomNavigationScreen();
         } else {
-          return const SplashScreen(); // User is not logged in
+          return const SplashScreen();
         }
       },
+    );
+  }
+}
+
+class NoInternetScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("No Internet")),
+      body: Center(child: Text("Please connect to the internet to use the app.")),
     );
   }
 }

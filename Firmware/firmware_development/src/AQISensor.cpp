@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#define MQ135_AnalogPin 4 //ADC Pin
+#define MQ135_AnalogPin 5 //ADC Pin
 
 
 
