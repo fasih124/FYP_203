@@ -179,20 +179,58 @@ class _SignInScreenState extends State<SignInScreen> {
   final TextEditingController passwordController = TextEditingController();
 
 
-  bool loginUser(){
+  // bool loginUser(){
+  //
+  //   print(emailController.text);
+  //   print(passwordController.text);
+  //   if (passwordController.text.length >= 6) {
+  //     Future<User?> loginuser = AuthService().signIn(emailController.text.trim(), passwordController.text.trim());
+  //     print(loginuser);
+  //     print('User is login');
+  //     return true;
+  //   }else{
+  //     print('invalid email or password');
+  //     return false;
+  //   }
+  //
+  // }
+  Future<bool> loginUser(BuildContext context) async {
+    try {
+      // Attempt user login
+      User? user  = await AuthService().signIn(
+        emailController.text.trim(),
+        passwordController.text.trim(),
+      );
 
-    print(emailController.text);
-    print(passwordController.text);
-    if (passwordController.text.length >= 6) {
-      Future<User?> loginuser = AuthService().signIn(emailController.text.trim(), passwordController.text.trim());
-      print(loginuser);
-      print('User is login');
-      return true;
-    }else{
-      print('invalid email or password');
-      return false;
+
+      if (user != null) {
+        print('User is logged in successfully');
+
+        // Show success Snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Login successful!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        return true; // Login successful
+      } else {
+        throw Exception('User not found');
+      }
+    } catch (e) {
+      print("Login failed: $e");
+
+      // Show error Snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Invalid email or password'),
+          backgroundColor: Colors.red,
+        ),
+      );
+
+      return false; // Login failed
     }
-
   }
 
   @override
@@ -261,10 +299,11 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                     const SizedBox(height: 32),
                     SizedBox(
+
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
-                          loginUser()?
+                        onPressed: () async{
+                          await loginUser(context)?
                           Navigator.of(context).push(_createRoute()):print("errot!!! occur in signin");
                         },
                         style: ElevatedButton.styleFrom(
