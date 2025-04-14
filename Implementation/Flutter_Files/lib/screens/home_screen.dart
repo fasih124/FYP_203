@@ -166,7 +166,7 @@ class HomeScreen extends StatelessWidget {
           Expanded(
             child: GridView.count(
               crossAxisCount: 2,
-              // childAspectRatio: 1.3,
+               childAspectRatio: 1,
               mainAxisSpacing: 0,
               crossAxisSpacing: 0,
               children: [
@@ -182,7 +182,7 @@ class HomeScreen extends StatelessWidget {
                       print('Stream error: ${snapshot.error}');
                       return _buildCard('Moisture', 'Error', 'assets/icons_img/Droplet.png');
                     } else {
-                      return _buildCard('Moisture', 'Loading...', 'assets/icons_img/Droplet.png');
+                      return _buildCard('Moisture', 'Loading', 'assets/icons_img/Droplet.png');
                     }
                   },
                 ),
@@ -202,7 +202,7 @@ class HomeScreen extends StatelessWidget {
 
 Widget _buildCard(String title, String value, String path) {
   return Padding(
-    padding: const EdgeInsets.all(16.0),
+    padding: const EdgeInsets.all(12.0),
     child: Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -217,6 +217,7 @@ Widget _buildCard(String title, String value, String path) {
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        // crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Container(
             decoration: const BoxDecoration(
@@ -227,7 +228,7 @@ Widget _buildCard(String title, String value, String path) {
             ),
             child: Padding(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16),
+                  const EdgeInsets.symmetric(horizontal: 2.0, vertical: 16),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.center,
