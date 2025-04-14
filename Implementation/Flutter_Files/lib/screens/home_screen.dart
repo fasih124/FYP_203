@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:fyp_203/Model/MositureSensor.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
 import 'package:fyp_203/screens/connect_cradle_screen.dart';
 import 'package:fyp_203/screens/setting_screen.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:fyp_203/services/firebase_sensordata.dart';
+
+
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -166,7 +171,24 @@ class HomeScreen extends StatelessWidget {
               crossAxisSpacing: 0,
               children: [
                 _buildCard('Temperature', '95°F', 'assets/icons_img/temp_Icon.png'),
-                _buildCard('Moisture', 'DRY', 'assets/icons_img/Droplet.png'),
+
+                StreamBuilder<MoistureSensorData>(
+                  stream: MoistureSensorService.getMoistureSensorData(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      final data = snapshot.data!;
+                      return _buildCard('Moisture', data.value.toUpperCase(), 'assets/icons_img/Droplet.png');
+                    } else if (snapshot.hasError) {
+                      print('Stream error: ${snapshot.error}');
+                      return _buildCard('Moisture', 'Error', 'assets/icons_img/Droplet.png');
+                    } else {
+                      return _buildCard('Moisture', 'Loading...', 'assets/icons_img/Droplet.png');
+                    }
+                  },
+                ),
+                // _buildCard('Moisture', 'DRY', 'assets/icons_img/Droplet.png'),
+
+
                 _buildCard('Air Quality', '200 AQI','assets/icons_img/aqi_icon.png' ),
                 _buildCard('Sound', '500 DB','assets/icons_img/sound_icon.png' ),
               ],
