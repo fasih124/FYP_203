@@ -132,9 +132,9 @@ class HomeScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Baby Presence',
+                            'Baby Presence :',
                             style: TextStyle(
-                              color: AppColorCode.primaryColor_800,
+                              color: AppColorCode.Black_shade,
                               fontFamily: 'Poppins',
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -166,7 +166,7 @@ class HomeScreen extends StatelessWidget {
               crossAxisSpacing: 0,
               children: [
                 _buildCard('Temperature', '95°F', 'assets/icons_img/temp_Icon.png'),
-                _buildCard('Weight', '2 KG', 'assets/icons_img/weight_icon.png'),
+                _buildCard('Moisture', 'DRY', 'assets/icons_img/Droplet.png'),
                 _buildCard('Air Quality', '200 AQI','assets/icons_img/aqi_icon.png' ),
                 _buildCard('Sound', '500 DB','assets/icons_img/sound_icon.png' ),
               ],
@@ -219,7 +219,7 @@ Widget _buildCard(String title, String value, String path) {
                     title,
                     style: const TextStyle(
                       color: AppColorCode.White_shade,
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -233,7 +233,7 @@ Widget _buildCard(String title, String value, String path) {
               value,
               style: const TextStyle(
                 color: AppColorCode.primaryColor_500,
-                fontSize: 32,
+                fontSize: 36,
                 fontWeight: FontWeight.bold,
               ),
             ),

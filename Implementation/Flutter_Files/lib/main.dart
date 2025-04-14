@@ -39,26 +39,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool _isConnected = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkInternet();
-    Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> result) {
-      setState(() {
-        _isConnected = result.contains(ConnectivityResult.wifi) ||
-            result.contains(ConnectivityResult.mobile);
-      });
-    });
-  }
-
-  Future<void> _checkInternet() async {
-    var connectivityResult = await Connectivity().checkConnectivity();
-    setState(() {
-      _isConnected = connectivityResult != ConnectivityResult.none;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,12 +49,15 @@ class _MyAppState extends State<MyApp> {
         fontFamily: 'Poppins',
       ).copyWith(scaffoldBackgroundColor: AppColorCode.neutralColor_500),
       debugShowCheckedModeBanner: false,
-      home: _isConnected ? AuthChecker() : NoInternetScreen(),
+      home: const AuthChecker() ,
     );
   }
 }
 
+
 class AuthChecker extends StatelessWidget {
+  const AuthChecker({super.key});
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
@@ -93,12 +76,3 @@ class AuthChecker extends StatelessWidget {
   }
 }
 
-class NoInternetScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("No Internet")),
-      body: Center(child: Text("Please connect to the internet to use the app.")),
-    );
-  }
-}
