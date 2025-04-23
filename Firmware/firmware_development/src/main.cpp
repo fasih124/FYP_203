@@ -365,11 +365,11 @@ void loop()
     
                 //Sending IRtemp(float) and weight reading(int) for debugging purpose
                 
-                //IRTemp reading
-                Firebase.RTDB.setFloat(&fbdo, "ignoreValues/IRTemp",get_Average_IRTemp());
-                Serial.println("IRTemp value pushed");
-                Serial.print("Path: "); Serial.println(fbdo.dataPath());
-                Serial.print("Type: "); Serial.println(fbdo.dataType());
+                // //IRTemp reading
+                // Firebase.RTDB.setFloat(&fbdo, "ignoreValues/IRTemp",get_Average_IRTemp());
+                // Serial.println("IRTemp value pushed");
+                // Serial.print("Path: "); Serial.println(fbdo.dataPath());
+                // Serial.print("Type: "); Serial.println(fbdo.dataType());
     
                 //Weight reading
                 Firebase.RTDB.setInt(&fbdo, "ignoreValues/Weight",measure_WeightChange());
