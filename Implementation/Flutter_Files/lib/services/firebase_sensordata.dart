@@ -49,3 +49,46 @@ class TemperatureSensorService  {
 }
 
 
+class AQISensorService  {
+  static  Stream<CradleSensorData> getAQISensorData() {
+
+    final database = FirebaseDatabase.instanceFor(
+      app: Firebase.app(),
+      databaseURL: 'https://fpy-203-default-rtdb.asia-southeast1.firebasedatabase.app',
+    );
+
+    final DatabaseReference _dbRef = database.ref('sensors/cradle1/AQISensor');
+
+    return _dbRef.onValue.map((event) {
+      final data = event.snapshot.value;
+      if (data != null && data is Map) {
+        return CradleSensorData.fromJson(Map<String, dynamic>.from(data));
+      } else {
+        throw Exception('Invalid or null moisture data');
+      }
+
+    });
+  }
+}
+
+class SoundSensorService  {
+  static  Stream<CradleSensorData> getSoundSensorData() {
+
+    final database = FirebaseDatabase.instanceFor(
+      app: Firebase.app(),
+      databaseURL: 'https://fpy-203-default-rtdb.asia-southeast1.firebasedatabase.app',
+    );
+
+    final DatabaseReference _dbRef = database.ref('sensors/cradle1/SoundSensor');
+
+    return _dbRef.onValue.map((event) {
+      final data = event.snapshot.value;
+      if (data != null && data is Map) {
+        return CradleSensorData.fromJson(Map<String, dynamic>.from(data));
+      } else {
+        throw Exception('Invalid or null moisture data');
+      }
+
+    });
+  }
+}

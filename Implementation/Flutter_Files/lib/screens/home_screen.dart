@@ -169,11 +169,9 @@ class HomeScreen extends StatelessWidget {
                childAspectRatio: 1,
               mainAxisSpacing: 0,
               crossAxisSpacing: 0,
-              children: [//TemperatureSensorService
-
-
-
+              children: [
                // temperature
+                // _buildCard('Temperature', '95°F', 'assets/icons_img/temp_Icon.png'),
                 StreamBuilder<CradleSensorData>(
                   stream: TemperatureSensorService.getTemperatureSensorData(),
                   builder: (context, snapshot) {
@@ -188,9 +186,7 @@ class HomeScreen extends StatelessWidget {
                     }
                   },
                 ),
-
-                // _buildCard('Temperature', '95°F', 'assets/icons_img/temp_Icon.png'),
-
+                // _buildCard('Moisture', 'DRY', 'assets/icons_img/Droplet.png'),
                 StreamBuilder<CradleSensorData>(
                   stream: MoistureSensorService.getMoistureSensorData(),
                   builder: (context, snapshot) {
@@ -205,42 +201,40 @@ class HomeScreen extends StatelessWidget {
                     }
                   },
                 ),
-                // _buildCard('Moisture', 'DRY', 'assets/icons_img/Droplet.png'),
 
-
-                _buildCard('Air Quality', '200 AQI','assets/icons_img/aqi_icon.png' ),
+                // _buildCard('Air Quality', '200 AQI','assets/icons_img/aqi_icon.png' ),
                 // AQI
-                // StreamBuilder<MoistureSensorData>(
-                //   stream: MoistureSensorService.getMoistureSensorData(),
-                //   builder: (context, snapshot) {
-                //     if (snapshot.hasData) {
-                //       final data = snapshot.data!;
-                //       return _buildCard('Moisture', data.value.toUpperCase(), 'assets/icons_img/Droplet.png');
-                //     } else if (snapshot.hasError) {
-                //       print('Stream error: ${snapshot.error}');
-                //       return _buildCard('Moisture', 'Error', 'assets/icons_img/Droplet.png');
-                //     } else {
-                //       return _buildCard('Moisture', 'Loading', 'assets/icons_img/Droplet.png');
-                //     }
-                //   },
-                // ),
+                StreamBuilder<CradleSensorData>(
+                  stream: AQISensorService.getAQISensorData(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      final data = snapshot.data!;
+                      return _buildCard('Air Quality', data.value.toUpperCase(), 'assets/icons_img/aqi_icon.png');
+                    } else if (snapshot.hasError) {
+                      print('Stream error: ${snapshot.error}');
+                      return _buildCard('Air Quality', 'Error', 'assets/icons_img/aqi_icon.png');
+                    } else {
+                      return _buildCard('Air Quality', 'Loading', 'assets/icons_img/aqi_icon.png');
+                    }
+                  },
+                ),
 
-                _buildCard('Sound', '500 DB','assets/icons_img/sound_icon.png' ),
+                // _buildCard('Sound', '500 DB','assets/icons_img/sound_icon.png' ),
                 // sound
-                // StreamBuilder<MoistureSensorData>(
-                //   stream: MoistureSensorService.getMoistureSensorData(),
-                //   builder: (context, snapshot) {
-                //     if (snapshot.hasData) {
-                //       final data = snapshot.data!;
-                //       return _buildCard('Moisture', data.value.toUpperCase(), 'assets/icons_img/Droplet.png');
-                //     } else if (snapshot.hasError) {
-                //       print('Stream error: ${snapshot.error}');
-                //       return _buildCard('Moisture', 'Error', 'assets/icons_img/Droplet.png');
-                //     } else {
-                //       return _buildCard('Moisture', 'Loading', 'assets/icons_img/Droplet.png');
-                //     }
-                //   },
-                // ),
+                StreamBuilder<CradleSensorData>(
+                  stream: SoundSensorService.getSoundSensorData(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      final data = snapshot.data!;
+                      return _buildCard('Sound', data.value.toUpperCase(), 'assets/icons_img/sound_icon.png');
+                    } else if (snapshot.hasError) {
+                      print('Stream error: ${snapshot.error}');
+                      return _buildCard('Sound', 'Error', 'assets/icons_img/sound_icon.png');
+                    } else {
+                      return _buildCard('Sound', 'Loading', 'assets/icons_img/sound_icon.png');
+                    }
+                  },
+                ),
               ],
             ),
           ),
