@@ -1,28 +1,28 @@
-class MoistureSensorData {
+class CradleSensorData {
   final num timestamp;
   final String type;
   final String value;
 
-  MoistureSensorData({
+  CradleSensorData({
     required this.timestamp,
     required this.type,
     required this.value,
   });
 
-  factory MoistureSensorData.fromJson(Map<String, dynamic> json) {
-    return MoistureSensorData(
+  factory CradleSensorData.fromJson(Map<String, dynamic> json) {
+    return CradleSensorData(
       timestamp: json['timestamp'] ?? 0,
       type: json['type'] ?? '',
       value: json['value'] ?? '',
     );
   }
 
-  MoistureSensorData copyWith({
+  CradleSensorData copyWith({
     num? timestamp,
     String? type,
     String? value,
   }) {
-    return MoistureSensorData(
+    return CradleSensorData(
       timestamp: timestamp ?? this.timestamp,
       type: type ?? this.type,
       value: value ?? this.value,

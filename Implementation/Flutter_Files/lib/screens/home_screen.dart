@@ -169,10 +169,29 @@ class HomeScreen extends StatelessWidget {
                childAspectRatio: 1,
               mainAxisSpacing: 0,
               crossAxisSpacing: 0,
-              children: [
-                _buildCard('Temperature', '95°F', 'assets/icons_img/temp_Icon.png'),
+              children: [//TemperatureSensorService
 
-                StreamBuilder<MoistureSensorData>(
+
+
+               // temperature
+                StreamBuilder<CradleSensorData>(
+                  stream: TemperatureSensorService.getTemperatureSensorData(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      final data = snapshot.data!;
+                      return _buildCard('Temperature', data.value.toUpperCase(), 'assets/icons_img/Droplet.png');
+                    } else if (snapshot.hasError) {
+                      print('Stream error: ${snapshot.error}');
+                      return _buildCard('Temperature', 'Error', 'assets/icons_img/Droplet.png');
+                    } else {
+                      return _buildCard('Temperature', 'Loading', 'assets/icons_img/Droplet.png');
+                    }
+                  },
+                ),
+
+                // _buildCard('Temperature', '95°F', 'assets/icons_img/temp_Icon.png'),
+
+                StreamBuilder<CradleSensorData>(
                   stream: MoistureSensorService.getMoistureSensorData(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
@@ -190,7 +209,38 @@ class HomeScreen extends StatelessWidget {
 
 
                 _buildCard('Air Quality', '200 AQI','assets/icons_img/aqi_icon.png' ),
+                // AQI
+                // StreamBuilder<MoistureSensorData>(
+                //   stream: MoistureSensorService.getMoistureSensorData(),
+                //   builder: (context, snapshot) {
+                //     if (snapshot.hasData) {
+                //       final data = snapshot.data!;
+                //       return _buildCard('Moisture', data.value.toUpperCase(), 'assets/icons_img/Droplet.png');
+                //     } else if (snapshot.hasError) {
+                //       print('Stream error: ${snapshot.error}');
+                //       return _buildCard('Moisture', 'Error', 'assets/icons_img/Droplet.png');
+                //     } else {
+                //       return _buildCard('Moisture', 'Loading', 'assets/icons_img/Droplet.png');
+                //     }
+                //   },
+                // ),
+
                 _buildCard('Sound', '500 DB','assets/icons_img/sound_icon.png' ),
+                // sound
+                // StreamBuilder<MoistureSensorData>(
+                //   stream: MoistureSensorService.getMoistureSensorData(),
+                //   builder: (context, snapshot) {
+                //     if (snapshot.hasData) {
+                //       final data = snapshot.data!;
+                //       return _buildCard('Moisture', data.value.toUpperCase(), 'assets/icons_img/Droplet.png');
+                //     } else if (snapshot.hasError) {
+                //       print('Stream error: ${snapshot.error}');
+                //       return _buildCard('Moisture', 'Error', 'assets/icons_img/Droplet.png');
+                //     } else {
+                //       return _buildCard('Moisture', 'Loading', 'assets/icons_img/Droplet.png');
+                //     }
+                //   },
+                // ),
               ],
             ),
           ),
