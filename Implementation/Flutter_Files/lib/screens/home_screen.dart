@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:fyp_203/Model/MositureSensor.dart';
+import 'package:fyp_203/Model/CradleSensorModel.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
 import 'package:fyp_203/screens/connect_cradle_screen.dart';
 import 'package:fyp_203/screens/setting_screen.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:fyp_203/services/firebase_sensordata.dart';
+
+import '../Model/SoundSensorModel.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -383,7 +385,7 @@ class HomeScreen extends StatelessWidget {
 
                 // _buildCard('Sound', '500 DB','assets/icons_img/sound_icon.png' ),
                 // sound
-                StreamBuilder<CradleSensorData>(
+                StreamBuilder<SoundSensorData>(
                   stream: SoundSensorService.getSoundSensorData(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
@@ -403,6 +405,7 @@ class HomeScreen extends StatelessWidget {
                           ),
                           'assets/icons_img/sound_icon.png');
                       }
+                      print( 'Sound is playing. this is : ${data.isplaying} ');
                       return _buildCard(
                           'Sound',
                           Text(

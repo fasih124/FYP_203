@@ -1,7 +1,9 @@
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:fyp_203/Model/MositureSensor.dart';
+import 'package:fyp_203/Model/CradleSensorModel.dart';
+
+import '../Model/SoundSensorModel.dart';
 
 class MoistureSensorService  {
   static  Stream<CradleSensorData> getMoistureSensorData() {
@@ -72,7 +74,7 @@ class AQISensorService  {
 }
 
 class SoundSensorService  {
-  static  Stream<CradleSensorData> getSoundSensorData() {
+  static  Stream<SoundSensorData> getSoundSensorData() {
 
     final database = FirebaseDatabase.instanceFor(
       app: Firebase.app(),
@@ -84,7 +86,7 @@ class SoundSensorService  {
     return _dbRef.onValue.map((event) {
       final data = event.snapshot.value;
       if (data != null && data is Map) {
-        return CradleSensorData.fromJson(Map<String, dynamic>.from(data));
+        return SoundSensorData.fromJson(Map<String, dynamic>.from(data));
       } else {
         throw Exception('Invalid or null moisture data');
       }

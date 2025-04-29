@@ -1,7 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
 import 'package:fyp_203/screens/signin_screen.dart';
 import 'package:fyp_203/services/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class OptionScreen extends StatefulWidget {
   const OptionScreen({super.key});
@@ -11,13 +13,63 @@ class OptionScreen extends StatefulWidget {
 }
 
 class _OptionScreenState extends State<OptionScreen> {
-   bool isPlaying = false;
-  bool getTemp = true;
-  bool getWeight = true;
-  bool getSound = true;
-  bool getAQI = true;
 
   @override
+  void initState() {
+    super.initState();
+    fetchInitialSensorValues();
+  }
+
+  void fetchInitialSensorValues() async {
+    final database = FirebaseDatabase.instanceFor(
+      app: Firebase.app(),
+      databaseURL: 'https://fpy-203-default-rtdb.asia-southeast1.firebasedatabase.app/',
+    );
+
+    try {
+      final tempSnapshot = await database.ref('sensors/cradle1/TempSensor/enable').once();
+      final moistSnapshot = await database.ref('sensors/cradle1/MositureSensor/enable').once();
+      final soundSnapshot = await database.ref('sensors/cradle1/SoundSensor/enable').once();
+      final aqiSnapshot = await database.ref('sensors/cradle1/AQISensor/enable').once();
+      final soundplayingSnapshot = await database.ref('sensors/cradle1/SoundSensor/isplaying').once();
+
+      setState(() {
+        getTemp = tempSnapshot.snapshot.value as bool? ?? false;
+        getMoisture = moistSnapshot.snapshot.value as bool? ?? false;
+        getSound = soundSnapshot.snapshot.value as bool? ?? false;
+        getAQI = aqiSnapshot.snapshot.value as bool? ?? false;
+        isPlaying = soundplayingSnapshot.snapshot.value as bool? ?? false;
+      });
+    } catch (e) {
+      print('Error fetching initial sensor values: $e');
+    }
+  }
+
+
+
+
+
+
+
+
+  bool isPlaying = false;
+  bool getTemp = true;
+  bool getMoisture = true;
+  bool getSound = true;
+  bool getAQI = true;
+   // updateSensorStatus('TempSensor', value);
+   void updateSensorStatus(String sensorType, bool status) {
+     final ref = FirebaseDatabase.instanceFor(
+       app: Firebase.app(),
+       databaseURL: 'https://fpy-203-default-rtdb.asia-southeast1.firebasedatabase.app/',
+     ).ref('sensors/cradle1/$sensorType');
+     ref.update({'enable': status});
+   }
+
+
+
+
+   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
@@ -92,7 +144,9 @@ class _OptionScreenState extends State<OptionScreen> {
                           onChanged: (value) {
                             setState(() {
                               getTemp = value;
+                              // print(value);
                             });
+                            updateSensorStatus('TempSensor', value); // 🔥 Firebase update
                           }),
                     ),
                     Divider(
@@ -102,22 +156,23 @@ class _OptionScreenState extends State<OptionScreen> {
                     ListTile(
                       onTap: () {},
                       leading: Image.asset(
-                        'assets/icons_img/weight_icon.png',
+                        'assets/icons_img/Droplet.png',
                         width: 25,
                         height: 23,
                         color: AppColorCode.Black_shade,
                       ),
-                      title: Text('Weight'),
+                      title: Text('moisture'),
                       trailing:Switch(
-                          value: getWeight,
+                          value: getMoisture,
                           activeColor: AppColorCode.play_500,
                           activeTrackColor:  Colors.grey.shade400,
                           inactiveThumbColor: AppColorCode.stop_500,
                           inactiveTrackColor:  Colors.grey.shade400,
                           onChanged: (value) {
                             setState(() {
-                              getWeight = value;
+                              getMoisture = value;
                             });
+                            updateSensorStatus('MositureSensor', value); // 🔥 Firebase update
                           }),
                     ),
                     Divider(
@@ -143,6 +198,7 @@ class _OptionScreenState extends State<OptionScreen> {
                             setState(() {
                               getSound = value;
                             });
+                            updateSensorStatus('SoundSensor', value); // 🔥 Firebase update
                           }),
                     ),
                     Divider(
@@ -168,6 +224,7 @@ class _OptionScreenState extends State<OptionScreen> {
                             setState(() {
                               getAQI = value;
                             });
+                            updateSensorStatus('AQISensor', value); // 🔥 Firebase update
                           }),
                     ),
                   ],
@@ -180,10 +237,18 @@ class _OptionScreenState extends State<OptionScreen> {
               child: OutlinedButton(
                 onPressed: () {
                   setState(() {
+                    final ref = FirebaseDatabase.instanceFor(
+                      app: Firebase.app(),
+                      databaseURL: 'https://fpy-203-default-rtdb.asia-southeast1.firebasedatabase.app/',
+                    ).ref('sensors/cradle1/SoundSensor');
+
+
                     if(!isPlaying){
                       isPlaying=true;
+                      ref.update({'isplaying': true});
                     }else{
                       isPlaying=false;
+                      ref.update({'isplaying': false});
                     }
 
                   });
@@ -212,8 +277,8 @@ class _OptionScreenState extends State<OptionScreen> {
                       height: 23,
                       color: AppColorCode.Black_shade,
                     ),
-                    const Text(
-                      'Play / Pause lullaby',
+                     Text(
+                      isPlaying ?'  Pause Lullaby':'  Play Lullaby',
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         fontFamily: 'Poppins',
