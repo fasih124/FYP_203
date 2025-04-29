@@ -6,8 +6,6 @@ import 'package:fyp_203/screens/setting_screen.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:fyp_203/services/firebase_sensordata.dart';
 
-
-
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -105,8 +103,8 @@ class HomeScreen extends StatelessWidget {
                     onPressed: () {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
-                            return const ConnectCradleScreen();
-                          }));
+                        return const ConnectCradleScreen();
+                      }));
                     },
                     icon: const Icon(Icons.arrow_forward,
                         color: Colors.white, size: 18),
@@ -166,41 +164,150 @@ class HomeScreen extends StatelessWidget {
           Expanded(
             child: GridView.count(
               crossAxisCount: 2,
-               childAspectRatio: 1,
+              childAspectRatio: 1,
               mainAxisSpacing: 0,
               crossAxisSpacing: 0,
               children: [
-               // temperature
+
+
+
+
+                // temperature
                 // _buildCard('Temperature', '95°F', 'assets/icons_img/temp_Icon.png'),
                 StreamBuilder<CradleSensorData>(
                   stream: TemperatureSensorService.getTemperatureSensorData(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       final data = snapshot.data!;
-                      return _buildCard('Temperature', data.value.toUpperCase(), 'assets/icons_img/Droplet.png');
+                      if (!data.enable) {
+                        // Sensor is turned off
+                        return _buildCard(
+                          'Temperature',
+                          Text(
+                            'Tuned Off',
+                            style: const TextStyle(
+                              color: AppColorCode.primaryColor_500,
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          'assets/icons_img/temp_icon.png',
+                        );
+                      }
+
+                      return _buildCard(
+                          'Temperature',
+                          Text(
+                            data.value.toUpperCase(),
+                            style: const TextStyle(
+                              color: AppColorCode.primaryColor_500,
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          'assets/icons_img/temp_icon.png');
                     } else if (snapshot.hasError) {
                       print('Stream error: ${snapshot.error}');
-                      return _buildCard('Temperature', 'Error', 'assets/icons_img/Droplet.png');
+                      return _buildCard(
+                          'Temperature',
+                          Text(
+                            'Error',
+                            style: const TextStyle(
+                              color: AppColorCode.primaryColor_500,
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          'assets/icons_img/temp_icon.png');
                     } else {
-                      return _buildCard('Temperature', 'Loading', 'assets/icons_img/Droplet.png');
+                      return _buildCard(
+                          'Temperature',
+                          Text(
+                            'Loading',
+                            style: const TextStyle(
+                              color: AppColorCode.primaryColor_500,
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          'assets/icons_img/temp_icon.png');
                     }
                   },
                 ),
+
+
+
+
+
+
                 // _buildCard('Moisture', 'DRY', 'assets/icons_img/Droplet.png'),
                 StreamBuilder<CradleSensorData>(
                   stream: MoistureSensorService.getMoistureSensorData(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       final data = snapshot.data!;
-                      return _buildCard('Moisture', data.value.toUpperCase(), 'assets/icons_img/Droplet.png');
+
+                      if (!data.enable) {
+                        // Sensor is turned off
+                        return _buildCard(
+                          'Moisture',
+                          Text(
+                            'Tuned Off',
+                            style: const TextStyle(
+                              color: AppColorCode.primaryColor_500,
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          'assets/icons_img/Droplet.png',
+                        );
+                      }
+
+                      return _buildCard(
+                          'Moisture',
+                          Text(
+                            data.value.toUpperCase(),
+                            style: const TextStyle(
+                              color: AppColorCode.primaryColor_500,
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          'assets/icons_img/Droplet.png');
                     } else if (snapshot.hasError) {
                       print('Stream error: ${snapshot.error}');
-                      return _buildCard('Moisture', 'Error', 'assets/icons_img/Droplet.png');
+                      return _buildCard(
+                          'Moisture',
+                          Text(
+                            'Error',
+                            style: const TextStyle(
+                              color: AppColorCode.primaryColor_500,
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          'assets/icons_img/Droplet.png');
                     } else {
-                      return _buildCard('Moisture', 'Loading', 'assets/icons_img/Droplet.png');
+                      return _buildCard(
+                          'Moisture',
+                          Text(
+                            'Loading',
+                            style: const TextStyle(
+                              color: AppColorCode.primaryColor_500,
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          'assets/icons_img/Droplet.png');
                     }
                   },
                 ),
+
+
+
+
+
+
 
                 // _buildCard('Air Quality', '200 AQI','assets/icons_img/aqi_icon.png' ),
                 // AQI
@@ -209,15 +316,70 @@ class HomeScreen extends StatelessWidget {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       final data = snapshot.data!;
-                      return _buildCard('Air Quality', data.value.toUpperCase(), 'assets/icons_img/aqi_icon.png');
+
+                      if (!data.enable) {
+                        // Sensor is turned off
+                        return _buildCard(
+                          'Air Quality',
+                          Text(
+                            'Tuned Off',
+                            style: const TextStyle(
+                              color: AppColorCode.primaryColor_500,
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          'assets/icons_img/aqi_icon.png',
+                        );
+                      }
+                      // Sensor is enabled, show value
+                      return _buildCard(
+                        'Air Quality',
+                        Text(
+                          data.value.toUpperCase(),
+                          style: const TextStyle(
+                            color: AppColorCode.primaryColor_500,
+                            fontSize: 36,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        'assets/icons_img/aqi_icon.png',
+                      );
+
                     } else if (snapshot.hasError) {
                       print('Stream error: ${snapshot.error}');
-                      return _buildCard('Air Quality', 'Error', 'assets/icons_img/aqi_icon.png');
+                      return _buildCard(
+                          'Air Quality',
+                          Text(
+                            'Error',
+                            style: const TextStyle(
+                              color: AppColorCode.primaryColor_500,
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          'assets/icons_img/aqi_icon.png');
                     } else {
-                      return _buildCard('Air Quality', 'Loading', 'assets/icons_img/aqi_icon.png');
+                      return _buildCard(
+                          'Air Quality',
+                          Text(
+                            'Loading',
+                            style: const TextStyle(
+                              color: AppColorCode.primaryColor_500,
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          'assets/icons_img/aqi_icon.png');
                     }
                   },
                 ),
+
+
+
+
+
+
 
                 // _buildCard('Sound', '500 DB','assets/icons_img/sound_icon.png' ),
                 // sound
@@ -226,15 +388,65 @@ class HomeScreen extends StatelessWidget {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       final data = snapshot.data!;
-                      return _buildCard('Sound', data.value.toUpperCase(), 'assets/icons_img/sound_icon.png');
+
+                      if (!data.enable) {
+                        // Sensor is turned off
+                      return _buildCard(
+                          'Sound',
+                          Text(
+                            'Tuned Off',
+                            style: const TextStyle(
+                              color: AppColorCode.primaryColor_500,
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          'assets/icons_img/sound_icon.png');
+                      }
+                      return _buildCard(
+                          'Sound',
+                          Text(
+                            data.value.toUpperCase(),
+                            style: const TextStyle(
+                              color: AppColorCode.primaryColor_500,
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          'assets/icons_img/sound_icon.png');
+
+
                     } else if (snapshot.hasError) {
                       print('Stream error: ${snapshot.error}');
-                      return _buildCard('Sound', 'Error', 'assets/icons_img/sound_icon.png');
+                      return _buildCard(
+                          'Sound',
+                          Text(
+                            'Error',
+                            style: const TextStyle(
+                              color: AppColorCode.primaryColor_500,
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          'assets/icons_img/sound_icon.png');
                     } else {
-                      return _buildCard('Sound', 'Loading', 'assets/icons_img/sound_icon.png');
+                      return _buildCard(
+                          'Sound',
+                          Text(
+                            'Loading',
+                            style: const TextStyle(
+                              color: AppColorCode.primaryColor_500,
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          'assets/icons_img/sound_icon.png');
                     }
                   },
                 ),
+
+
+
               ],
             ),
           ),
@@ -244,7 +456,7 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-Widget _buildCard(String title, String value, String path) {
+Widget _buildCard(String title, Text sensorText, String path) {
   return Padding(
     padding: const EdgeInsets.all(12.0),
     child: Container(
@@ -281,7 +493,7 @@ Widget _buildCard(String title, String value, String path) {
                     path,
                     width: 25,
                     height: 23,
-                  ),// Icon(icon, color: AppColorCode.White_shade),
+                  ), // Icon(icon, color: AppColorCode.White_shade),
                   Text(
                     title,
                     style: const TextStyle(
@@ -296,14 +508,15 @@ Widget _buildCard(String title, String value, String path) {
             ),
           ),
           Center(
-            child: Text(
-              value,
-              style: const TextStyle(
-                color: AppColorCode.primaryColor_500,
-                fontSize: 36,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            child: sensorText,
+            // Text(
+            //   value,
+            //   style: const TextStyle(
+            //     color: AppColorCode.primaryColor_500,
+            //     fontSize: 36,
+            //     fontWeight: FontWeight.bold,
+            //   ),
+            // ),
           ),
           const SizedBox(
             height: 2,
