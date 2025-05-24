@@ -26,8 +26,8 @@ Things to do in main.cpp when integrating a new module:
 #include "addons/RTDBHelper.h"
 
 // Firebase Config
-#define DB_URL "https://esp-test-rtdb-a7ae5-default-rtdb.asia-southeast1.firebasedatabase.app/"
-#define API_KEY "AIzaSyAkcfm9OAStI2TGGAaKoO-6ZepYpOU6O9g"
+#define DB_URL "************************************"
+#define API_KEY "*******************************"
 
 // Firebase Objects
 FirebaseData fbdo;
@@ -50,8 +50,7 @@ int micInterval = 5000; // Adjusted to actual interval used in MicSensor
 
 bool signupCheck = false;
 
-void setup() 
-{
+void setup() {
     Serial.begin(115200);
     delay(100);
 
@@ -65,13 +64,10 @@ void setup()
     config.api_key = API_KEY;
     config.database_url = DB_URL;
 
-    if (Firebase.signUp(&config, &auth, "", "")) 
-    {
+    if (Firebase.signUp(&config, &auth, "", "")) {
         Serial.println("Sign-up check: OK");
         signupCheck = true;
-    } 
-    else 
-    {
+    } else {
         Serial.println("Error in Signup & DB connection");
         Serial.println(config.signer.signupError.message.c_str());
     }
@@ -79,73 +75,54 @@ void setup()
     config.token_status_callback = tokenStatusCallback;
     Firebase.begin(&config, &auth);
     Firebase.reconnectWiFi(true);
+}
 
-}// setup() ends
-
-void pushDataToFirebase(const String& path, const String& type, bool success) 
-{
-    if (success) 
-    {
-       Serial.print(type); Serial.println(" Pushed");
+void pushDataToFirebase(const String& path, const String& type, bool success) {
+    if (success) {
+        Serial.println(type + " Pushed");
         Serial.print("Path: "); Serial.println(path);
         Serial.print("Type: "); Serial.println(type);
-    } 
-    else 
-    {
+    } else {
         Serial.println("FAILED!");
         Serial.print("Firebase Error: "); Serial.println(fbdo.errorReason());
     }
-
 }
 
-void loop() 
-{
+void loop() {
     unsigned long currentMillis = millis();
 
-    if (Firebase.ready() && signupCheck) 
-    {
+    if (Firebase.ready() && signupCheck) {
 
-        if (currentMillis - prevTimeAQISentData > aqiInterval || prevTimeAQISentData == 0) 
-        {
+        if (currentMillis - prevTimeAQISentData > aqiInterval || prevTimeAQISentData == 0) {
             prevTimeAQISentData = currentMillis;
             pushDataToFirebase("ignoreValues/AQIVoltage", "AQI Voltage", Firebase.RTDB.setInt(&fbdo, "ignoreValues/AQIVoltage", read_AQI_Voltage()));
             Firebase.RTDB.setString(&fbdo, "sensors/AQIGrade", AQI_grade());
         }
 
-        if (currentMillis - prevTimeMoistureSentData > moistureInterval || prevTimeMoistureSentData == 0) 
-        {
+        if (currentMillis - prevTimeMoistureSentData > moistureInterval || prevTimeMoistureSentData == 0) {
             prevTimeMoistureSentData = currentMillis;
             pushDataToFirebase("sensors/DiaperCondition", "Diaper Condition", Firebase.RTDB.setString(&fbdo, "sensors/DiaperCondition", diaper_Condition()));
         }
 
-        if (currentMillis - prevTimeProbeSentData > probeInterval || prevTimeProbeSentData == 0) 
-        {
+        if (currentMillis - prevTimeProbeSentData > probeInterval || prevTimeProbeSentData == 0) {
             prevTimeProbeSentData = currentMillis;
             pushDataToFirebase("sensors/ProbeTemp", "Probe Temperature", Firebase.RTDB.setFloat(&fbdo, "sensors/ProbeTemp", temp_In_Fahrenheit()));
         }
 
-        if (currentMillis - prevTimeBabyDetectionSentData > detectionInterval || prevTimeBabyDetectionSentData == 0) 
-        {
+        if (currentMillis - prevTimeBabyDetectionSentData > detectionInterval || prevTimeBabyDetectionSentData == 0) {
             prevTimeBabyDetectionSentData = currentMillis;
             pushDataToFirebase("sensors/BabyDetection", "Baby Detection", Firebase.RTDB.setBool(&fbdo, "sensors/BabyDetection", baby_Detection_Flag()));
         }
 
-        if (currentMillis - prevTimeMicSentData > micInterval || prevTimeMicSentData == 0) 
-        {
+        if (currentMillis - prevTimeMicSentData > micInterval || prevTimeMicSentData == 0) {
             prevTimeMicSentData = currentMillis;
-            pushDataToFirebase("sensors/BabyCrying", "Baby Crying", Firebase.RTDB.setBool(&fbdo, "sensors/BabyCrying", detect_Cry()));
-            Firebase.RTDB.setInt(&fbdo, "ignoreValues/Mic", mic_Raw_Value());
+            pushDataToFirebase("sensors/BabyCrying", "Baby Crying", Firebase.RTDB.setBool(&fbdo, "sensors/BabyCrying", mic_Detection_Flag()));
         }
 
-    } 
-    else 
-    {
+    } else {
         Serial.println("Interval wait!");
         Serial.print("Firebase Error: ("); Serial.print(fbdo.errorReason()); Serial.println(")");
         delay(1500);
     }
+}
 
-
-
-
-}//loop() ends
