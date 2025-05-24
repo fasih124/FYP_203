@@ -1,69 +1,88 @@
 #include <Arduino.h>
 
 #define MIC_PIN 2
-#define THRESHOLD 2500
-#define DURATION_MS 5000
-#define SAMPLE_INTERVAL 10
-#define MIN_LOUD_COUNT 7
 
-unsigned long monitoringStart = 0;
+#define HIGH_THRESHOLD 2500
+#define LOW_THRESHOLD 200
+
+#define NUM_AVERAGE_SAMPLES 10
+
+#define SAMPLE_INTERVAL 100 //eval interval to check status
+#define MIN_CRY_DURATION 500  //min time to keep crying (less value, more sensitive detection with false positives also)
+#define QUIET_TIME 3000 //min time to reset flag to status quiet. (more value, more stable cry flag)
+
+int soundReadings[NUM_AVERAGE_SAMPLES];
+int readIndex = 0;
+long total = 0;
+int average = 0;
+
 unsigned long lastSampleTime = 0;
-int loudCount = 0;
-bool monitoring = false;
-unsigned long postCheckDelay = 5000;
-unsigned long postCheckStart = 0;
-bool inPostDelay = false;
+unsigned long quietStartTime = 0;
+unsigned long loudStartTime = 0;
 
-bool babyCrying = false;  // can be used externally if needed
+bool babyCrying = false;
+int currentRawValue = 0;
 
-void init_Mic() {
+void init_Mic()
+{
   pinMode(MIC_PIN, INPUT);
+  for (int i = 0; i < NUM_AVERAGE_SAMPLES; i++) {
+    soundReadings[i] = 0;
+  }
 }
 
-int mic_Raw_Value() {
+int mic_Raw_Value()
+{
   return analogRead(MIC_PIN);
 }
 
-bool detect_Cry() 
-{
+bool processSoundAndDetectCry() {
   unsigned long currentTime = millis();
 
-  if (!monitoring && !inPostDelay) {
-    monitoringStart = currentTime;
-    lastSampleTime = currentTime;
-    loudCount = 0;
-    monitoring = true;
-  }
+  currentRawValue = mic_Raw_Value();
 
-  if (monitoring && (currentTime - lastSampleTime >= SAMPLE_INTERVAL)) 
+  total = total - soundReadings[readIndex];
+  soundReadings[readIndex] = currentRawValue;
+  total = total + currentRawValue;
+  readIndex++;
+  if (readIndex >= NUM_AVERAGE_SAMPLES) {
+    readIndex = 0;
+  }
+  average = total / NUM_AVERAGE_SAMPLES;
+
+  if (currentTime - lastSampleTime >= SAMPLE_INTERVAL)
   {
     lastSampleTime = currentTime;
-    int soundLevel = analogRead(MIC_PIN);
-    if (soundLevel > THRESHOLD) {
-      loudCount++;
-    }
-  }
 
-  if (monitoring && (currentTime - monitoringStart >= DURATION_MS)) 
-  {
-    monitoring = false;
-    inPostDelay = true;
-    postCheckStart = currentTime;
+    bool isLoudNow = (currentRawValue > HIGH_THRESHOLD || currentRawValue < LOW_THRESHOLD);
 
-    if (loudCount >= MIN_LOUD_COUNT) 
+    if (isLoudNow)
     {
-      babyCrying = true;
-      return true;
-    } else {
-      babyCrying = false;
-      return false;
+      if (loudStartTime == 0) {
+        loudStartTime = currentTime;
+      }
+      quietStartTime = 0;
+
+      if (!babyCrying && (currentTime - loudStartTime >= MIN_CRY_DURATION))
+      {
+        babyCrying = true;
+      }
+    }
+    else
+    {
+      loudStartTime = 0;
+
+      if (quietStartTime == 0) {
+        quietStartTime = currentTime;
+      }
+
+      if (babyCrying && (currentTime - quietStartTime >= QUIET_TIME))
+      {
+        babyCrying = false;
+        quietStartTime = 0;
+      }
     }
   }
 
-  if (inPostDelay && (currentTime - postCheckStart >= postCheckDelay)) {
-    inPostDelay = false;
-  }
-
-  return false;  // Default return if no decision made yet
-
-} //func ends
+  return babyCrying;
+}
