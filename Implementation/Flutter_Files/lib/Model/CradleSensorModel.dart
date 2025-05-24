@@ -1,31 +1,36 @@
-class MoistureSensorData {
+class CradleSensorData {
   final num timestamp;
   final String type;
   final String value;
+  final bool enable;
 
-  MoistureSensorData({
+  CradleSensorData({
     required this.timestamp,
     required this.type,
     required this.value,
+    required this.enable,
   });
 
-  factory MoistureSensorData.fromJson(Map<String, dynamic> json) {
-    return MoistureSensorData(
+  factory CradleSensorData.fromJson(Map<String, dynamic> json) {
+    return CradleSensorData(
       timestamp: json['timestamp'] ?? 0,
       type: json['type'] ?? '',
       value: json['value'] ?? '',
+      enable: json['enable'] ?? false,
     );
   }
 
-  MoistureSensorData copyWith({
+  CradleSensorData copyWith({
     num? timestamp,
     String? type,
     String? value,
+    bool? enable,
   }) {
-    return MoistureSensorData(
+    return CradleSensorData(
       timestamp: timestamp ?? this.timestamp,
       type: type ?? this.type,
       value: value ?? this.value,
+      enable: enable ?? this.enable,
     );
   }
 
@@ -34,6 +39,7 @@ class MoistureSensorData {
       'timestamp': timestamp,
       'type': type,
       'value': value,
+      'enable': enable,
     };
   }
 }
