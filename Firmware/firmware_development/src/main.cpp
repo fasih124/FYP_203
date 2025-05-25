@@ -46,7 +46,7 @@ int aqiInterval = 10000;
 int moistureInterval = 10000;
 int probeInterval = 10000;
 int detectionInterval = 10000;
-int micInterval = 1000; // Adjusted to actual interval used in MicSensor
+int micInterval = 100; // Adjusted to actual interval used in MicSensor
 
 bool signupCheck = false;
 
@@ -102,6 +102,7 @@ void loop()
 {
     unsigned long currentMillis = millis();
 
+    //NOTE: DO NOT change the order of sensor code. Otherwise, mic_sensor may not give right values due to firebase latency issues
     if (Firebase.ready() && signupCheck) 
     {
 
@@ -110,6 +111,7 @@ void loop()
         {
             prevTimeBabyDetectionSentData = currentMillis;
             pushDataToFirebase("sensors/BabyDetection", "Baby Detection", Firebase.RTDB.setBool(&fbdo, "sensors/BabyDetection", baby_Detection_Flag()));
+            
         }
 
 
@@ -120,6 +122,7 @@ void loop()
             pushDataToFirebase("sensors/BabyCrying", "Baby Crying", Firebase.RTDB.setBool(&fbdo, "sensors/BabyCrying", processSoundAndDetectCry()));
             //Firebase.RTDB.setInt(&fbdo, "ignoreValues/Mic", mic_Raw_Value());
             //Firebase.RTDB.setInt(&fbdo, "ignoreValues/Mic_Average", average);
+            Serial.println(mic_Raw_Value());
         }
 
 

@@ -2,13 +2,13 @@
 
 #define MIC_PIN 2
 
-#define HIGH_THRESHOLD 2500
-#define LOW_THRESHOLD 200
+#define HIGH_THRESHOLD 2200
+#define LOW_THRESHOLD 600
 
 #define NUM_AVERAGE_SAMPLES 10
 
-#define SAMPLE_INTERVAL 100 //eval interval to check status
-#define MIN_CRY_DURATION 500  //min time to keep crying (less value, more sensitive detection with false positives also)
+#define SAMPLE_INTERVAL 70 //eval interval to check status
+#define MIN_CRY_DURATION 300  //min time to keep crying (less value, more sensitive detection with false positives also)
 #define QUIET_TIME 3000 //min time to reset flag to status quiet. (more value, more stable cry flag)
 
 int soundReadings[NUM_AVERAGE_SAMPLES];
@@ -86,3 +86,4 @@ bool processSoundAndDetectCry() {
 
   return babyCrying;
 }
+
