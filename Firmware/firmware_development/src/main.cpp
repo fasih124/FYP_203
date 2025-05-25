@@ -102,7 +102,14 @@ void loop()
 {
     unsigned long currentMillis = millis();
 
-    //NOTE: DO NOT change the order of sensor code. Otherwise, mic_sensor may not give right values due to firebase latency issues
+    /* NOTE:
+     DO NOT change the order of sensor code. 
+     Otherwise, mic_sensor may not give right values 
+     due to firebase latency issues.
+     Also, DO NOT send raw values unless necessary 'cuz,
+     this can also introduce latency in firebase.
+    */
+   
     if (Firebase.ready() && signupCheck) 
     {
 
@@ -122,7 +129,15 @@ void loop()
             pushDataToFirebase("sensors/BabyCrying", "Baby Crying", Firebase.RTDB.setBool(&fbdo, "sensors/BabyCrying", processSoundAndDetectCry()));
             //Firebase.RTDB.setInt(&fbdo, "ignoreValues/Mic", mic_Raw_Value());
             //Firebase.RTDB.setInt(&fbdo, "ignoreValues/Mic_Average", average);
-            Serial.println(mic_Raw_Value());
+            
+
+            //initially mic raw values will be fluctuating greatly, they'll stabilize after 30 seconds of execution.
+            Serial.println(mic_Raw_Value());  
+            
+
+            //flag will always be false if baby is not present
+            //Serial.println(processSoundAndDetectCry());
+            
         }
 
 

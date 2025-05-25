@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "BabyDetection.h"  //if baby is detected
 
 #define MIC_PIN 2
 
@@ -26,7 +27,8 @@ int currentRawValue = 0;
 void init_Mic()
 {
   pinMode(MIC_PIN, INPUT);
-  for (int i = 0; i < NUM_AVERAGE_SAMPLES; i++) {
+  for (int i = 0; i < NUM_AVERAGE_SAMPLES; i++) 
+  {
     soundReadings[i] = 0;
   }
 }
@@ -36,16 +38,20 @@ int mic_Raw_Value()
   return analogRead(MIC_PIN);
 }
 
-bool processSoundAndDetectCry() {
-  unsigned long currentTime = millis();
+bool processSoundAndDetectCry() //signal processing 
+{
+  unsigned long currentTime = millis(); //keep this before detection_flag
 
+if(/*baby_Detection_Flag()*/  true) //'true' for debugging purpose if detection module is not attached
+{
   currentRawValue = mic_Raw_Value();
 
   total = total - soundReadings[readIndex];
   soundReadings[readIndex] = currentRawValue;
   total = total + currentRawValue;
   readIndex++;
-  if (readIndex >= NUM_AVERAGE_SAMPLES) {
+  if (readIndex >= NUM_AVERAGE_SAMPLES) 
+  {
     readIndex = 0;
   }
   average = total / NUM_AVERAGE_SAMPLES;
@@ -58,7 +64,8 @@ bool processSoundAndDetectCry() {
 
     if (isLoudNow)
     {
-      if (loudStartTime == 0) {
+      if (loudStartTime == 0) 
+      {
         loudStartTime = currentTime;
       }
       quietStartTime = 0;
@@ -72,7 +79,8 @@ bool processSoundAndDetectCry() {
     {
       loudStartTime = 0;
 
-      if (quietStartTime == 0) {
+      if (quietStartTime == 0) 
+      {
         quietStartTime = currentTime;
       }
 
@@ -86,4 +94,26 @@ bool processSoundAndDetectCry() {
 
   return babyCrying;
 }
+
+else  //no baby detected, reset the flag status to avoid errors from previous readings
+{
+  babyCrying = false;
+  loudStartTime = 0;
+  quietStartTime = 0;
+
+  for (int i = 0; i < NUM_AVERAGE_SAMPLES; i++) 
+  {
+      soundReadings[i] = 0;
+  }
+  total = 0;
+  average = 0;
+  currentRawValue = 0;
+
+  lastSampleTime = currentTime;
+
+  return false; //cry status false
+}
+
+
+}// end of detect cry
 
