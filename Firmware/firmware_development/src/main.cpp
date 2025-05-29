@@ -19,6 +19,9 @@ Things to do in main.cpp when integrating a new module:
 #include "WeightSensor.h"   // Weight Sensor
 #include "BabyDetection.h"  // Baby Detection Module
 #include "MicSensor.h"      // Crying Detection using Mic
+#include "dfplayer.h"       // Mp3 module
+
+
 
 //Provides the token generation process info
 #include "addons/TokenHelper.h"
@@ -54,8 +57,13 @@ void setup()
 {
     Serial.begin(115200);
     delay(100);
+    
+    myDFPlayer.play(1);     //welcome note
+    myDFPlayer.play(2);     //initiating components
+    
 
-    init_Wifi_Connections();
+    init_Dfplayer();
+    init_Wifi_Connections();    //contains wifi ok audio
     init_AQI_sensor();
     init_Moisture_Sensor();
     init_Probe_Sensor();
@@ -69,16 +77,23 @@ void setup()
     {
         Serial.println("Sign-up check: OK");
         signupCheck = true;
+
+        myDFPlayer.play(5); //DB ok audio
     } 
     else 
     {
         Serial.println("Error in Signup & DB connection");
         Serial.println(config.signer.signupError.message.c_str());
+
+        myDFPlayer.play(6); //DB failed audio
     }
 
     config.token_status_callback = tokenStatusCallback;
     Firebase.begin(&config, &auth);
     Firebase.reconnectWiFi(true);
+
+    myDFPlayer.play(7);     //all system checks ok
+
 
 }// setup() ends
 

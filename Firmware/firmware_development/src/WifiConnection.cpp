@@ -3,6 +3,8 @@
 
 #include <Arduino.h>
 #include <WiFiManager.h>
+#include "dfplayer.h"
+
 
 WiFiManager wm;
 
@@ -18,6 +20,8 @@ void init_Wifi_Connections()
         Serial.println("Wifi connected!");
         Serial.print("IP Address: ");
         Serial.println(WiFi.localIP()); //Prints assigned IP
+        
+        myDFPlayer.play(3); //wifi ok
 
     }
     else
@@ -25,6 +29,8 @@ void init_Wifi_Connections()
         Serial.println("Failed to Connect!");
         ESP.restart(); // restarts the ESP which means re-executes setup() which means retries to establish connection.
         
+        myDFPlayer.play(4);
+
         //If not connected again and again, ESP will keep restarting. Like a loop. Thats what this function does.
         
     }
