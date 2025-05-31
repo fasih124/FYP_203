@@ -3,34 +3,30 @@
 #ifndef MIC_SENSOR_H
 #define MIC_SENSOR_H
 
-#include <Arduino.h>        // Required for Arduino types like bool, int, unsigned long, millis()
+#include <Arduino.h>        // Required for Arduino types like bool, int, unsigned long
 #include "BabyDetection.h"  // Include for baby_Detection_Flag()
 
-// Define constants (these don't need 'extern' as #define is a preprocessor directive)
-#define MIC_PIN 2
-#define CRY_THRESHOLD 2000
-#define NUM_AVERAGE_SAMPLES 10
-#define MIN_CRY_DURATION 1000
-#define QUIET_TIME 3000
+// --- ADJUST THESE THRESHOLDS ---
+// Based on your observation: 50-250 in silence.
+// A crying sound should be significantly OUTSIDE this range.
+// You MUST fine-tune these values during testing.
+#define RAW_HIGH_THRESHOLD 2200 // Example: Raw reading above this is "loud" (a cry)
+#define RAW_LOW_THRESHOLD  300 // Example: Raw reading below this is "loud" (e.g., mic disconnect, or very specific sound)
+
+#define MIN_CRY_DURATION 300  // Minimum time (ms) raw sound must be continuously "loud" to be a cry
+#define QUIET_TIME 3000       // Minimum time (ms) raw sound must be "quiet" to reset cry flag
 
 // Declare global variables as 'extern'
-// This tells other files that these variables are defined in MicSensor.cpp
-extern int soundReadings[NUM_AVERAGE_SAMPLES];
-extern int readIndex;
-extern long total;
-extern int average;
-
+// (Removed moving average specific variables)
 extern unsigned long loudStartTime;
 extern unsigned long quietStartTime;
 
 extern bool babyCrying;
-extern int currentRawValue;
+extern int currentRawValue; // Still useful for debugging the raw value
 
 // Declare function prototypes
-// These functions are implemented in MicSensor.cpp
 void init_Mic();
-int mic_Raw_Value();
-int mic_Smoothed_Value();
+int mic_Raw_Value(); // Only raw value is relevant now
 bool process_Sound_And_Detect_Cry();
 
 #endif // MIC_SENSOR_H

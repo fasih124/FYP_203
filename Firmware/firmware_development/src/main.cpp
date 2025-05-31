@@ -155,11 +155,10 @@ void loop()
             //Firebase.RTDB.setInt(&fbdo, "ignoreValues/Mic_Average", average);
             
 
-            //initially mic raw values will be fluctuating greatly, they'll stabilize after 30 seconds of execution.
-            Serial.print(mic_Raw_Value());  Serial.print("-------------"); Serial.println(mic_Smoothed_Value());
+            //initially mic raw values will be fluctuating greatly, they'll stabilize after some minutes of execution.
+            Serial.print("-------------"); Serial.print(mic_Raw_Value());  Serial.println("-------------");
             Serial.print("Cry Status: "); Serial.println(process_Sound_And_Detect_Cry());
 
-            
         }
 
 
