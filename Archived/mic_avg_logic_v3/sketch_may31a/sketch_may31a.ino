@@ -1,7 +1,5 @@
-//mic_avg_logic_v3
-
-#include <Arduino.h>
-#include "BabyDetection.h"  // Assuming this provides baby_Detection_Flag()
+// #include <Arduino.h>
+// #include "BabyDetection.h"  // Assuming this provides baby_Detection_Flag()
 
 #define MIC_PIN 2
 
@@ -9,7 +7,7 @@
 // Based on your observation of 50-250 in silence:
 // Anything significantly *above* 250 would indicate a sound.
 // A typical cry would likely push it much higher than 250.
-#define CRY_THRESHOLD 2000 // Example: Any smoothed reading above 400 is considered "loud"
+#define CRY_THRESHOLD 200 // Example: Any smoothed reading above 400 is considered "loud"
                           // You MUST fine-tune this value by testing with actual cries.
                           // Start with something like 300, 400, or 500 and adjust.
 
@@ -19,7 +17,7 @@
 
 #define NUM_AVERAGE_SAMPLES 10 // Number of samples for the moving average. Good for smoothing noise.
 
-#define MIN_CRY_DURATION 1000  // Minimum time (in milliseconds) a sound must be continuously "loud" to be classified as a cry.
+#define MIN_CRY_DURATION 300  // Minimum time (in milliseconds) a sound must be continuously "loud" to be classified as a cry.
                               // Shorter value = more sensitive, more false positives.
 #define QUIET_TIME 3000       // Minimum time (in milliseconds) the sound must be "quiet" to reset the babyCrying flag.
                               // Longer value = cry flag stays true for longer after sound stops.
@@ -60,7 +58,7 @@ int mic_Smoothed_Value()
 
 
 // Signal processing and crying detection logic
-bool process_Sound_And_Detect_Cry()
+bool processSoundAndDetectCry()
 {
   unsigned long currentTime = millis(); // Get current time for all timing checks
 
@@ -137,3 +135,20 @@ bool process_Sound_And_Detect_Cry()
   return babyCrying; // Return the current status of the babyCrying flag
 }
 
+
+
+void setup()
+{
+  Serial.begin(9600);
+  init_Mic();
+}
+
+
+
+void loop()
+{
+  Serial.print(mic_Raw_Value()); Serial.print("-----------"); Serial.print(mic_Smoothed_Value());
+  Serial.println();
+  Serial.print("Cry Status: "); Serial.println(processSoundAndDetectCry());
+  delay(2000);
+}

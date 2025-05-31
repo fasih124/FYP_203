@@ -12,7 +12,7 @@ void init_Wifi_Connections()
 {
     // wm.resetSettings(); //Deletes the saved wifi credentials. (Run once for testing purpose only)
 
-    bool result = wm.autoConnect("CareNest", "carenest");   //Connected network credentials are storede in the variable.
+    bool result = wm.autoConnect("CareNest", "carenest");   //Connected network credentials are stored in the variable.
 
     //Checks if connection was successful
     if(result)

@@ -47,10 +47,10 @@ unsigned long prevTimeLullabyPlayed = 0;
 
 
 // Intervals
-int aqiInterval = 10000;
-int moistureInterval = 10000;
-int probeInterval = 10000;
-int detectionInterval = 10000;
+int aqiInterval = 30000;
+int moistureInterval = 30000;
+int probeInterval = 30000;
+int detectionInterval = 30000;
 int micInterval = 100; // Adjusted to actual interval used in MicSensor
 int lullabyInterval = 10000;   //10 sec of lullaby playing
 
@@ -150,17 +150,15 @@ void loop()
         if (currentMillis - prevTimeMicSentData > micInterval || prevTimeMicSentData == 0) 
         {
             prevTimeMicSentData = currentMillis;
-            pushDataToFirebase("sensors/BabyCrying", "Baby Crying", Firebase.RTDB.setBool(&fbdo, "sensors/BabyCrying", processSoundAndDetectCry()));
+            pushDataToFirebase("sensors/BabyCrying", "Baby Crying", Firebase.RTDB.setBool(&fbdo, "sensors/BabyCrying", process_Sound_And_Detect_Cry()));
             //Firebase.RTDB.setInt(&fbdo, "ignoreValues/Mic", mic_Raw_Value());
             //Firebase.RTDB.setInt(&fbdo, "ignoreValues/Mic_Average", average);
             
 
             //initially mic raw values will be fluctuating greatly, they'll stabilize after 30 seconds of execution.
-            Serial.println(mic_Raw_Value());  
-            
+            Serial.print(mic_Raw_Value());  Serial.print("-------------"); Serial.println(mic_Smoothed_Value());
+            Serial.print("Cry Status: "); Serial.println(process_Sound_And_Detect_Cry());
 
-            //flag will always be false if baby is not present
-            //Serial.println(processSoundAndDetectCry());
             
         }
 
@@ -197,24 +195,24 @@ void loop()
     but checks if baby is crying and plays the lullaby with proper timing.
     */
 
-    // Call processSoundAndDetectCry() frequently for accurate detection
+    // Call process_Sound_And_Detect_Cry() frequently for accurate detection
     
     // This runs regardless of lullaby playback state or intervals, crucial for accuracy.
-    bool babyIsCrying = processSoundAndDetectCry();
+    bool babyIsCrying = process_Sound_And_Detect_Cry();
 
-    if (babyIsCrying) {
-        if (currentMillis - prevTimeLullabyPlayed > lullabyInterval) {
-            myDFPlayer.play(8); // Play the lullaby track
-            prevTimeLullabyPlayed = currentMillis; // Update the timestamp for the next cooldown check
+    // if (babyIsCrying) {
+    //     if (currentMillis - prevTimeLullabyPlayed > lullabyInterval) {
+    //         myDFPlayer.play(8); // Play the lullaby track
+    //         prevTimeLullabyPlayed = currentMillis; // Update the timestamp for the next cooldown check
             
-            Serial.println("Baby crying detected, starting/restarting lullaby.");
-        }
-    }
+    //         Serial.println("Baby crying detected, starting/restarting lullaby.");
+    //     }
+    // }
 
-    // Keep myDFPlayer.loop() or myDFPlayer.available() somewhere in your loop()
-    // It's still good practice to process incoming data, even if you don't act on 'PlayFinished'.
-    // If you remove this, communication with the DFPlayer might become unreliable over time.
-    myDFPlayer.available(); // Just check for availability to clear the buffer
+    // // Keep myDFPlayer.loop() or myDFPlayer.available() somewhere in your loop()
+    // // It's still good practice to process incoming data, even if you don't act on 'PlayFinished'.
+    // // If you remove this, communication with the DFPlayer might become unreliable over time.
+    // myDFPlayer.available(); // Just check for availability to clear the buffer
 
 
     } 

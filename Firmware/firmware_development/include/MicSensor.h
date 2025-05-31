@@ -1,46 +1,36 @@
-// #ifndef MIC_SENSOR_H
-// #define MIC_SENSOR_H
+// MicSensor.h
 
-// void init_Mic();
-// int mic_Raw_Value();
-// bool processSoundAndDetectCry();
+#ifndef MIC_SENSOR_H
+#define MIC_SENSOR_H
 
-// #endif
+#include <Arduino.h>        // Required for Arduino types like bool, int, unsigned long, millis()
+#include "BabyDetection.h"  // Include for baby_Detection_Flag()
 
-
-//-----------------------------------------
-
-#ifndef BABY_CRY_DETECTOR_H
-#define BABY_CRY_DETECTOR_H
-
-#include <Arduino.h>
-
-// ... (other #defines like MIC_PIN, THRESHOLDS, etc.) ...
-
-#define HIGH_THRESHOLD 2400
-#define LOW_THRESHOLD 300
+// Define constants (these don't need 'extern' as #define is a preprocessor directive)
+#define MIC_PIN 2
+#define CRY_THRESHOLD 2000
 #define NUM_AVERAGE_SAMPLES 10
-#define SAMPLE_INTERVAL 100
-#define MIN_CRY_DURATION 500
+#define MIN_CRY_DURATION 1000
 #define QUIET_TIME 3000
 
-// --- EXTERN DECLARATIONS FOR GLOBAL VARIABLES ---
+// Declare global variables as 'extern'
+// This tells other files that these variables are defined in MicSensor.cpp
 extern int soundReadings[NUM_AVERAGE_SAMPLES];
 extern int readIndex;
 extern long total;
-extern int average; // <-- THIS IS KEY for 'average'
+extern int average;
 
-extern unsigned long lastSampleTime;
-extern unsigned long quietStartTime;
 extern unsigned long loudStartTime;
+extern unsigned long quietStartTime;
 
-extern bool babyCrying;    // <-- THIS IS KEY for 'babyCrying'
-extern int currentRawValue; // <-- THIS IS KEY for 'currentRawValue'
-// --- END EXTERN DECLARATIONS ---
+extern bool babyCrying;
+extern int currentRawValue;
 
-// Function declarations
+// Declare function prototypes
+// These functions are implemented in MicSensor.cpp
 void init_Mic();
 int mic_Raw_Value();
-bool processSoundAndDetectCry();
+int mic_Smoothed_Value();
+bool process_Sound_And_Detect_Cry();
 
-#endif // BABY_CRY_DETECTOR_H
+#endif // MIC_SENSOR_H
