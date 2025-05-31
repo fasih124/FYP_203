@@ -52,7 +52,7 @@ int moistureInterval = 30000;
 int probeInterval = 30000;
 int detectionInterval = 30000;
 int micInterval = 100; // Adjusted to actual interval used in MicSensor
-int lullabyInterval = 10000;   //10 sec of lullaby playing
+int lullabyInterval = 60000;   //wont repeat within 1 min duration if flag fluctuates from true to false & then false to true
 
 bool signupCheck = false;
 bool lullabyCurrentlyPlaying = false;
@@ -142,6 +142,9 @@ void loop()
         {
             prevTimeBabyDetectionSentData = currentMillis;
             pushDataToFirebase("sensors/BabyDetection", "Baby Detection", Firebase.RTDB.setBool(&fbdo, "sensors/BabyDetection", baby_Detection_Flag()));
+            Serial.print("WEIGHT: "); Serial.println(measure_WeightChange());
+            Serial.print("TEMPERATURE:  "); Serial.println(get_Average_IRTemp());
+            
             
         }
 
@@ -199,19 +202,19 @@ void loop()
     // This runs regardless of lullaby playback state or intervals, crucial for accuracy.
     bool babyIsCrying = process_Sound_And_Detect_Cry();
 
-    // if (babyIsCrying) {
-    //     if (currentMillis - prevTimeLullabyPlayed > lullabyInterval) {
-    //         myDFPlayer.play(8); // Play the lullaby track
-    //         prevTimeLullabyPlayed = currentMillis; // Update the timestamp for the next cooldown check
+    if (babyIsCrying) {
+        if (currentMillis - prevTimeLullabyPlayed > lullabyInterval) {
+            myDFPlayer.play(8); // Play the lullaby track
+            prevTimeLullabyPlayed = currentMillis; // Update the timestamp for the next cooldown check
             
-    //         Serial.println("Baby crying detected, starting/restarting lullaby.");
-    //     }
-    // }
+            Serial.println("Baby crying detected, starting/restarting lullaby.");
+        }
+    }
 
-    // // Keep myDFPlayer.loop() or myDFPlayer.available() somewhere in your loop()
-    // // It's still good practice to process incoming data, even if you don't act on 'PlayFinished'.
-    // // If you remove this, communication with the DFPlayer might become unreliable over time.
-    // myDFPlayer.available(); // Just check for availability to clear the buffer
+    // Keep myDFPlayer.loop() or myDFPlayer.available() somewhere in your loop()
+    // It's still good practice to process incoming data, even if you don't act on 'PlayFinished'.
+    // If you remove this, communication with the DFPlayer might become unreliable over time.
+    myDFPlayer.available(); // Just check for availability to clear the buffer
 
 
     } 
