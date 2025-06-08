@@ -3,13 +3,13 @@
 
 #include <HX711.h>  //external library by bogde
 
-#define DT_PIN 4   // DT Pin (Don't change or else error in reading)
-#define SCK_PIN 7  // SCK Pin (Don't change or else error in reading)
+#define DT_PIN 16   // DT Pin (Don't use touch-active pins)
+#define SCK_PIN 21  // SCK Pin (Don't use touch-active pins)
 
 HX711 scale;
 
 float scaleFactor = 101.0;   //ADC to kg calibration
-int weightThreshold = 200; //Set to 300kg (because sensor is not calibrated for actual weight, this will detect change effectively anyways)
+int weightThreshold = 300; //Set to 300kg (because sensor is not calibrated for actual weight, this will detect change effectively anyways)
 
 void init_WeightSensor()
 {

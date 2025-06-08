@@ -19,6 +19,6 @@ void loop()
   delay(5000);
 
   file2();
-  delay(120000);
+  delay(5000);
 
 }

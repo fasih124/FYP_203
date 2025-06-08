@@ -144,6 +144,7 @@ void loop()
             pushDataToFirebase("sensors/BabyDetection", "Baby Detection", Firebase.RTDB.setBool(&fbdo, "sensors/BabyDetection", baby_Detection_Flag()));
             Serial.print("WEIGHT: "); Serial.println(measure_WeightChange());
             Serial.print("TEMPERATURE:  "); Serial.println(get_Average_IRTemp());
+            Serial.print("Baby Detection Flag:  "); Serial.println(baby_Detection_Flag());
             
             
         }
@@ -189,8 +190,6 @@ void loop()
             prevTimeProbeSentData = currentMillis;
             pushDataToFirebase("sensors/ProbeTemp", "Probe Temperature", Firebase.RTDB.setFloat(&fbdo, "sensors/ProbeTemp", temp_In_Fahrenheit()));
         }
-
-
 
     /*
     Following block doesn't send data to firebase,
