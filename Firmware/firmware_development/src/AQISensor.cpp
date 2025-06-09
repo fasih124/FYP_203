@@ -21,10 +21,10 @@ String AQI_grade()
 {
   int aqiResolution = read_AQI_Voltage();
 
-  if (aqiResolution < 200) return "Excellent";
-  else if (aqiResolution < 400) return "Good";
-  else if (aqiResolution < 600) return "Moderate";
-  else if (aqiResolution < 800) return "Poor";
+  if (aqiResolution <= 500) return "Excellent";
+  else if (aqiResolution <= 800) return "Good";
+  else if (aqiResolution <= 1200) return "Moderate";
+  else if (aqiResolution <= 1500) return "Poor";
   else 
     return "Hazardous";
 

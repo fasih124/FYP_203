@@ -33,22 +33,18 @@ bool process_Sound_And_Detect_Cry()
   // --- 1. Read Raw Sound Value ---
   currentRawValue = mic_Raw_Value(); // Read the raw sensor value directly
 
+  //if there's no baby in the craddle, no need for signal processing
+  if (!baby_Detection_Flag() /* && !true */) // Remove '&& !true' for production code
+  {
+    babyCrying = false;
+    loudStartTime = 0;
+    quietStartTime = 0;
+    // No moving average states to reset here
+    return babyCrying;
+  }
+  else  //if baby is detected, then go to signal processing
+  {
 
-  // --- 2. Optional: Baby Presence Check (from BabyDetection module) ---
-  // If baby_Detection_Flag() returns false, reset states and indicate no crying.
-  // Use 'true' for debugging if BabyDetection module is not fully integrated/working.
-  // if (!baby_Detection_Flag() /* && !true */) // Remove '&& !true' for production
-  // {
-  //   babyCrying = false;
-  //   loudStartTime = 0;
-  //   quietStartTime = 0;
-  //   // No moving average states to reset here
-  //   return false;
-  // }
-
-  // --- 3. Determine "Loudness" based on Raw Value and Thresholds ---
-  // We're looking for values outside the typical silent range (50-250).
-  // A cry would typically be significantly higher than 250.
   // The RAW_LOW_THRESHOLD might catch mic disconnects or very unique sounds.
   bool isLoudNow = (currentRawValue > RAW_HIGH_THRESHOLD || currentRawValue < RAW_LOW_THRESHOLD);
 
@@ -87,5 +83,8 @@ bool process_Sound_And_Detect_Cry()
     }
   }
 
+
   return babyCrying; // Return the current status of the babyCrying flag
+  }
+
 }

@@ -9,7 +9,7 @@
 HX711 scale;
 
 float scaleFactor = 101.0;   //ADC to kg calibration
-int weightThreshold = 300; //Set to 300kg (because sensor is not calibrated for actual weight, this will detect change effectively anyways)
+int weightThreshold = 1000; //Set to 300kg (because sensor is not calibrated for actual weight, this will detect change effectively anyways)
 
 void init_WeightSensor()
 {
@@ -25,6 +25,7 @@ int measure_WeightChange()
     int weight = 0;
     if(scale.is_ready())    //if hx711 is working fine
     {
+        //dont use scale.read() or scale.read_average for reading calculation, it provides oisy values
         weight = scale.get_units(10)/1000; // Takes average of 10 readings (g) and converts that in kg   
         delay(200); //for stability in readings
 
@@ -36,5 +37,6 @@ int measure_WeightChange()
 
 bool weight_Detection_Flag()
 {
-    return measure_WeightChange() > weightThreshold;  //checks the condition and returns true or false
+    return true;
+    //measure_WeightChange() > weightThreshold;  //checks the condition and returns true or false
 }

@@ -29,8 +29,8 @@ Things to do in main.cpp when integrating a new module:
 #include "addons/RTDBHelper.h"
 
 // Firebase Config
-#define DB_URL "https://esp-test-rtdb-a7ae5-default-rtdb.asia-southeast1.firebasedatabase.app/"
-#define API_KEY "AIzaSyAkcfm9OAStI2TGGAaKoO-6ZepYpOU6O9g"
+#define DB_URL "https://carenest-5594e-default-rtdb.firebaseio.com/"
+#define API_KEY "AIzaSyCkLbu5xrMndsmpfY_hvYv19thuOXH8F68"
 
 // Firebase Objects
 FirebaseData fbdo;
@@ -50,12 +50,15 @@ unsigned long prevTimeLullabyPlayed = 0;
 int aqiInterval = 30000;
 int moistureInterval = 30000;
 int probeInterval = 30000;
-int detectionInterval = 30000;
+int detectionInterval = 15000;
 int micInterval = 100; // Adjusted to actual interval used in MicSensor
 int lullabyInterval = 60000;   //wont repeat within 1 min duration if flag fluctuates from true to false & then false to true
 
 bool signupCheck = false;
 bool lullabyCurrentlyPlaying = false;
+
+bool babyIsCrying = false;      //already defined in MicSensor file for global access
+
 
 void setup() 
 {
@@ -142,7 +145,7 @@ void loop()
         {
             prevTimeBabyDetectionSentData = currentMillis;
             pushDataToFirebase("sensors/BabyDetection", "Baby Detection", Firebase.RTDB.setBool(&fbdo, "sensors/BabyDetection", baby_Detection_Flag()));
-            Serial.print("WEIGHT: "); Serial.println(measure_WeightChange());
+            //Serial.print("WEIGHT: "); Serial.println(measure_WeightChange());
             Serial.print("TEMPERATURE:  "); Serial.println(get_Average_IRTemp());
             Serial.print("Baby Detection Flag:  "); Serial.println(baby_Detection_Flag());
             
@@ -154,14 +157,17 @@ void loop()
         if (currentMillis - prevTimeMicSentData > micInterval || prevTimeMicSentData == 0) 
         {
             prevTimeMicSentData = currentMillis;
-            pushDataToFirebase("sensors/BabyCrying", "Baby Crying", Firebase.RTDB.setBool(&fbdo, "sensors/BabyCrying", process_Sound_And_Detect_Cry()));
+            
+            babyIsCrying = process_Sound_And_Detect_Cry();    
+            
+            pushDataToFirebase("sensors/BabyCrying", "Baby Crying", Firebase.RTDB.setBool(&fbdo, "sensors/BabyCrying", babyIsCrying/*babyCrying*/ /*process_Sound_And_Detect_Cry()*/));
             //Firebase.RTDB.setInt(&fbdo, "ignoreValues/Mic", mic_Raw_Value());
             //Firebase.RTDB.setInt(&fbdo, "ignoreValues/Mic_Average", average);
             
 
             //initially mic raw values will be fluctuating greatly, they'll stabilize after some minutes of execution.
             Serial.print("-------------"); Serial.print(mic_Raw_Value());  Serial.println("-------------");
-            Serial.print("Cry Status: "); Serial.println(process_Sound_And_Detect_Cry());
+            Serial.print("Cry Status: "); Serial.println(babyIsCrying);
 
         }
 
@@ -199,7 +205,8 @@ void loop()
     // Call process_Sound_And_Detect_Cry() frequently for accurate detection
     
     // This runs regardless of lullaby playback state or intervals, crucial for accuracy.
-    bool babyIsCrying = process_Sound_And_Detect_Cry();
+    
+    //bool babyIsCrying = false /*process_Sound_And_Detect_Cry();*/;     //define this var in global and just call the func once
 
     if (babyIsCrying) {
         if (currentMillis - prevTimeLullabyPlayed > lullabyInterval) {

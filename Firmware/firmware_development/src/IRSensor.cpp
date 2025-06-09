@@ -9,14 +9,14 @@
 Adafruit_MLX90614 mlx = Adafruit_MLX90614();
 
 
-float IRTempThreshold = 81;
+float IRTempThreshold = 86;
 
 
 //Initializing sensor
 void init_IRSensor()
 {
-    Wire.begin(9, 8); //SDA, SCL
-
+    Wire.begin(14, 10); //SDA, SCL
+    delay(100);
     while(!mlx.begin())
     {
         Serial.println("Error connecting to IR Sensor");
@@ -39,6 +39,7 @@ float get_Average_IRTemp()
 
     return sum/readings;
 }
+
 
 
 bool IR_Detection_Flag()
