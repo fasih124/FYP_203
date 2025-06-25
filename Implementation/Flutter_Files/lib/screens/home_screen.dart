@@ -193,7 +193,7 @@ class HomeScreen extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          'assets/icons_img/temp_icon.png',
+                          'assets/icons_img/temp_Icon.png',
                         );
                       }
 
@@ -207,7 +207,7 @@ class HomeScreen extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          'assets/icons_img/temp_icon.png');
+                          'assets/icons_img/temp_Icon.png');
                     } else if (snapshot.hasError) {
                       print('Stream error: ${snapshot.error}');
                       return _buildCard(
@@ -220,7 +220,7 @@ class HomeScreen extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          'assets/icons_img/temp_icon.png');
+                          'assets/icons_img/temp_Icon.png');
                     } else {
                       return _buildCard(
                           'Temperature',
@@ -232,7 +232,7 @@ class HomeScreen extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          'assets/icons_img/temp_icon.png');
+                          'assets/icons_img/temp_Icon.png');
                     }
                   },
                 ),

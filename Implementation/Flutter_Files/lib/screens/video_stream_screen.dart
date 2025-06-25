@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fyp_203/screens/setting_screen.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 import '../constants/colors_constant.dart';
 
@@ -11,6 +12,33 @@ class VideoStreamScreen extends StatefulWidget {
 }
 
 class _VideoStreamScreenState extends State<VideoStreamScreen> {
+
+  // late final WebViewController _controller;
+  late  WebViewController _controller;
+  bool isLoading = true;
+  bool isPlaying = false;
+  final String streamUrl = 'http://192.168.100.55/'; // Your ESP32 IP
+
+  @override
+  void initState() {
+    super.initState();
+    isLoading = false;
+
+    _controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..loadRequest(Uri.parse(streamUrl));
+
+    // Force loading spinner to disappear after 3 seconds
+    Future.delayed(Duration(seconds: 3), () {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -91,47 +119,226 @@ class _VideoStreamScreenState extends State<VideoStreamScreen> {
             ),
           ),
           const SizedBox(
-            height: 150,
+            height: 50,
           ),
-          Container(
-            width: 345,
-            height: 165,
-            decoration: BoxDecoration(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14.0),
+            child: isPlaying
+                ? ClipRRect(
               borderRadius: BorderRadius.circular(14),
-              color: const Color(0xFF2F2E41),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x992F2E41), // Shadow color with opacity
-                  spreadRadius: 4, // How much the shadow spreads
-                  blurRadius: 10, // How blurry the shadow is
-                  offset: Offset(0, 4), // Shadow position (x, y)
-                ),
-              ],
-            ),
-            child: Center(
-                child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(50),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x33FFFFFF), // Shadow color with opacity
-                          spreadRadius: 4, // How much the shadow spreads
-                          blurRadius: 10, // How blurry the shadow is
-                          offset: Offset(0, 0), // Shadow position (x, y)
-                        ),
-                      ],
-                    ),
-                    child: InkWell(
-                      onTap: () {},
-                      child: Image.asset(
-                        'assets/icons_img/play_button.png',
-                        width: 95,
-                        height: 89,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    height: 300,
+                    width: 350,
+                    child: WebViewWidget(controller: _controller),
+                  ),
+                  if (isLoading)
+                    Container(
+                      height: 300,
+                      width: 350,
+                      color: Colors.black26,
+                      child: const Center(
+                        child: CircularProgressIndicator(color: Colors.white),
                       ),
-                    ))),
+                    ),
+                ],
+              ),
+            )
+                : Container(
+              width: 350,
+              height: 300,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                color: const Color(0xFF2F2E41),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x992F2E41),
+                    spreadRadius: 4,
+                    blurRadius: 10,
+                    offset: Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x33FFFFFF),
+                        spreadRadius: 4,
+                        blurRadius: 10,
+                        offset: Offset(0, 0),
+                      ),
+                    ],
+                  ),
+                  child: InkWell(
+                    // onTap: () {
+                    //   setState(() {
+                    //     isPlaying = true;
+                    //     isLoading = true;
+                    //   });
+                    //
+                    //   // Delay for 3 seconds to simulate stream load
+                    //   Future.delayed(Duration(seconds: 3), () {
+                    //     if (mounted) {
+                    //       setState(() {
+                    //         isLoading = false;
+                    //       });
+                    //     }
+                    //   });
+                    // },
+                    onTap: () async {
+                      setState(() {
+                        isPlaying = false;
+                        isLoading = true;
+                      });
+
+                      // Close previous connection by loading blank page
+                      _controller.loadRequest(Uri.dataFromString(
+                        '<html></html>',
+                        mimeType: 'text/html',
+                      ));
+
+                      // Short delay to allow ESP32 to release old socket
+                      await Future.delayed(const Duration(milliseconds: 500));
+
+                      // Create new controller and start the stream
+                      final newController = WebViewController()
+                        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+                        ..setNavigationDelegate(
+                          NavigationDelegate(
+                            onPageStarted: (url) {
+                              setState(() {
+                                isLoading = true;
+                              });
+                            },
+                            onPageFinished: (url) {
+                              // Always show loader for at least 3 sec
+                              Future.delayed(const Duration(seconds: 3), () {
+                                if (mounted) {
+                                  setState(() {
+                                    isLoading = false;
+                                  });
+                                }
+                              });
+                            },
+                            onWebResourceError: (error) {
+                              if (mounted) {
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              }
+                              print("Stream error: ${error.description}");
+                            },
+                          ),
+                        )
+                        ..loadRequest(Uri.parse(streamUrl));
+
+                      // Assign and play
+                      setState(() {
+                        _controller = newController;
+                        isPlaying = true;
+                      });
+                    },
+
+                    child: Image.asset(
+                      'assets/icons_img/play_button.png',
+                      width: 95,
+                      height: 89,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
+
+          const SizedBox(height: 40),
+
+          // Refresh button
+          ElevatedButton.icon(
+            onPressed: () {
+              _controller.reload();
+            },
+            icon: Icon(Icons.refresh,color: Colors.white,),
+            label: Text("Reload Stream",style: TextStyle(color: Colors.white),),
+            style: ElevatedButton.styleFrom(
+              padding: EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+              textStyle: TextStyle(fontSize: 16),
+              backgroundColor: AppColorCode.secondaryColor_500,
+            ),
+          ),
+
         ],
       ),
     );
   }
+
+  @override
+  void dispose() {
+    // Load a blank page to stop stream and free ESP32 connection
+    _controller.loadRequest(Uri.dataFromString(
+      '<html></html>',
+      mimeType: 'text/html',
+    ));
+    super.dispose();
+  }
+
+
 }
+
+
+
+///////////////////////////////////////////////////////////////////
+
+// Container(
+//   width: 300,
+//   height: 350,
+//   decoration: BoxDecoration(
+//     borderRadius: BorderRadius.circular(14),
+//     color: const Color(0xFF2F2E41),
+//     boxShadow: const [
+//       BoxShadow(
+//         color: Color(0x992F2E41), // Shadow color with opacity
+//         spreadRadius: 4, // How much the shadow spreads
+//         blurRadius: 10, // How blurry the shadow is
+//         offset: Offset(0, 4), // Shadow position (x, y)
+//       ),
+//     ],
+//   ),
+//   child: Center(
+//       child: Container(
+//           decoration: BoxDecoration(
+//             borderRadius: BorderRadius.circular(50),
+//             boxShadow: const [
+//               BoxShadow(
+//                 color: Color(0x33FFFFFF), // Shadow color with opacity
+//                 spreadRadius: 4, // How much the shadow spreads
+//                 blurRadius: 10, // How blurry the shadow is
+//                 offset: Offset(0, 0), // Shadow position (x, y)
+//               ),
+//             ],
+//           ),
+//           child: InkWell(
+//             onTap: () {},
+//             child: Image.asset(
+//               'assets/icons_img/play_button.png',
+//               width: 95,
+//               height: 89,
+//             ),
+//           ))),
+// ),
+///////////////////////////////////////////////////////////////////
+///////////////////////////////OPTION 1////////////////////////////////////
+
+
+
+// WebViewWidget(
+//   controller: WebViewController()
+//     ..setJavaScriptMode(JavaScriptMode.unrestricted)
+//     ..loadRequest(
+//       Uri.parse('http://192.168.100.55/'), // Change to your ESP32 IP or mDNS
+//     ),
+// ),
