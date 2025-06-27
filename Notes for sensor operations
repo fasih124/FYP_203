@@ -1,0 +1,13 @@
+-------- Notes for sensors operation -----------
+
+		Load Cells
+Dont work on the raw values, they are noisy. Tare the values and work with function scale.get_units() instead of scale.read() or scale.read_Average()
+Dont use touch-active pins. They read the change even without touch.read() function.
+If pressed esp-reset button, load cells may print values without taring and result can be unintended and unreliable. Also, it should not fail to connect with load cell otherwise, values can be raw.
+
+		IR Sensor
+If values are not printed, just plug out and plug-in the DT & SCK wires again. Also, you may ned to adjust the values of threshold at the eleventh hour
+
+
+		Mic Sensor: 
+Change the threshold and sensitivity time on runtime according to need

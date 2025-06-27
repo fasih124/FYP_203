@@ -2,7 +2,7 @@
 
 #define HW_Pin 5
 
-int susuThreshold = 1500;   //Greater value, clean environment. Less value, more moist
+int susuThreshold = 1000;   //Greater value, clean environment. Less value, more moist
 int sensorValue = 0;
 
 
@@ -18,7 +18,7 @@ String diaper_Condition()
 
     sensorValue = analogRead(HW_Pin);
 
- if (sensorValue < 1500)
+ if (sensorValue < susuThreshold)
  {
     return moist;
  }  
