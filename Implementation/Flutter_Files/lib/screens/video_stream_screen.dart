@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:fyp_203/screens/setting_screen.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../Model/CardelModel.dart';
 import '../constants/colors_constant.dart';
+import '../services/firebase_sensordata.dart';
+import 'option_screen.dart';
 
 class VideoStreamScreen extends StatefulWidget {
   const VideoStreamScreen({super.key});
@@ -82,7 +85,7 @@ class _VideoStreamScreenState extends State<VideoStreamScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (builder) => const SettingScreen(),
+                              builder: (builder) => const OptionScreen(),
                             ),
                           );
                         },
@@ -103,13 +106,24 @@ class _VideoStreamScreenState extends State<VideoStreamScreen> {
                   const SizedBox(
                     height: 6,
                   ),
-                  const Text(
-                    'Cradle : Modelx-FYP203',
-                    style: TextStyle(
-                      color: AppColorCode.White_shade,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  StreamBuilder<CradleModelData>(
+                    stream: CradleModelService.getCradleModel(),
+                    builder: (context, snapshot) {
+                      String modelName = '...';
+                      if (snapshot.hasData) {
+                        modelName = snapshot.data!.model;
+                      } else if (snapshot.hasError) {
+                        modelName = 'Error';
+                      }
+                      return Text(
+                        'Cradle : $modelName',
+                        style: const TextStyle(
+                          color: AppColorCode.White_shade,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(
                     height: 6,

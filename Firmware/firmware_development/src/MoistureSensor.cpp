@@ -12,8 +12,8 @@ void init_Moisture_Sensor()
 
 String diaper_Condition()
 {
-   String moist = "Change diaper";
-   String clean = "Diaper clean";
+   String moist = "Change Diaper";
+   String clean = "Diaper Clean";
 
    sensorValue = analogRead(HW_Pin);
 

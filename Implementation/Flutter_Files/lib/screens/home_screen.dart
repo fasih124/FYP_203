@@ -7,6 +7,8 @@ import 'package:fyp_203/screens/setting_screen.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:fyp_203/services/firebase_sensordata.dart';
 
+import '../Model/BabyPresenceModel.dart';
+import '../Model/CardelModel.dart';
 import '../Model/SoundSensorModel.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -77,27 +79,42 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(
                     height: 16,
                   ),
-                  RichText(
-                    text: const TextSpan(
-                      children: [
-                        TextSpan(
-                          text: 'Cradle :',
-                          style: TextStyle(
-                              color: AppColorCode.primaryColor_500,
-                              fontSize: 24,
-                              fontWeight: FontWeight.w700,
-                              fontFamily: 'Poppins'),
+
+                  StreamBuilder<CradleModelData>(
+                    stream: CradleModelService.getCradleModel(),
+                    builder: (context, snapshot) {
+                      String modelName = 'Loading...';
+                      if (snapshot.hasData) {
+                        modelName = snapshot.data!.model;
+                      } else if (snapshot.hasError) {
+                        modelName = 'Error';
+                      }
+
+                      return RichText(
+                        text: TextSpan(
+                          children: [
+                            const TextSpan(
+                              text: 'Cradle : ',
+                              style: TextStyle(
+                                color: AppColorCode.primaryColor_500,
+                                fontSize: 24,
+                                fontWeight: FontWeight.w700,
+                                fontFamily: 'Poppins',
+                              ),
+                            ),
+                            TextSpan(
+                              text: modelName,
+                              style: const TextStyle(
+                                color: Colors.black54,
+                                fontSize: 24,
+                                fontWeight: FontWeight.w700,
+                                fontFamily: 'Poppins',
+                              ),
+                            ),
+                          ],
                         ),
-                        TextSpan(
-                          text: ' Modelx-FYP203',
-                          style: TextStyle(
-                              color: Colors.black54,
-                              fontSize: 24,
-                              fontWeight: FontWeight.w700,
-                              fontFamily: 'Poppins'),
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
                   const SizedBox(
                     height: 8,
@@ -125,38 +142,91 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(
                     height: 32,
                   ),
-                  Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                            color: AppColorCode.primaryColor_500, width: 4),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Baby Presence :',
-                            style: TextStyle(
-                              color: AppColorCode.Black_shade,
-                              fontFamily: 'Poppins',
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
+                  // Container(
+                  //     padding: const EdgeInsets.symmetric(
+                  //         horizontal: 16, vertical: 8),
+                  //     decoration: BoxDecoration(
+                  //       color: Colors.white,
+                  //       borderRadius: BorderRadius.circular(12),
+                  //       border: Border.all(
+                  //           color: AppColorCode.primaryColor_500, width: 4),
+                  //     ),
+                  //     child: const Row(
+                  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //       children: [
+                  //         Text(
+                  //           'Baby Presence :',
+                  //           style: TextStyle(
+                  //             color: AppColorCode.Black_shade,
+                  //             fontFamily: 'Poppins',
+                  //             fontSize: 16,
+                  //             fontWeight: FontWeight.bold,
+                  //           ),
+                  //         ),
+                  //         Text(
+                  //           'PRESENT',
+                  //           style: TextStyle(
+                  //             color: AppColorCode.secondaryColor_500,
+                  //             fontFamily: 'Poppins',
+                  //             fontSize: 16,
+                  //             fontWeight: FontWeight.bold,
+                  //           ),
+                  //         ),
+                  //       ],
+                  //     )),
+                  StreamBuilder<BabyPresenceSensorData>(
+                    stream: BabyPresenceSensorService.getBabyPresenceSensorData(),
+                    builder: (context, snapshot) {
+                      String status = 'Loading...';
+                      Color statusColor = Colors.grey;
+
+                      if (snapshot.hasData) {
+                        final presence = snapshot.data!;
+                        status = presence.isPresent ? 'PRESENT' : 'NOT PRESENT';
+                        statusColor = presence.isPresent
+                            ? AppColorCode.secondaryColor_500
+                            : Colors.redAccent;
+                      } else if (snapshot.hasError) {
+                        status = 'ERROR';
+                        statusColor = Colors.red;
+                      }
+
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppColorCode.primaryColor_500,
+                            width: 4,
                           ),
-                          Text(
-                            'PRESENT',
-                            style: TextStyle(
-                              color: AppColorCode.secondaryColor_500,
-                              fontFamily: 'Poppins',
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              'Baby Presence :',
+                              style: TextStyle(
+                                color: AppColorCode.Black_shade,
+                                fontFamily: 'Poppins',
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                        ],
-                      )),
+                            Text(
+                              status,
+                              style: TextStyle(
+                                color: statusColor,
+                                fontFamily: 'Poppins',
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
             ),
@@ -164,6 +234,7 @@ class HomeScreen extends StatelessWidget {
           Expanded(
             child: ListView(
               children: [
+                // temperature
                 StreamBuilder<CradleSensorData>(
                   stream: TemperatureSensorService.getTemperatureSensorData(),
                   builder: (context, snapshot) {
@@ -216,7 +287,7 @@ class HomeScreen extends StatelessWidget {
                             contentPadding: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             title: Text(
-                              data.value.toUpperCase(),
+                              "${double.tryParse(data.value)?.toStringAsFixed(1) ?? data.value} °F",
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 26,
@@ -376,7 +447,7 @@ class HomeScreen extends StatelessWidget {
                             contentPadding: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             title: Text(
-                              data.value.toUpperCase(),
+                              data.value,
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 26,
@@ -546,7 +617,7 @@ class HomeScreen extends StatelessWidget {
                             contentPadding: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             title: Text(
-                              data.value.toUpperCase(),
+                              data.value,
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 26,
@@ -709,7 +780,7 @@ class HomeScreen extends StatelessWidget {
                             contentPadding: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             title: Text(
-                              data.value.toUpperCase(),
+                              (data.value.toLowerCase() == "true" ? "Crying" : "Calm"),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 26,

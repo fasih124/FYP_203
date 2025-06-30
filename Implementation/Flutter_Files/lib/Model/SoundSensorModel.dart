@@ -17,7 +17,7 @@ class SoundSensorData {
     return SoundSensorData(
       timestamp: json['timestamp'] ?? 0,
       type: json['type'] ?? '',
-      value: json['value'] ?? '',
+      value: json['value']?.toString() ?? '',
       enable: json['enable'] ?? false,
       isplaying: json['isplaying'] ?? false,
     );

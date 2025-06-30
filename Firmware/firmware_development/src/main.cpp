@@ -150,8 +150,9 @@ void loop()
 
         String presencePath = "sensors/";
         presencePath.concat(firebaseCradleID);
-        presencePath.concat("/SoundSensor");
-        presencePath.concat("/value");
+        presencePath.concat("/babyPresence");
+        presencePath.concat("/ispresent");
+        
 
         // Baby detection (Weight and IR)
         if (currentMillis - prevTimeBabyDetectionSentData > detectionInterval || prevTimeBabyDetectionSentData == 0)
@@ -165,6 +166,13 @@ void loop()
             Serial.println(baby_Detection_Flag());
         }
 
+
+
+        String cryingPath = "sensors/";
+        cryingPath.concat(firebaseCradleID);
+        cryingPath.concat("/SoundSensor");
+        cryingPath.concat("/value");
+        
         // Cry detection (Mic)
         if (currentMillis - prevTimeMicSentData > micInterval || prevTimeMicSentData == 0)
         {
@@ -173,6 +181,7 @@ void loop()
             babyIsCrying = process_Sound_And_Detect_Cry();
 
             // pushDataToFirebase("sensors/BabyCrying", "Baby Crying", Firebase.RTDB.setBool(&fbdo, "sensors/BabyCrying", babyIsCrying/*babyCrying*/ /*process_Sound_And_Detect_Cry()*/));
+            pushDataToFirebase(cryingPath, "Baby Crying", Firebase.RTDB.setBool(&fbdo, cryingPath, babyIsCrying/*babyCrying*/ /*process_Sound_And_Detect_Cry()*/));
             // Firebase.RTDB.setInt(&fbdo, "ignoreValues/Mic", mic_Raw_Value());
             // Firebase.RTDB.setInt(&fbdo, "ignoreValues/Mic_Average", average);
 

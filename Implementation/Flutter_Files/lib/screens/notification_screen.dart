@@ -4,6 +4,10 @@ import 'package:fyp_203/constants/colors_constant.dart';
 import 'package:fyp_203/constants/text_constant.dart';
 import 'package:fyp_203/screens/setting_screen.dart';
 
+import '../Model/CardelModel.dart';
+import '../services/firebase_sensordata.dart';
+import 'option_screen.dart';
+
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
 
@@ -55,7 +59,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (builder) => const SettingScreen(),
+                              builder: (builder) => const OptionScreen(),
                             ),
                           );
                         },
@@ -76,13 +80,33 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   const SizedBox(
                     height: 6,
                   ),
-                  const Text(
-                    'Cradle : Modelx-FYP203',
-                    style: TextStyle(
-                      color: AppColorCode.White_shade,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  // const Text(
+                  //   'Cradle : Modelx-FYP203',
+                  //   style: TextStyle(
+                  //     color: AppColorCode.White_shade,
+                  //     fontSize: 18,
+                  //     fontWeight: FontWeight.w500,
+                  //   ),
+                  // ),
+                  StreamBuilder<CradleModelData>(
+                    stream: CradleModelService.getCradleModel(),
+                    builder: (context, snapshot) {
+                      String modelName = '...';
+                      if (snapshot.hasData) {
+                        modelName = snapshot.data!.model;
+                      } else if (snapshot.hasError) {
+                        modelName = 'Error';
+                      }
+
+                      return Text(
+                        'Cradle : $modelName',
+                        style: const TextStyle(
+                          color: AppColorCode.White_shade,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(
                     height: 8,
