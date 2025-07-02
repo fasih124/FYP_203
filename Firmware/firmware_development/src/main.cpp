@@ -59,6 +59,11 @@ bool babyIsCrying = false; // already defined in MicSensor file for global acces
 
 String firebaseCradleID = "cradle1"; // Change this to your cradle ID
 
+// for temp notification
+bool tempAlertSent = false;
+unsigned long lastTempAlertTime = 0;
+int tempAlertCooldown = 10 * 60 * 1000;
+
 void setup()
 {
     Serial.begin(115200);
@@ -74,6 +79,19 @@ void setup()
     Serial.println("******************************************************");
     Serial.println("******************************************************");
     init_Wifi_Connections();
+    // After Wi-Fi is connected
+    configTime(0, 0, "pool.ntp.org", "time.nist.gov");
+
+    Serial.println("Waiting for NTP time sync...");
+    time_t now = time(nullptr);
+    while (now < 100000)
+    {
+        delay(500);
+        Serial.print(".");
+        now = time(nullptr);
+    }
+    Serial.println("\nNTP time synced!");
+
     // Serial.println("Using Cradle ID: ");
     Serial.println(firebaseCradleID);
     Serial.println("******************************************************");
@@ -133,6 +151,48 @@ void pushDataToFirebase(const String &path, const String &type, bool success)
     }
 }
 
+void pushTemperatureNotification(float tempValue)
+{
+    String parentId = "F6hVlGjbukP96l0hWAgi2RkjcFE2"; // Can be replaced with actual Firebase UID
+    String path = "/notifications/";
+
+    FirebaseJson json;
+
+    // 🧠 Build the message using concat (no `+`)
+    String msg;
+    msg.concat("Baby's temperature is high! Current: ");
+    msg.concat(String(tempValue, 1));
+    msg.concat("°F");
+
+    json.set("message", msg);
+    json.set("timestamp", time(nullptr)); // UNIX timestamp
+    json.set("type", "temperature_alert");
+    json.set("acknowledged", false);
+    json.set("parentId", parentId);
+
+    if (Firebase.RTDB.pushJSON(&fbdo, path.c_str(), &json))
+    {
+        String notificationId = fbdo.pushName();
+        Serial.print("Notification ID: ");
+        Serial.println(notificationId);
+
+        // 👇 Add notificationId using concat
+        FirebaseJson updateJson;
+        updateJson.set("notificationId", notificationId);
+
+        String finalPath;
+        finalPath.concat(path);
+        finalPath.concat(notificationId);
+
+        Firebase.RTDB.updateNode(&fbdo, finalPath.c_str(), &updateJson);
+    }
+    else
+    {
+        Serial.print("Push failed: ");
+        Serial.println(fbdo.errorReason());
+    }
+}
+
 void loop()
 {
     unsigned long currentMillis = millis();
@@ -152,7 +212,6 @@ void loop()
         presencePath.concat(firebaseCradleID);
         presencePath.concat("/babyPresence");
         presencePath.concat("/ispresent");
-        
 
         // Baby detection (Weight and IR)
         if (currentMillis - prevTimeBabyDetectionSentData > detectionInterval || prevTimeBabyDetectionSentData == 0)
@@ -166,13 +225,11 @@ void loop()
             Serial.println(baby_Detection_Flag());
         }
 
-
-
         String cryingPath = "sensors/";
         cryingPath.concat(firebaseCradleID);
         cryingPath.concat("/SoundSensor");
         cryingPath.concat("/value");
-        
+
         // Cry detection (Mic)
         if (currentMillis - prevTimeMicSentData > micInterval || prevTimeMicSentData == 0)
         {
@@ -181,7 +238,7 @@ void loop()
             babyIsCrying = process_Sound_And_Detect_Cry();
 
             // pushDataToFirebase("sensors/BabyCrying", "Baby Crying", Firebase.RTDB.setBool(&fbdo, "sensors/BabyCrying", babyIsCrying/*babyCrying*/ /*process_Sound_And_Detect_Cry()*/));
-            pushDataToFirebase(cryingPath, "Baby Crying", Firebase.RTDB.setBool(&fbdo, cryingPath, babyIsCrying/*babyCrying*/ /*process_Sound_And_Detect_Cry()*/));
+            pushDataToFirebase(cryingPath, "Baby Crying", Firebase.RTDB.setBool(&fbdo, cryingPath, babyIsCrying /*babyCrying*/ /*process_Sound_And_Detect_Cry()*/));
             // Firebase.RTDB.setInt(&fbdo, "ignoreValues/Mic", mic_Raw_Value());
             // Firebase.RTDB.setInt(&fbdo, "ignoreValues/Mic_Average", average);
 
@@ -226,9 +283,26 @@ void loop()
         // Probe sensor
         if (currentMillis - prevTimeProbeSentData > probeInterval || prevTimeProbeSentData == 0)
         {
+            // prevTimeProbeSentData = currentMillis;
+            // // pushDataToFirebase("sensors/ProbeTemp", "Probe Temperature", Firebase.RTDB.setFloat(&fbdo, "sensors/ProbeTemp", temp_In_Fahrenheit()));
+            // pushDataToFirebase(tempPath, "Probe Temperature", Firebase.RTDB.setFloat(&fbdo, tempPath, temp_In_Fahrenheit()));
+
             prevTimeProbeSentData = currentMillis;
-            // pushDataToFirebase("sensors/ProbeTemp", "Probe Temperature", Firebase.RTDB.setFloat(&fbdo, "sensors/ProbeTemp", temp_In_Fahrenheit()));
-            pushDataToFirebase(tempPath, "Probe Temperature", Firebase.RTDB.setFloat(&fbdo, tempPath, temp_In_Fahrenheit()));
+
+            float currentTemp = temp_In_Fahrenheit();
+            pushDataToFirebase(tempPath, "Probe Temperature", Firebase.RTDB.setFloat(&fbdo, tempPath, currentTemp));
+
+            // 🧠 Check if temperature is high and cooldown passed
+            if (currentTemp > 95.4 && (!tempAlertSent || (currentMillis - lastTempAlertTime > tempAlertCooldown)))
+            {
+                pushTemperatureNotification(currentTemp);
+                tempAlertSent = true;
+                lastTempAlertTime = currentMillis;
+            }
+            else if (currentTemp <= 100.4)
+            {
+                tempAlertSent = false; // Reset if temp returns to normal
+            }
         }
 
 /*
