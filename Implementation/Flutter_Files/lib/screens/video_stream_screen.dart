@@ -223,14 +223,38 @@ class _VideoStreamScreenState extends State<VideoStreamScreen> {
                       final newController = WebViewController()
                         ..setJavaScriptMode(JavaScriptMode.unrestricted)
                         ..setNavigationDelegate(
+                          // NavigationDelegate(
+                          //   onPageStarted: (url) {
+                          //     setState(() {
+                          //       isLoading = true;
+                          //     });
+                          //   },
+                          //   onPageFinished: (url) {
+                          //     // Always show loader for at least 3 sec
+                          //     Future.delayed(const Duration(seconds: 3), () {
+                          //       if (mounted) {
+                          //         setState(() {
+                          //           isLoading = false;
+                          //         });
+                          //       }
+                          //     });
+                          //   },
+                          //   onWebResourceError: (error) {
+                          //     if (mounted) {
+                          //       setState(() {
+                          //         isLoading = false;
+                          //       });
+                          //     }
+                          //     print("Stream error: ${error.description}");
+                          //   },
+                          // ),
                           NavigationDelegate(
                             onPageStarted: (url) {
                               setState(() {
                                 isLoading = true;
                               });
-                            },
-                            onPageFinished: (url) {
-                              // Always show loader for at least 3 sec
+
+                              // Manually hide loader after 2.5 seconds (arbitrary, tweak as needed)
                               Future.delayed(const Duration(seconds: 3), () {
                                 if (mounted) {
                                   setState(() {

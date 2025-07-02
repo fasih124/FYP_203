@@ -59,11 +59,28 @@ bool babyIsCrying = false; // already defined in MicSensor file for global acces
 
 String firebaseCradleID = "cradle1"; // Change this to your cradle ID
 
+//////////////////////////////////////////////////////////////////variable for notifications//////////////////////////////////////////////////////////////////////////
 // for temp notification
 bool tempAlertSent = false;
 unsigned long lastTempAlertTime = 0;
-int tempAlertCooldown = 10 * 60 * 1000;
-
+int tempAlertCooldown = 10 * 60 * 1000; // 10 minutes
+// For moisture notification
+bool moistureAlertSent = false;
+unsigned long lastMoistureAlertTime = 0;
+int moistureAlertCooldown = 15 * 60 * 1000; // 15 minutes
+// For AQI notification
+bool aqiAlertSent = false;
+unsigned long lastAqiAlertTime = 0;
+int aqiAlertCooldown = 15 * 60 * 1000; // 15 minutes
+// For baby absence notification
+bool babyAbsentAlertSent = false;
+unsigned long lastBabyAbsentAlertTime = 0;
+int babyAbsentAlertCooldown = 10 * 60 * 1000; // 10 minutes
+// For baby crying notification
+bool babyCryingAlertSent = false;
+unsigned long lastBabyCryingAlertTime = 0;
+int babyCryingAlertCooldown = 10 * 60 * 1000; // 10 minutes
+//////////////////////////////////////////////////////////////////variable for notifications//////////////////////////////////////////////////////////////////////////
 void setup()
 {
     Serial.begin(115200);
@@ -193,6 +210,159 @@ void pushTemperatureNotification(float tempValue)
     }
 }
 
+void pushMoistureNotification()
+{
+    String parentId = "F6hVlGjbukP96l0hWAgi2RkjcFE2"; // Replace with actual UID if dynamic
+    String path = "/notifications/";
+
+    FirebaseJson json;
+
+    // 🧠 Build message
+    String msg;
+    msg.concat("Diaper change needed! Moisture detected.");
+
+    json.set("message", msg);
+    json.set("timestamp", time(nullptr)); // UNIX timestamp
+    json.set("type", "moisture_alert");
+    json.set("acknowledged", false);
+    json.set("parentId", parentId);
+
+    if (Firebase.RTDB.pushJSON(&fbdo, path.c_str(), &json))
+    {
+        String notificationId = fbdo.pushName();
+        Serial.print("Notification ID: ");
+        Serial.println(notificationId);
+
+        FirebaseJson updateJson;
+        updateJson.set("notificationId", notificationId);
+
+        String finalPath;
+        finalPath.concat(path);
+        finalPath.concat(notificationId);
+
+        Firebase.RTDB.updateNode(&fbdo, finalPath.c_str(), &updateJson);
+    }
+    else
+    {
+        Serial.print("Push failed: ");
+        Serial.println(fbdo.errorReason());
+    }
+}
+
+void pushAqiNotification()
+{
+    String parentId = "F6hVlGjbukP96l0hWAgi2RkjcFE2"; // Replace with dynamic UID if needed
+    String path = "/notifications/";
+
+    FirebaseJson json;
+
+    String msg;
+    msg.concat("Air Quality is Hazardous! Take precautions immediately.");
+
+    json.set("message", msg);
+    json.set("timestamp", time(nullptr)); // UNIX timestamp
+    json.set("type", "aqi_alert");
+    json.set("acknowledged", false);
+    json.set("parentId", parentId);
+
+    if (Firebase.RTDB.pushJSON(&fbdo, path.c_str(), &json))
+    {
+        String notificationId = fbdo.pushName();
+        Serial.print("Notification ID: ");
+        Serial.println(notificationId);
+
+        FirebaseJson updateJson;
+        updateJson.set("notificationId", notificationId);
+
+        String finalPath;
+        finalPath.concat(path);
+        finalPath.concat(notificationId);
+
+        Firebase.RTDB.updateNode(&fbdo, finalPath.c_str(), &updateJson);
+    }
+    else
+    {
+        Serial.print("Push failed: ");
+        Serial.println(fbdo.errorReason());
+    }
+}
+
+void pushBabyAbsentNotification()
+{
+    String parentId = "F6hVlGjbukP96l0hWAgi2RkjcFE2"; // Replace with actual UID if needed
+    String path = "/notifications/";
+
+    FirebaseJson json;
+
+    String msg;
+    msg.concat("Baby is not in the cradle! Please check.");
+
+    json.set("message", msg);
+    json.set("timestamp", time(nullptr)); // UNIX timestamp
+    json.set("type", "baby_absent_alert");
+    json.set("acknowledged", false);
+    json.set("parentId", parentId);
+
+    if (Firebase.RTDB.pushJSON(&fbdo, path.c_str(), &json))
+    {
+        String notificationId = fbdo.pushName();
+        Serial.print("Notification ID: ");
+        Serial.println(notificationId);
+
+        FirebaseJson updateJson;
+        updateJson.set("notificationId", notificationId);
+
+        String finalPath;
+        finalPath.concat(path);
+        finalPath.concat(notificationId);
+
+        Firebase.RTDB.updateNode(&fbdo, finalPath.c_str(), &updateJson);
+    }
+    else
+    {
+        Serial.print("Push failed: ");
+        Serial.println(fbdo.errorReason());
+    }
+}
+
+void pushBabyCryingNotification()
+{
+    String parentId = "F6hVlGjbukP96l0hWAgi2RkjcFE2"; // Replace with actual UID if needed
+    String path = "/notifications/";
+
+    FirebaseJson json;
+
+    String msg;
+    msg.concat("Baby is crying! Please check on the baby.");
+
+    json.set("message", msg);
+    json.set("timestamp", time(nullptr)); // UNIX timestamp
+    json.set("type", "crying_alert");
+    json.set("acknowledged", false);
+    json.set("parentId", parentId);
+
+    if (Firebase.RTDB.pushJSON(&fbdo, path.c_str(), &json))
+    {
+        String notificationId = fbdo.pushName();
+        Serial.print("Notification ID: ");
+        Serial.println(notificationId);
+
+        FirebaseJson updateJson;
+        updateJson.set("notificationId", notificationId);
+
+        String finalPath;
+        finalPath.concat(path);
+        finalPath.concat(notificationId);
+
+        Firebase.RTDB.updateNode(&fbdo, finalPath.c_str(), &updateJson);
+    }
+    else
+    {
+        Serial.print("Push failed: ");
+        Serial.println(fbdo.errorReason());
+    }
+}
+
 void loop()
 {
     unsigned long currentMillis = millis();
@@ -207,6 +377,7 @@ void loop()
 
     if (Firebase.ready() && signupCheck)
     {
+        /////////////////////////////////////////////////////////presence sensory///////////////////////////////////////////////////////////
 
         String presencePath = "sensors/";
         presencePath.concat(firebaseCradleID);
@@ -216,14 +387,32 @@ void loop()
         // Baby detection (Weight and IR)
         if (currentMillis - prevTimeBabyDetectionSentData > detectionInterval || prevTimeBabyDetectionSentData == 0)
         {
+
             prevTimeBabyDetectionSentData = currentMillis;
-            pushDataToFirebase(presencePath, "Baby Detection", Firebase.RTDB.setBool(&fbdo, presencePath, baby_Detection_Flag()));
+
+            bool babyPresent = baby_Detection_Flag();
+
+            // Push presence status to Firebase
+            pushDataToFirebase(presencePath, "Baby Detection", Firebase.RTDB.setBool(&fbdo, presencePath, babyPresent));
             // Serial.print("WEIGHT: "); Serial.println(measure_WeightChange());
             Serial.print("TEMPERATURE:  ");
             Serial.println(get_Average_IRTemp());
             Serial.print("Baby Detection Flag:  ");
-            Serial.println(baby_Detection_Flag());
+            Serial.println(babyPresent);
+
+            // Notification logic: alert if baby is NOT detected
+            if (!babyPresent && (!babyAbsentAlertSent || (currentMillis - lastBabyAbsentAlertTime > babyAbsentAlertCooldown)))
+            {
+                pushBabyAbsentNotification();
+                babyAbsentAlertSent = true;
+                lastBabyAbsentAlertTime = currentMillis;
+            }
+            else if (babyPresent)
+            {
+                babyAbsentAlertSent = false; // Reset alert flag if baby returns
+            }
         }
+        /////////////////////////////////////////////////////////sound cry sensory///////////////////////////////////////////////////////////
 
         String cryingPath = "sensors/";
         cryingPath.concat(firebaseCradleID);
@@ -248,7 +437,18 @@ void loop()
             // Serial.println("-------------");
             // Serial.print("Cry Status: ");
             // Serial.println(babyIsCrying);
+            if (babyIsCrying && (!babyCryingAlertSent || (currentMillis - lastBabyCryingAlertTime > babyCryingAlertCooldown)))
+            {
+                pushBabyCryingNotification();
+                babyCryingAlertSent = true;
+                lastBabyCryingAlertTime = currentMillis;
+            }
+            else if (!babyIsCrying)
+            {
+                babyCryingAlertSent = false; // Reset when baby stops crying
+            }
         }
+        /////////////////////////////////////////////////////////AQI sensory///////////////////////////////////////////////////////////
 
         String AQIPath = "sensors/";
         AQIPath.concat(firebaseCradleID);
@@ -258,11 +458,29 @@ void loop()
         // AQI sensor
         if (currentMillis - prevTimeAQISentData > aqiInterval || prevTimeAQISentData == 0)
         {
-            prevTimeAQISentData = currentMillis;
-            pushDataToFirebase(AQIPath, "AQI Grade", Firebase.RTDB.setString(&fbdo, AQIPath, AQI_grade()));
+            // prevTimeAQISentData = currentMillis;
+            // pushDataToFirebase(AQIPath, "AQI Grade", Firebase.RTDB.setString(&fbdo, AQIPath, AQI_grade()));
             // Firebase.RTDB.setInt(&fbdo, "ignoreValues/AQIVoltage", read_AQI_Voltage());
-        }
+            prevTimeAQISentData = currentMillis;
 
+            String aqiStatus = AQI_grade();
+
+            // Push AQI status to Firebase
+            pushDataToFirebase(AQIPath, "AQI Grade", Firebase.RTDB.setString(&fbdo, AQIPath, aqiStatus));
+
+            // Notification logic for "Hazardous" with cooldown
+            if (aqiStatus == "Hazardous" && (!aqiAlertSent || (currentMillis - lastAqiAlertTime > aqiAlertCooldown)))
+            {
+                pushAqiNotification();
+                aqiAlertSent = true;
+                lastAqiAlertTime = currentMillis;
+            }
+            else if (aqiStatus != "Hazardous")
+            {
+                aqiAlertSent = false; // Reset flag if air quality improves
+            }
+        }
+        /////////////////////////////////////////////////////////moisture sensory///////////////////////////////////////////////////////////
         String moisturePath = "sensors/";
         moisturePath.concat(firebaseCradleID);
         moisturePath.concat("/MositureSensor");
@@ -272,8 +490,26 @@ void loop()
         if (currentMillis - prevTimeMoistureSentData > moistureInterval || prevTimeMoistureSentData == 0)
         {
             prevTimeMoistureSentData = currentMillis;
-            pushDataToFirebase(moisturePath, "Diaper Condition", Firebase.RTDB.setString(&fbdo, moisturePath, diaper_Condition()));
+            // pushDataToFirebase(moisturePath, "Diaper Condition", Firebase.RTDB.setString(&fbdo, moisturePath, diaper_Condition()));
+
+            String diaperStatus = diaper_Condition();
+
+            // Push to Firebase
+            pushDataToFirebase(moisturePath, "Diaper Condition", Firebase.RTDB.setString(&fbdo, moisturePath, diaperStatus));
+
+            // Notification logic with cooldown
+            if (diaperStatus == "Change Diaper" && (!moistureAlertSent || (currentMillis - lastMoistureAlertTime > moistureAlertCooldown)))
+            {
+                pushMoistureNotification();
+                moistureAlertSent = true;
+                lastMoistureAlertTime = currentMillis;
+            }
+            else if (diaperStatus == "Diaper Clean")
+            {
+                moistureAlertSent = false; // Reset flag when condition normalizes
+            }
         }
+        /////////////////////////////////////////////////////////probe temp sensory///////////////////////////////////////////////////////////
 
         // firebase temp sesor path
         String tempPath = "sensors/";

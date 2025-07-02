@@ -13,6 +13,8 @@ import 'option_screen.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fyp_203/services/notification_service.dart';
 
+
+
 Future<List<NotificationModel>> getNotificationsForParent(
     String parentId) async {
   final database = FirebaseDatabase.instanceFor(
@@ -44,6 +46,9 @@ Future<List<NotificationModel>> getNotificationsForParent(
 
 
 class NotificationScreen extends StatefulWidget {
+
+
+
   final String parentId; // e.g., 'parent1'
   const NotificationScreen({super.key, required this.parentId});
 
@@ -59,6 +64,42 @@ class _NotificationScreenState extends State<NotificationScreen> {
     super.initState();
     _notificationFuture = getNotificationsForParent(widget.parentId);
   }
+
+  final Map<String, String> notificationIconMap = {
+    'temperature_alert': 'assets/icons_img/temp_Icon.png',
+    'moisture_alert': 'assets/icons_img/Droplet.png',
+    'aqi_alert': 'assets/icons_img/aqi_icon.png',
+    'baby_absent_alert': 'assets/icons_img/weight_icon.png',
+    'crying_alert': 'assets/icons_img/sound_icon.png',
+  };
+
+  final Map<String, Color> notificationColorMap = {
+    'temperature_alert': Colors.red,
+    'baby_absent_alert': Colors.green,
+    'aqi_alert': Colors.orange,
+    'moisture_alert': Colors.indigo,
+    'crying_alert': Colors.purple,
+  };
+
+  final Map<String, Color> notificationShadeMap = {
+    'temperature_alert': Colors.redAccent.shade100,
+    'baby_absent_alert': Colors.green.shade300,
+    'aqi_alert': Colors.orangeAccent.shade100,
+    'moisture_alert': Colors.indigoAccent.shade200,
+    'crying_alert': Colors.purpleAccent.shade100,
+  };
+
+
+  String getNotificationIcon(String type) {
+    return notificationIconMap[type] ?? 'assets/icons_img/default_icon.png';
+  }
+  Color getNotificationColor(String type) {
+    return notificationColorMap[type] ?? Colors.grey.shade600;
+  }
+  Color getNotificationShade(String type) {
+    return notificationShadeMap[type] ?? Colors.grey.shade300;
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -203,7 +244,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                               return Container(
                                 margin: EdgeInsets.symmetric(vertical: 5),
                                 decoration: BoxDecoration(
-                                  color: Colors.red.shade600, //Colors.red,
+                                  // color: Colors.red.shade600, //Colors.red,
+                                  color: getNotificationColor(notif.type),
                                   borderRadius: BorderRadius.circular(15),
                                 ),
                                 child: ListTile(
@@ -211,13 +253,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                   leading: Container(
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(15),
-                                      color: Colors
-                                          .red.shade300, //Colors.red.shade300,
+                                      color: getNotificationShade(notif.type),
                                     ),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Image.asset(
-                                        'assets/icons_img/temp_Icon.png', //'assets/icons_img/temp_Icon.png',
+                                        getNotificationIcon(notif.type), //'assets/icons_img/temp_Icon.png',
                                         width: 25,
                                         height: 23,
                                       ),

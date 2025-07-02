@@ -121,10 +121,10 @@ class HomeScreen extends StatelessWidget {
                   ),
                   ElevatedButton.icon(
                     onPressed: () {
-                      // Navigator.push(context,
-                      //     MaterialPageRoute(builder: (context) {
-                      //   return const ConnectCradleScreen();
-                      // }));
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return const ConnectCradleScreen();
+                      }));
                     },
                     icon: const Icon(Icons.arrow_forward,
                         color: Colors.white, size: 18),
