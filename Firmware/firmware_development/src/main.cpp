@@ -204,16 +204,16 @@ void loop()
     
     //un-comment following region for lullaby playing
     #pragma region 
-    // if (babyIsCrying) 
-    // {
+    if (babyIsCrying) 
+    {
 
-    //     if (currentMillis - prevTimeLullabyPlayed > lullabyInterval) {
-    //         myDFPlayer.play(8); // Play the lullaby track
-    //         prevTimeLullabyPlayed = currentMillis; // Update the timestamp for the next cooldown check
+        if (currentMillis - prevTimeLullabyPlayed > lullabyInterval) {
+            myDFPlayer.play(8); // Play the lullaby track
+            prevTimeLullabyPlayed = currentMillis; // Update the timestamp for the next cooldown check
             
-    //         Serial.println("Baby crying detected, starting/restarting lullaby.");
-    //     }
-    // }
+            Serial.println("Baby crying detected, starting/restarting lullaby.");
+        }
+    }
     #pragma endregion
     myDFPlayer.available(); // Just check for availability to clear the buffer
 
