@@ -5,6 +5,11 @@ import 'package:fyp_203/screens/signin_screen.dart';
 import 'package:fyp_203/services/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 
+import 'package:fyp_203/screens/about-us-screen.dart';
+import 'package:fyp_203/screens/connect_cradle_screen.dart';
+import 'package:fyp_203/screens/option_screen.dart';
+
+
 class OptionScreen extends StatefulWidget {
   const OptionScreen({super.key});
 
@@ -92,7 +97,7 @@ class _OptionScreenState extends State<OptionScreen> {
                     ),
                   ),
                   Text(
-                    'Options'.toUpperCase(),
+                    'Setting'.toUpperCase(),
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w700,
@@ -227,69 +232,169 @@ class _OptionScreenState extends State<OptionScreen> {
                             updateSensorStatus('AQISensor', value); // 🔥 Firebase update
                           }),
                     ),
-                  ],
-                ),
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.all(24),
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () {
-                  setState(() {
-                    final ref = FirebaseDatabase.instanceFor(
-                      app: Firebase.app(),
-                      databaseURL: 'https://fpy-203-default-rtdb.asia-southeast1.firebasedatabase.app/',
-                    ).ref('sensors/cradle1/SoundSensor');
-
-
-                    if(!isPlaying){
-                      isPlaying=true;
-                      ref.update({'isplaying': true});
-                    }else{
-                      isPlaying=false;
-                      ref.update({'isplaying': false});
-                    }
-
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      isPlaying ? AppColorCode.stop_500 : AppColorCode.play_500,
-                  foregroundColor: AppColorCode.warningColor_500,
-                  padding: EdgeInsets.symmetric(
-                    vertical: 16,
+                    Divider(
+                    color: Colors.grey.shade300, // Line color
+                    thickness: 1,
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      12,
+                    ListTile(
+                      onTap: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                              return const AboutUsScreen();
+                            }));
+                      },
+                      leading: Image.asset(
+                        'assets/icons_img/about_icon.png',
+                        width: 25,
+                        height: 23,
+                      ),
+                      title: Text('About Us'),
+                      trailing: Icon(Icons.arrow_forward_ios_rounded),
                     ),
-                  ),
-                  side: const BorderSide(
-                      color: AppColorCode.Black_shade, width: 2),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'assets/icons_img/sound_icon.png',
-                      width: 25,
-                      height: 23,
-                      color: AppColorCode.Black_shade,
+                    Divider(
+                      color: Colors.grey.shade300, // Line color
+                      thickness: 1,
                     ),
-                     Text(
-                      isPlaying ?'  Pause Lullaby':'  Play Lullaby',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontFamily: 'Poppins',
-                        fontSize: 20,
-                        color: AppColorCode.Black_shade,
+                    const SizedBox(height: 24),
+                    Container(
+                      margin: EdgeInsets.all(24),
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () async {
+                          await AuthService().signOut();
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (builder) => const SignInScreen(),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: AppColorCode.warningColor_500,
+                          padding: EdgeInsets.symmetric(
+                            vertical: 16,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              12,
+                            ),
+                          ),
+                          side: const BorderSide(
+                              color: AppColorCode.warningColor_500, width: 2),
+                        ),
+                        child: const Text(
+                          'Logout',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'Poppins',
+                            fontSize: 20,
+                            decoration: TextDecoration.underline,
+                            decorationColor: AppColorCode.warningColor_500,
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
+            // Container(
+            //   margin: EdgeInsets.all(24),
+            //   width: double.infinity,
+            //   child: OutlinedButton(
+            //     onPressed: () {
+            //       setState(() {
+            //         final ref = FirebaseDatabase.instanceFor(
+            //           app: Firebase.app(),
+            //           databaseURL: 'https://fpy-203-default-rtdb.asia-southeast1.firebasedatabase.app/',
+            //         ).ref('sensors/cradle1/SoundSensor');
+            //
+            //
+            //         if(!isPlaying){
+            //           isPlaying=true;
+            //           ref.update({'isplaying': true});
+            //         }else{
+            //           isPlaying=false;
+            //           ref.update({'isplaying': false});
+            //         }
+            //
+            //       });
+            //     },
+            //     style: ElevatedButton.styleFrom(
+            //       backgroundColor:
+            //           isPlaying ? AppColorCode.stop_500 : AppColorCode.play_500,
+            //       foregroundColor: AppColorCode.warningColor_500,
+            //       padding: EdgeInsets.symmetric(
+            //         vertical: 16,
+            //       ),
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(
+            //           12,
+            //         ),
+            //       ),
+            //       side: const BorderSide(
+            //           color: AppColorCode.Black_shade, width: 2),
+            //     ),
+            //     // child: Row(
+            //     //   mainAxisAlignment: MainAxisAlignment.center,
+            //     //   children: [
+            //     //     Image.asset(
+            //     //       'assets/icons_img/sound_icon.png',
+            //     //       width: 25,
+            //     //       height: 23,
+            //     //       color: AppColorCode.Black_shade,
+            //     //     ),
+            //     //      Text(
+            //     //       isPlaying ?'  Pause Lullaby':'  Play Lullaby',
+            //     //       style: TextStyle(
+            //     //         fontWeight: FontWeight.w500,
+            //     //         fontFamily: 'Poppins',
+            //     //         fontSize: 20,
+            //     //         color: AppColorCode.Black_shade,
+            //     //       ),
+            //     //     ),
+            //     //   ],
+            //     // ),
+            //   ),
+            // ),
+            // Container(
+            //   margin: EdgeInsets.all(24),
+            //   width: double.infinity,
+            //   child: OutlinedButton(
+            //     onPressed: () async {
+            //       await AuthService().signOut();
+            //       Navigator.pushReplacement(
+            //         context,
+            //         MaterialPageRoute(
+            //           builder: (builder) => const SignInScreen(),
+            //         ),
+            //       );
+            //     },
+            //     style: ElevatedButton.styleFrom(
+            //       foregroundColor: AppColorCode.warningColor_500,
+            //       padding: EdgeInsets.symmetric(
+            //         vertical: 16,
+            //       ),
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(
+            //           12,
+            //         ),
+            //       ),
+            //       side: const BorderSide(
+            //           color: AppColorCode.warningColor_500, width: 2),
+            //     ),
+            //     child: const Text(
+            //       'Logout',
+            //       style: TextStyle(
+            //         fontWeight: FontWeight.w700,
+            //         fontFamily: 'Poppins',
+            //         fontSize: 20,
+            //         decoration: TextDecoration.underline,
+            //         decorationColor: AppColorCode.warningColor_500,
+            //       ),
+            //     ),
+            //   ),
+            // ),
             const SizedBox(height: 24),
           ],
         ),

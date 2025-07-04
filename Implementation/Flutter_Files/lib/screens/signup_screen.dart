@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -23,25 +24,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController confirmPasswordController =
       TextEditingController();
 
-  // bool registerUser(){
-  //
-  //     print(emailController.text);
-  //     print(usernameController.text);
-  //     print(passwordController.text);
-  //     print(confirmPasswordController.text);
-  //
-  //     if ((passwordController.text == confirmPasswordController.text) && (passwordController.text.length >= 6)) {
-  //       Future<User?> user = AuthService().signUp(emailController.text.trim(), passwordController.text.trim());
-  //       print(user);
-  //       print('User is register');
-  //       return true;
-  //     }else{
-  //       print('Password not match');
-  //       return false;
-  //     }
-  //
-  //   }
-
   Future<bool> registerUser(BuildContext context) async {
     print(emailController.text);
     print(usernameController.text);
@@ -60,7 +42,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
           // Store username in Realtime Database under the user's UID
           DatabaseReference userRef =
-              FirebaseDatabase.instance.ref("parents/${user.uid}");
+
+              FirebaseDatabase.instanceFor(
+            app: Firebase.app(),
+            databaseURL:
+                'https://fpy-203-default-rtdb.asia-southeast1.firebasedatabase.app',
+          ).ref("parents/${user.uid}");
           await userRef.set({
             "username": usernameController.text.trim(),
             "email": emailController.text.trim(),

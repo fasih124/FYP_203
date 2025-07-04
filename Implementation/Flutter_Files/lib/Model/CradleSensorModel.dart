@@ -15,7 +15,7 @@ class CradleSensorData {
     return CradleSensorData(
       timestamp: json['timestamp'] ?? 0,
       type: json['type'] ?? '',
-      value: json['value'] ?? '',
+      value: json['value']?.toString() ?? '',
       enable: json['enable'] ?? false,
     );
   }
