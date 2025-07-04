@@ -175,7 +175,7 @@ void pushTemperatureNotification(float tempValue)
 
     FirebaseJson json;
 
-    // 🧠 Build the message using concat (no `+`)
+    // Build the message using concat (no `+`)
     String msg;
     msg.concat("Baby's temperature is high! Current: ");
     msg.concat(String(tempValue, 1));
@@ -193,7 +193,7 @@ void pushTemperatureNotification(float tempValue)
         Serial.print("Notification ID: ");
         Serial.println(notificationId);
 
-        // 👇 Add notificationId using concat
+        // Add notificationId using concat
         FirebaseJson updateJson;
         updateJson.set("notificationId", notificationId);
 
@@ -217,7 +217,7 @@ void pushMoistureNotification()
 
     FirebaseJson json;
 
-    // 🧠 Build message
+    // Build message
     String msg;
     msg.concat("Diaper change needed! Moisture detected.");
 
@@ -528,7 +528,7 @@ void loop()
             float currentTemp = temp_In_Fahrenheit();
             pushDataToFirebase(tempPath, "Probe Temperature", Firebase.RTDB.setFloat(&fbdo, tempPath, currentTemp));
 
-            // 🧠 Check if temperature is high and cooldown passed
+            // Check if temperature is high and cooldown passed
             if (currentTemp > 95.4 && (!tempAlertSent || (currentMillis - lastTempAlertTime > tempAlertCooldown)))
             {
                 pushTemperatureNotification(currentTemp);
