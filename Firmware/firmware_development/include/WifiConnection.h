@@ -3,7 +3,6 @@
 
 
 #include <Arduino.h>
-// extern String cradleId;
 
 void init_Wifi_Connections();
 

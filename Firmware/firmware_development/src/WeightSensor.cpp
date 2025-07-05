@@ -9,7 +9,7 @@
 HX711 scale;
 
 float scaleFactor = 101.0;   //ADC to kg calibration
-int weightThreshold = 1000; //Set to 300kg (because sensor is not calibrated for actual weight, this will detect change effectively anyways)
+int weightThreshold = 1000; 
 
 void init_WeightSensor()
 {
