@@ -13,8 +13,6 @@ import 'option_screen.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fyp_203/services/notification_service.dart';
 
-
-
 Future<List<NotificationModel>> getNotificationsForParent(
     String parentId) async {
   final database = FirebaseDatabase.instanceFor(
@@ -25,17 +23,13 @@ Future<List<NotificationModel>> getNotificationsForParent(
   final snapshot = await database.ref("notifications").get();
   // final snapshot =
 
-
-
-
-
   if (!snapshot.exists) return [];
 
   final raw = Map<String, dynamic>.from(snapshot.value as Map);
 
   final filtered = raw.entries
-      .map(
-          (e) => NotificationModel.fromJson(Map<String, dynamic>.from(e.value)))
+      .map((e) =>
+          NotificationModel.fromJson(Map<String, dynamic>.from(e.value), e.key))
       .where((notif) => notif.parentId == parentId)
       .toList();
 
@@ -46,9 +40,6 @@ Future<List<NotificationModel>> getNotificationsForParent(
 
 
 class NotificationScreen extends StatefulWidget {
-
-
-
   final String parentId; // e.g., 'parent1'
   const NotificationScreen({super.key, required this.parentId});
 
@@ -64,6 +55,54 @@ class _NotificationScreenState extends State<NotificationScreen> {
     super.initState();
     _notificationFuture = getNotificationsForParent(widget.parentId);
   }
+
+  Future<void> deleteNotification(String firebaseKey) async {
+    final ref = FirebaseDatabase.instanceFor(
+      app: Firebase.app(),
+      databaseURL: 'https://fpy-203-default-rtdb.asia-southeast1.firebasedatabase.app',
+    ).ref('notifications/$firebaseKey');
+
+    await ref.remove();
+    setState(() {
+      _notificationFuture = getNotificationsForParent(widget.parentId);
+    });
+  }
+
+  Future<void> deleteOldNotifications(int keepCount) async {
+    final database = FirebaseDatabase.instanceFor(
+      app: Firebase.app(),
+      databaseURL: 'https://fpy-203-default-rtdb.asia-southeast1.firebasedatabase.app',
+    );
+
+    final snapshot = await database.ref("notifications").get();
+
+    if (!snapshot.exists) return;
+
+    final raw = Map<String, dynamic>.from(snapshot.value as Map);
+
+    // Convert all entries to NotificationModel and include firebaseKey
+    final notifications = raw.entries
+        .map((e) => NotificationModel.fromJson(Map<String, dynamic>.from(e.value), e.key))
+        .toList();
+
+    // Sort by timestamp DESC (latest first)
+    notifications.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+
+    // Keep only latest `keepCount` notifications
+    final toDelete = notifications.skip(keepCount);
+
+    // Delete each from Firebase
+    for (var notif in toDelete) {
+      await database.ref("notifications/${notif.firebaseKey}").remove();
+    }
+
+    // Refresh screen
+    setState(() {
+      _notificationFuture = getNotificationsForParent(widget.parentId);
+    });
+  }
+
+
 
   final Map<String, String> notificationIconMap = {
     'temperature_alert': 'assets/icons_img/temp_Icon.png',
@@ -89,17 +128,17 @@ class _NotificationScreenState extends State<NotificationScreen> {
     'crying_alert': Colors.purpleAccent.shade100,
   };
 
-
   String getNotificationIcon(String type) {
     return notificationIconMap[type] ?? 'assets/icons_img/default_icon.png';
   }
+
   Color getNotificationColor(String type) {
     return notificationColorMap[type] ?? Colors.grey.shade600;
   }
+
   Color getNotificationShade(String type) {
     return notificationShadeMap[type] ?? Colors.grey.shade300;
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -203,6 +242,60 @@ class _NotificationScreenState extends State<NotificationScreen> {
           const SizedBox(
             height: 12,
           ),
+          Align(
+            alignment: Alignment.topRight,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppColorCode.primaryColor_500, width: 4), // 🔴 Outline color
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                icon:  const Icon(Icons.delete_sweep, color: AppColorCode.primaryColor_500),
+                label: const Text(
+                "Clear Old Notifications",
+                style: TextStyle(color: AppColorCode.primaryColor_500),
+              ),
+                // tooltip: 'Clear old notifications',
+                onPressed: () async {
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text("Clear Old Notifications"),
+                      content: const Text(
+                        "Do you want to delete all but the latest 10 notifications?",
+                      ),
+                      actions: [
+                        TextButton(
+                          child: const Text("Cancel"),
+                          onPressed: () => Navigator.of(context).pop(false),
+                        ),
+                        TextButton(
+                          child: const Text("Delete"),
+                          onPressed: () => Navigator.of(context).pop(true),
+                        ),
+                      ],
+                    ),
+                  );
+
+                  if (confirm == true) {
+                    await deleteOldNotifications(10); // ✅ keep 10 latest
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Old notifications deleted")),
+                    );
+                  }
+                },
+              ),
+            ),
+          ),
+
+          const SizedBox(
+            height: 15,
+          ),
+
           Container(
             child: Expanded(
               child: SingleChildScrollView(
@@ -258,7 +351,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: Image.asset(
-                                        getNotificationIcon(notif.type), //'assets/icons_img/temp_Icon.png',
+                                        getNotificationIcon(notif
+                                            .type), //'assets/icons_img/temp_Icon.png',
                                         width: 25,
                                         height: 23,
                                       ),
@@ -279,14 +373,19 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                   title: Text(
                                     notif.message,
                                     style: TextStyle(
-                                      fontSize: 16,
-                                      fontFamily: 'Poppins',
-                                      fontWeight: FontWeight.w700,
-                                      decoration: TextDecoration.underline,
-                                      decorationColor: Colors.white,
-                                      color: Colors.white,
-                                      decorationThickness: 1
-                                    ),
+                                        fontSize: 16,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.w700,
+                                        decoration: TextDecoration.underline,
+                                        decorationColor: Colors.white,
+                                        color: Colors.white,
+                                        decorationThickness: 1),
+                                  ),
+                                  trailing: IconButton(
+                                    icon: const Icon(Icons.close_rounded, color: Colors.white),
+                                    onPressed: () {
+                                      deleteNotification(notif.firebaseKey); // 🔴 Use firebaseKey here
+                                    },
                                   ),
                                 ),
                               );

@@ -166,21 +166,6 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
                         shape: BoxShape.circle,
                       ),
                     ),
-                    // child: Container(
-                    //   padding: const EdgeInsets.all(4),
-                    //   decoration: const BoxDecoration(
-                    //     color: Colors.red,
-                    //     shape: BoxShape.circle,
-                    //   ),
-                    //   child: Text(
-                    //     '$_unreadCount',
-                    //     style: const TextStyle(
-                    //       color: Colors.white,
-                    //       fontSize: 12,
-                    //       fontWeight: FontWeight.bold,
-                    //     ),
-                    //   ),
-                    // ),
                   ),
               ],
             ),
