@@ -10,11 +10,11 @@
 // Based on your observation: 50-250 in silence.
 // A crying sound should be significantly OUTSIDE this range.
 // You MUST fine-tune these values during testing.
-#define RAW_HIGH_THRESHOLD 350 // Example: Raw reading above this is "loud" (a cry)
-#define RAW_LOW_THRESHOLD  30 // Example: Raw reading below this is "loud" (e.g., mic disconnect, or very specific sound)
+#define RAW_HIGH_THRESHOLD 1800 // Example: Raw reading above this is "loud" (a cry)
+#define RAW_LOW_THRESHOLD  50 // Example: Raw reading below this is "loud" (e.g., mic disconnect, or very specific sound)
 
-#define MIN_CRY_DURATION 150  // Minimum time (ms) raw sound must be continuously "loud" to be a cry
-#define QUIET_TIME 3000       // Minimum time (ms) raw sound must be "quiet" to reset cry flag
+#define MIN_CRY_DURATION 200  // Minimum time (ms) raw sound must be continuously "loud" to be a cry
+#define QUIET_TIME 2000       // Minimum time (ms) raw sound must be "quiet" to reset cry flag
 
 // Declare global variables as 'extern'
 // (Removed moving average specific variables)
