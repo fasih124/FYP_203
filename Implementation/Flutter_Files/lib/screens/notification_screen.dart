@@ -204,33 +204,76 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   const SizedBox(
                     height: 6,
                   ),
-                  // const Text(
-                  //   'Cradle : Modelx-FYP203',
-                  //   style: TextStyle(
-                  //     color: AppColorCode.White_shade,
-                  //     fontSize: 18,
-                  //     fontWeight: FontWeight.w500,
-                  //   ),
-                  // ),
-                  StreamBuilder<CradleModelData>(
-                    stream: CradleModelService.getCradleModel(),
-                    builder: (context, snapshot) {
-                      String modelName = '...';
-                      if (snapshot.hasData) {
-                        modelName = snapshot.data!.model;
-                      } else if (snapshot.hasError) {
-                        modelName = 'Error';
-                      }
+                  Row(
+                    mainAxisAlignment:MainAxisAlignment.spaceBetween,
+                    children: [
+                      StreamBuilder<CradleModelData>(
+                        stream: CradleModelService.getCradleModel(),
+                        builder: (context, snapshot) {
+                          String modelName = '...';
+                          if (snapshot.hasData) {
+                            modelName = snapshot.data!.model;
+                          } else if (snapshot.hasError) {
+                            modelName = 'Error';
+                          }
 
-                      return Text(
-                        'Cradle : $modelName',
-                        style: const TextStyle(
-                          color: AppColorCode.White_shade,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
+                          return Text(
+                            'Cradle : $modelName',
+                            style: const TextStyle(
+                              color: AppColorCode.White_shade,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          );
+                        },
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                        child: OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: AppColorCode.neutralColor_600, width: 4), // 🔴 Outline color
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          icon:  const Icon(Icons.delete_sweep, color: AppColorCode.neutralColor_600),
+                          label: const Text(
+                            "Clear",
+                            style: TextStyle(color: AppColorCode.neutralColor_600),
+                          ),
+                          // tooltip: 'Clear old notifications',
+                          onPressed: () async {
+                            final confirm = await showDialog<bool>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text("Clear Old Notifications"),
+                                content: const Text(
+                                  "This will Delete all but keep the latest 10 notifications?",
+                                ),
+                                actions: [
+                                  TextButton(
+                                    child: const Text("Cancel"),
+                                    onPressed: () => Navigator.of(context).pop(false),
+                                  ),
+                                  TextButton(
+                                    child: const Text("Delete"),
+                                    onPressed: () => Navigator.of(context).pop(true),
+                                  ),
+                                ],
+                              ),
+                            );
+
+                            if (confirm == true) {
+                              await deleteOldNotifications(10); // ✅ keep 10 latest
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Old notifications deleted")),
+                              );
+                            }
+                          },
                         ),
-                      );
-                    },
+                      ),
+                    ],
                   ),
                   const SizedBox(
                     height: 8,
@@ -242,55 +285,55 @@ class _NotificationScreenState extends State<NotificationScreen> {
           const SizedBox(
             height: 12,
           ),
-          Align(
-            alignment: Alignment.topRight,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppColorCode.primaryColor_500, width: 4), // 🔴 Outline color
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                icon:  const Icon(Icons.delete_sweep, color: AppColorCode.primaryColor_500),
-                label: const Text(
-                "Clear Old Notifications",
-                style: TextStyle(color: AppColorCode.primaryColor_500),
-              ),
-                // tooltip: 'Clear old notifications',
-                onPressed: () async {
-                  final confirm = await showDialog<bool>(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text("Clear Old Notifications"),
-                      content: const Text(
-                        "Do you want to delete all but the latest 10 notifications?",
-                      ),
-                      actions: [
-                        TextButton(
-                          child: const Text("Cancel"),
-                          onPressed: () => Navigator.of(context).pop(false),
-                        ),
-                        TextButton(
-                          child: const Text("Delete"),
-                          onPressed: () => Navigator.of(context).pop(true),
-                        ),
-                      ],
-                    ),
-                  );
-
-                  if (confirm == true) {
-                    await deleteOldNotifications(10); // ✅ keep 10 latest
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Old notifications deleted")),
-                    );
-                  }
-                },
-              ),
-            ),
-          ),
+          // Align(
+          //   alignment: Alignment.topRight,
+          //   child: Padding(
+          //     padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          //     child: OutlinedButton.icon(
+          //       style: OutlinedButton.styleFrom(
+          //         side: const BorderSide(color: AppColorCode.primaryColor_500, width: 4), // 🔴 Outline color
+          //         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          //         shape: RoundedRectangleBorder(
+          //           borderRadius: BorderRadius.circular(12),
+          //         ),
+          //       ),
+          //       icon:  const Icon(Icons.delete_sweep, color: AppColorCode.primaryColor_500),
+          //       label: const Text(
+          //       "Clear Old Notifications",
+          //       style: TextStyle(color: AppColorCode.primaryColor_500),
+          //     ),
+          //       // tooltip: 'Clear old notifications',
+          //       onPressed: () async {
+          //         final confirm = await showDialog<bool>(
+          //           context: context,
+          //           builder: (context) => AlertDialog(
+          //             title: const Text("Clear Old Notifications"),
+          //             content: const Text(
+          //               "Do you want to delete all but the latest 10 notifications?",
+          //             ),
+          //             actions: [
+          //               TextButton(
+          //                 child: const Text("Cancel"),
+          //                 onPressed: () => Navigator.of(context).pop(false),
+          //               ),
+          //               TextButton(
+          //                 child: const Text("Delete"),
+          //                 onPressed: () => Navigator.of(context).pop(true),
+          //               ),
+          //             ],
+          //           ),
+          //         );
+          //
+          //         if (confirm == true) {
+          //           await deleteOldNotifications(10); // ✅ keep 10 latest
+          //           ScaffoldMessenger.of(context).showSnackBar(
+          //             const SnackBar(content: Text("Old notifications deleted")),
+          //           );
+          //         }
+          //       },
+          //     ),
+          //   ),
+          // ),
 
           const SizedBox(
             height: 15,
@@ -340,6 +383,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                   // color: Colors.red.shade600, //Colors.red,
                                   color: getNotificationColor(notif.type),
                                   borderRadius: BorderRadius.circular(15),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: getNotificationColor(notif.type).withOpacity(0.6),
+                                      blurRadius: 10,
+                                      spreadRadius: 1,
+                                      offset: Offset(0, 4),
+                                    ),
+                                  ],
                                 ),
                                 child: ListTile(
                                   //  tileColor: Colors.red,
