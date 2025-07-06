@@ -10,32 +10,32 @@ Things to do in main.cpp when integrating a new module:
 #include <Arduino.h>
 #include <Firebase_ESP_Client.h>
 
-//Custom header files
+// Custom header files
 #include "WifiConnection.h" // WiFi Connection
 #include "AQISensor.h"      // AQI Sensor
 #include "MoistureSensor.h" // Moisture Sensor
 #include "ProbeSensor.h"    // Probe Temperature Sensor
-#include "IRSensor.h"       // IR Sensor
+#include "ultrasonic.h"     // Ultrasonic Sensor
 #include "WeightSensor.h"   // Weight Sensor
 #include "BabyDetection.h"  // Baby Detection Module
 #include "MicSensor.h"      // Crying Detection using Mic
 #include "dfplayer.h"       // Mp3 module
 
 
-
-//Provides the token generation process info
-#include "addons/TokenHelper.h"
-//Provides the RTDB payload printing info and other helper functions
-#include "addons/RTDBHelper.h"
-
-// Firebase Config
-#define DB_URL "https://carenest-5594e-default-rtdb.firebaseio.com/"
-#define API_KEY "AIzaSyCkLbu5xrMndsmpfY_hvYv19thuOXH8F68"
-
+// Firebase_ESP_Client Firebase;
 // Firebase Objects
 FirebaseData fbdo;
 FirebaseAuth auth;
 FirebaseConfig config;
+
+// Provides the token generation process info
+#include "addons/TokenHelper.h"
+// Provides the RTDB payload printing info and other helper functions
+#include "addons/RTDBHelper.h"
+
+// Firebase Config
+#define DB_URL "https://fpy-203-default-rtdb.asia-southeast1.firebasedatabase.app/" //"https://carenest-5594e-default-rtdb.firebaseio.com/"
+#define API_KEY "AIzaSyDgpAMZvSibox-INAbPeTfOlroY-LTs9eE"                           //"AIzaSyCkLbu5xrMndsmpfY_hvYv19thuOXH8F68"
 
 // Execution Timers
 unsigned long prevTimeAQISentData = 0;
@@ -45,35 +45,79 @@ unsigned long prevTimeBabyDetectionSentData = 0;
 unsigned long prevTimeMicSentData = 0;
 unsigned long prevTimeLullabyPlayed = 0;
 
-
 // Intervals
 int aqiInterval = 30000;
 int moistureInterval = 30000;
 int probeInterval = 30000;
-int detectionInterval = 15000;
-int micInterval = 100; // Adjusted to actual interval used in MicSensor
-int lullabyInterval = 60000;   //wont repeat within 1 min duration if flag fluctuates from true to false & then false to true
+int detectionInterval = 10000;
+int micInterval = 100;       // Adjusted to actual interval used in MicSensor
+int lullabyInterval = 60000; // wont repeat within 1 min duration if flag fluctuates from true to false & then false to true
 
 bool signupCheck = false;
 bool lullabyCurrentlyPlaying = false;
 
-bool babyIsCrying = false;      //already defined in MicSensor file for global access
+bool babyIsCrying = false; // already defined in MicSensor file for global access
 
+String firebaseCradleID = "cradle1"; // Change this to your cradle ID
 
-void setup() 
+//////////////////////////////////////////////////////////////////variable for notifications//////////////////////////////////////////////////////////////////////////
+// for temp notification
+bool tempAlertSent = false;
+unsigned long lastTempAlertTime = 0;
+int tempAlertCooldown = 10 * 60 * 1000; // 10 minutes
+// For moisture notification
+bool moistureAlertSent = false;
+unsigned long lastMoistureAlertTime = 0;
+int moistureAlertCooldown = 15 * 60 * 1000; // 15 minutes
+// For AQI notification
+bool aqiAlertSent = false;
+unsigned long lastAqiAlertTime = 0;
+int aqiAlertCooldown = 15 * 60 * 1000; // 15 minutes
+// For baby absence notification
+bool babyAbsentAlertSent = false;
+unsigned long lastBabyAbsentAlertTime = 0;
+int babyAbsentAlertCooldown = 10 * 60 * 1000; // 10 minutes
+// For baby crying notification
+bool babyCryingAlertSent = false;
+unsigned long lastBabyCryingAlertTime = 0;
+int babyCryingAlertCooldown = 10 * 60 * 1000; // 10 minutes
+//////////////////////////////////////////////////////////////////variable for notifications//////////////////////////////////////////////////////////////////////////
+void setup()
 {
     Serial.begin(115200);
-    delay(100);
-    init_Dfplayer();    //call before using its play() functions
+    delay(500);
+    init_Dfplayer(); // call before using its play() functions
 
-    myDFPlayer.play(1);     //welcome note
+    myDFPlayer.play(1); // welcome note
     delay(5000);
 
-    myDFPlayer.play(2);     //initiating components
+    myDFPlayer.play(2); // initiating components
     delay(5000);
 
+    Serial.println("******************************************************");
+    Serial.println("******************************************************");
+    init_Wifi_Connections();
+
+    // After Wi-Fi is connected
     
-    init_Wifi_Connections();    //contains wifi ok audio
+    // configTime(0, 0, "pool.ntp.org", "time.nist.gov");
+
+    // Serial.println("Waiting for NTP time sync...");
+    // time_t now = time(nullptr);
+    // while (now < 100000)
+    // {
+    //     delay(500);
+    //     Serial.print(".");
+    //     now = time(nullptr);
+    // }
+    // Serial.println("\nNTP time synced!");
+
+    // // Serial.println("Using Cradle ID: ");
+    // Serial.println(firebaseCradleID);
+    // Serial.println("******************************************************");
+    // Serial.println("******************************************************");
+
+    // contains wifi ok audio
     init_AQI_sensor();
     init_Moisture_Sensor();
     init_Probe_Sensor();
@@ -83,20 +127,20 @@ void setup()
     config.api_key = API_KEY;
     config.database_url = DB_URL;
 
-    if (Firebase.signUp(&config, &auth, "", "")) 
+    if (Firebase.signUp(&config, &auth, "", ""))
     {
         Serial.println("Sign-up check: OK");
         signupCheck = true;
 
-        myDFPlayer.play(5); //DB ok audio
+        myDFPlayer.play(5); // DB ok audio
         delay(5000);
-    } 
-    else 
+    }
+    else
     {
         Serial.println("Error in Signup & DB connection");
         Serial.println(config.signer.signupError.message.c_str());
 
-        myDFPlayer.play(6); //DB failed audio
+        myDFPlayer.play(6); // DB failed audio
         delay(5000);
     }
 
@@ -104,97 +148,404 @@ void setup()
     Firebase.begin(&config, &auth);
     Firebase.reconnectWiFi(true);
 
-    myDFPlayer.play(7);     //all system checks ok
+    myDFPlayer.play(7); // all system checks ok
 
+} // setup() ends
 
-}// setup() ends
-
-void pushDataToFirebase(const String& path, const String& type, bool success) 
+void pushDataToFirebase(const String &path, const String &type, bool success)
 {
-    if (success) 
+    if (success)
     {
-        Serial.print(type); Serial.println(" Pushed");
-        Serial.print("Path: "); Serial.println(path);
-        Serial.print("Type: "); Serial.println(type);
-    } 
-    else 
+        Serial.print(type);
+        Serial.println(" Pushed");
+        Serial.print("Path: ");
+        Serial.println(path);
+        Serial.print("Type: ");
+        Serial.println(type);
+    }
+    else
     {
         Serial.println("FAILED!");
-        Serial.print("Firebase Error: "); Serial.println(fbdo.errorReason());
+        Serial.print("Firebase Error: ");
+        Serial.println(fbdo.errorReason());
     }
-
 }
 
-void loop() 
+void pushTemperatureNotification(float tempValue)
+{
+    String parentId = "F6hVlGjbukP96l0hWAgi2RkjcFE2"; // Can be replaced with actual Firebase UID
+    String path = "/notifications/";
+
+    FirebaseJson json;
+
+    // Build the message using concat (no `+`)
+    String msg;
+    msg.concat("Baby's temperature is high! Current: ");
+    msg.concat(String(tempValue, 1));
+    msg.concat("°F");
+
+    json.set("message", msg);
+    json.set("timestamp", time(nullptr)); // UNIX timestamp
+    json.set("type", "temperature_alert");
+    json.set("acknowledged", false);
+    json.set("parentId", parentId);
+
+    if (Firebase.RTDB.pushJSON(&fbdo, path.c_str(), &json))
+    {
+        String notificationId = fbdo.pushName();
+        Serial.print("Notification ID: ");
+        Serial.println(notificationId);
+
+        // Add notificationId using concat
+        FirebaseJson updateJson;
+        updateJson.set("notificationId", notificationId);
+
+        String finalPath;
+        finalPath.concat(path);
+        finalPath.concat(notificationId);
+
+        Firebase.RTDB.updateNode(&fbdo, finalPath.c_str(), &updateJson);
+    }
+    else
+    {
+        Serial.print("Push failed: ");
+        Serial.println(fbdo.errorReason());
+    }
+}
+
+void pushMoistureNotification()
+{
+    String parentId = "F6hVlGjbukP96l0hWAgi2RkjcFE2"; // Replace with actual UID if dynamic
+    String path = "/notifications/";
+
+    FirebaseJson json;
+
+    // Build message
+    String msg;
+    msg.concat("Diaper change needed! Moisture detected.");
+
+    json.set("message", msg);
+    json.set("timestamp", time(nullptr)); // UNIX timestamp
+    json.set("type", "moisture_alert");
+    json.set("acknowledged", false);
+    json.set("parentId", parentId);
+
+    if (Firebase.RTDB.pushJSON(&fbdo, path.c_str(), &json))
+    {
+        String notificationId = fbdo.pushName();
+        Serial.print("Notification ID: ");
+        Serial.println(notificationId);
+
+        FirebaseJson updateJson;
+        updateJson.set("notificationId", notificationId);
+
+        String finalPath;
+        finalPath.concat(path);
+        finalPath.concat(notificationId);
+
+        Firebase.RTDB.updateNode(&fbdo, finalPath.c_str(), &updateJson);
+    }
+    else
+    {
+        Serial.print("Push failed: ");
+        Serial.println(fbdo.errorReason());
+    }
+}
+
+void pushAqiNotification()
+{
+    String parentId = "F6hVlGjbukP96l0hWAgi2RkjcFE2"; // Replace with dynamic UID if needed
+    String path = "/notifications/";
+
+    FirebaseJson json;
+
+    String msg;
+    msg.concat("Air Quality is Hazardous! Take precautions immediately.");
+
+    json.set("message", msg);
+    json.set("timestamp", time(nullptr)); // UNIX timestamp
+    json.set("type", "aqi_alert");
+    json.set("acknowledged", false);
+    json.set("parentId", parentId);
+
+    if (Firebase.RTDB.pushJSON(&fbdo, path.c_str(), &json))
+    {
+        String notificationId = fbdo.pushName();
+        Serial.print("Notification ID: ");
+        Serial.println(notificationId);
+
+        FirebaseJson updateJson;
+        updateJson.set("notificationId", notificationId);
+
+        String finalPath;
+        finalPath.concat(path);
+        finalPath.concat(notificationId);
+
+        Firebase.RTDB.updateNode(&fbdo, finalPath.c_str(), &updateJson);
+    }
+    else
+    {
+        Serial.print("Push failed: ");
+        Serial.println(fbdo.errorReason());
+    }
+}
+
+void pushBabyAbsentNotification()
+{
+    String parentId = "F6hVlGjbukP96l0hWAgi2RkjcFE2"; // Replace with actual UID if needed
+    String path = "/notifications/";
+
+    FirebaseJson json;
+
+    String msg;
+    msg.concat("Baby is not in the cradle! Please check.");
+
+    json.set("message", msg);
+    json.set("timestamp", time(nullptr)); // UNIX timestamp
+    json.set("type", "baby_absent_alert");
+    json.set("acknowledged", false);
+    json.set("parentId", parentId);
+
+    if (Firebase.RTDB.pushJSON(&fbdo, path.c_str(), &json))
+    {
+        String notificationId = fbdo.pushName();
+        Serial.print("Notification ID: ");
+        Serial.println(notificationId);
+
+        FirebaseJson updateJson;
+        updateJson.set("notificationId", notificationId);
+
+        String finalPath;
+        finalPath.concat(path);
+        finalPath.concat(notificationId);
+
+        Firebase.RTDB.updateNode(&fbdo, finalPath.c_str(), &updateJson);
+    }
+    else
+    {
+        Serial.print("Push failed: ");
+        Serial.println(fbdo.errorReason());
+    }
+}
+
+void pushBabyCryingNotification()
+{
+    String parentId = "F6hVlGjbukP96l0hWAgi2RkjcFE2"; // Replace with actual UID if needed
+    String path = "/notifications/";
+
+    FirebaseJson json;
+
+    String msg;
+    msg.concat("Baby is crying! Please check on the baby.");
+
+    json.set("message", msg);
+    json.set("timestamp", time(nullptr)); // UNIX timestamp
+    json.set("type", "crying_alert");
+    json.set("acknowledged", false);
+    json.set("parentId", parentId);
+
+    if (Firebase.RTDB.pushJSON(&fbdo, path.c_str(), &json))
+    {
+        String notificationId = fbdo.pushName();
+        Serial.print("Notification ID: ");
+        Serial.println(notificationId);
+
+        FirebaseJson updateJson;
+        updateJson.set("notificationId", notificationId);
+
+        String finalPath;
+        finalPath.concat(path);
+        finalPath.concat(notificationId);
+
+        Firebase.RTDB.updateNode(&fbdo, finalPath.c_str(), &updateJson);
+    }
+    else
+    {
+        Serial.print("Push failed: ");
+        Serial.println(fbdo.errorReason());
+    }
+}
+
+void loop()
 {
     unsigned long currentMillis = millis();
 
     /* NOTE:
-     DO NOT change the order of sensor code. 
-     Otherwise, mic_sensor may not give right values 
+     DO NOT change the order of sensor code.
+     Otherwise, mic_sensor may not give right values
      due to firebase latency issues.
      Also, DO NOT send raw values unless necessary 'cuz,
      this can also introduce latency in firebase.
     */
-   
-    if (Firebase.ready() && signupCheck) 
+
+    if (Firebase.ready() && signupCheck)
     {
+        ////////////////////////////// Baby Detection ////////////////////////////////////////
 
-        //Baby detection (Weight and IR)
-        if (currentMillis - prevTimeBabyDetectionSentData > detectionInterval || prevTimeBabyDetectionSentData == 0) 
+        String presencePath = "sensors/";
+        presencePath.concat(firebaseCradleID);
+        presencePath.concat("/babyPresence");
+        presencePath.concat("/ispresent");
+
+        // Baby detection (Weight and Ultrasonic)
+        if (currentMillis - prevTimeBabyDetectionSentData > detectionInterval || prevTimeBabyDetectionSentData == 0)
         {
+
             prevTimeBabyDetectionSentData = currentMillis;
-            pushDataToFirebase("sensors/BabyDetection", "Baby Detection", Firebase.RTDB.setBool(&fbdo, "sensors/BabyDetection", baby_Detection_Flag()));
-            //Serial.print("WEIGHT: "); Serial.println(measure_WeightChange());
-            Serial.print("TEMPERATURE:  "); Serial.println(get_Average_IRTemp());
-            Serial.print("Baby Detection Flag:  "); Serial.println(baby_Detection_Flag());
+
+            bool babyPresent = baby_Detection_Flag();
+            Serial.print("Baby Detection Flag:  "); Serial.println(babyPresent);
+            //Serial.print("Ultrasonic Distance: "); Serial.println(get_Distance());
+
+            // Push presence status to Firebase
+            pushDataToFirebase(presencePath, "Baby Detection", Firebase.RTDB.setBool(&fbdo, presencePath, babyPresent));
             
+            // Serial.print("WEIGHT: "); Serial.println(measure_WeightChange());
+            // Serial.print("TEMPERATURE:  "); Serial.println(get_Average_IRTemp());
+                        
             
+            // Notification logic: alert if baby is NOT detected
+            if (!babyPresent && (!babyAbsentAlertSent || (currentMillis - lastBabyAbsentAlertTime > babyAbsentAlertCooldown)))
+            {
+                pushBabyAbsentNotification();
+                babyAbsentAlertSent = true;
+                lastBabyAbsentAlertTime = currentMillis;
+            }
+            else if (babyPresent)
+            {
+                babyAbsentAlertSent = false; // Reset alert flag if baby returns
+            }
         }
+        ///////////////////////////////////////////////////////// sound cry sensor ///////////////////////////////////////////////////////////
 
+        String cryingPath = "sensors/";
+        cryingPath.concat(firebaseCradleID);
+        cryingPath.concat("/SoundSensor");
+        cryingPath.concat("/value");
 
-        //Cry detection (Mic)
-        if (currentMillis - prevTimeMicSentData > micInterval || prevTimeMicSentData == 0) 
+        // Cry detection (Mic)
+        if (currentMillis - prevTimeMicSentData > micInterval || prevTimeMicSentData == 0)
         {
             prevTimeMicSentData = currentMillis;
-            
-            babyIsCrying = process_Sound_And_Detect_Cry();    
-            
-            pushDataToFirebase("sensors/BabyCrying", "Baby Crying", Firebase.RTDB.setBool(&fbdo, "sensors/BabyCrying", babyIsCrying/*babyCrying*/ /*process_Sound_And_Detect_Cry()*/));
-            //Firebase.RTDB.setInt(&fbdo, "ignoreValues/Mic", mic_Raw_Value());
-            //Firebase.RTDB.setInt(&fbdo, "ignoreValues/Mic_Average", average);
+
+            babyIsCrying = process_Sound_And_Detect_Cry();
+
+            // pushDataToFirebase("sensors/BabyCrying", "Baby Crying", Firebase.RTDB.setBool(&fbdo, "sensors/BabyCrying", babyIsCrying/*babyCrying*/ /*process_Sound_And_Detect_Cry()*/));
+            pushDataToFirebase(cryingPath, "Baby Crying", Firebase.RTDB.setBool(&fbdo, cryingPath, babyIsCrying /*babyCrying*/ /*process_Sound_And_Detect_Cry()*/));
             
 
-            //initially mic raw values will be fluctuating greatly, they'll stabilize after some minutes of execution.
-            Serial.print("-------------"); Serial.print(mic_Raw_Value());  Serial.println("-------------");
-            Serial.print("Cry Status: "); Serial.println(babyIsCrying);
+            // initially mic raw values will be fluctuating greatly, they'll stabilize after some minutes of execution.
+            Serial.print("-------------");
+            Serial.print(mic_Raw_Value());
+            Serial.println("-------------");
+            Serial.print("Cry Status: ");
+            Serial.println(babyIsCrying);
+            
+            // for checking if baby is present or not (only for debugging purpose, not the part of the logic)
+            //Serial.print("Baby Flag: "); Serial.println(baby_Detection_Flag());
 
+            if (babyIsCrying && (!babyCryingAlertSent || (currentMillis - lastBabyCryingAlertTime > babyCryingAlertCooldown)))
+            {
+                pushBabyCryingNotification();
+                babyCryingAlertSent = true;
+                lastBabyCryingAlertTime = currentMillis;
+            }
+            else if (!babyIsCrying)
+            {
+                babyCryingAlertSent = false; // Reset when baby stops crying
+            }
         }
+        ///////////////////////////////////////////////////////// AQI sensor ///////////////////////////////////////////////////////////
 
-
+        String AQIPath = "sensors/";
+        AQIPath.concat(firebaseCradleID);
+        AQIPath.concat("/AQISensor");
+        AQIPath.concat("/value");
 
         // AQI sensor
-        if (currentMillis - prevTimeAQISentData > aqiInterval || prevTimeAQISentData == 0) 
+        if (currentMillis - prevTimeAQISentData > aqiInterval || prevTimeAQISentData == 0)
         {
+            // prevTimeAQISentData = currentMillis;
+            // pushDataToFirebase(AQIPath, "AQI Grade", Firebase.RTDB.setString(&fbdo, AQIPath, AQI_grade()));
+            // Firebase.RTDB.setInt(&fbdo, "ignoreValues/AQIVoltage", read_AQI_Voltage());
             prevTimeAQISentData = currentMillis;
-            pushDataToFirebase("sensors/AQIGrade", "AQI Grade", Firebase.RTDB.setString(&fbdo, "sensors/AQIGrade", AQI_grade()));
-            //Firebase.RTDB.setInt(&fbdo, "ignoreValues/AQIVoltage", read_AQI_Voltage());
-            
-            
-        }
 
-        //Diaper sensor
-        if (currentMillis - prevTimeMoistureSentData > moistureInterval || prevTimeMoistureSentData == 0) 
+            String aqiStatus = AQI_grade();
+
+            // Push AQI status to Firebase
+            pushDataToFirebase(AQIPath, "AQI Grade", Firebase.RTDB.setString(&fbdo, AQIPath, aqiStatus));
+
+            // Notification logic for "Hazardous" with cooldown
+            if (aqiStatus == "Hazardous" && (!aqiAlertSent || (currentMillis - lastAqiAlertTime > aqiAlertCooldown)))
+            {
+                pushAqiNotification();
+                aqiAlertSent = true;
+                lastAqiAlertTime = currentMillis;
+            }
+            else if (aqiStatus != "Hazardous")
+            {
+                aqiAlertSent = false; // Reset flag if air quality improves
+            }
+        }
+        /////////////////////////////////////////////////////////moisture sensory///////////////////////////////////////////////////////////
+        String moisturePath = "sensors/";
+        moisturePath.concat(firebaseCradleID);
+        moisturePath.concat("/MositureSensor");
+        moisturePath.concat("/value");
+
+        // Diaper sensor
+        if (currentMillis - prevTimeMoistureSentData > moistureInterval || prevTimeMoistureSentData == 0)
         {
             prevTimeMoistureSentData = currentMillis;
-            pushDataToFirebase("sensors/DiaperCondition", "Diaper Condition", Firebase.RTDB.setString(&fbdo, "sensors/DiaperCondition", diaper_Condition()));
-        }
+            // pushDataToFirebase(moisturePath, "Diaper Condition", Firebase.RTDB.setString(&fbdo, moisturePath, diaper_Condition()));
 
-        //Probe sensor
-        if (currentMillis - prevTimeProbeSentData > probeInterval || prevTimeProbeSentData == 0) 
+            String diaperStatus = diaper_Condition();
+
+            // Push to Firebase
+            pushDataToFirebase(moisturePath, "Diaper Condition", Firebase.RTDB.setString(&fbdo, moisturePath, diaperStatus));
+
+            // Notification logic with cooldown
+            if (diaperStatus == "Change Diaper" && (!moistureAlertSent || (currentMillis - lastMoistureAlertTime > moistureAlertCooldown)))
+            {
+                pushMoistureNotification();
+                moistureAlertSent = true;
+                lastMoistureAlertTime = currentMillis;
+            }
+            else if (diaperStatus == "Diaper Clean")
+            {
+                moistureAlertSent = false; // Reset flag when condition normalizes
+            }
+        }
+        /////////////////////////////////////////////////////////probe temp sensory///////////////////////////////////////////////////////////
+
+        // firebase temp sesor path
+        String tempPath = "sensors/";
+        tempPath.concat(firebaseCradleID);
+        tempPath.concat("/TempSensor");
+        tempPath.concat("/value");
+        // Probe sensor
+        if (currentMillis - prevTimeProbeSentData > probeInterval || prevTimeProbeSentData == 0)
         {
+            // prevTimeProbeSentData = currentMillis;
+            // // pushDataToFirebase("sensors/ProbeTemp", "Probe Temperature", Firebase.RTDB.setFloat(&fbdo, "sensors/ProbeTemp", temp_In_Fahrenheit()));
+            // pushDataToFirebase(tempPath, "Probe Temperature", Firebase.RTDB.setFloat(&fbdo, tempPath, temp_In_Fahrenheit()));
+
             prevTimeProbeSentData = currentMillis;
-            pushDataToFirebase("sensors/ProbeTemp", "Probe Temperature", Firebase.RTDB.setFloat(&fbdo, "sensors/ProbeTemp", temp_In_Fahrenheit()));
+
+            float currentTemp = temp_In_Fahrenheit();
+            pushDataToFirebase(tempPath, "Probe Temperature", Firebase.RTDB.setFloat(&fbdo, tempPath, currentTemp));
+
+            // Check if temperature is high and cooldown passed
+            if (currentTemp > 99 && (!tempAlertSent || (currentMillis - lastTempAlertTime > tempAlertCooldown)))
+            {
+                pushTemperatureNotification(currentTemp);
+                tempAlertSent = true;
+                lastTempAlertTime = currentMillis;
+            }
+            else if (currentTemp <= 98)
+            {
+                tempAlertSent = false; // Reset if temp returns to normal
+            }
         }
 
     /*
@@ -203,7 +554,7 @@ void loop()
     */
     
     //un-comment following region for lullaby playing
-    #pragma region 
+     #pragma region 
     // if (babyIsCrying) 
     // {
 
@@ -215,18 +566,15 @@ void loop()
     //     }
     // }
     #pragma endregion
-    myDFPlayer.available(); // Just check for availability to clear the buffer
-
-
-    } 
-    else 
+        myDFPlayer.available(); // Just check for availability to clear the buffer
+    }
+    else
     {
-        //Serial.println("Interval wait!");
-        Serial.print("Firebase Error: ("); Serial.print(fbdo.errorReason()); Serial.println(")");
+        // Serial.println("Interval wait!");
+        Serial.print("Firebase Error: (");
+        Serial.print(fbdo.errorReason());
+        Serial.println(")");
         delay(1500);
     }
 
-
-
-
-}//loop() ends
+} // loop() ends

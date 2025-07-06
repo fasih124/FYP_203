@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:fyp_203/screens/setting_screen.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../Model/CardelModel.dart';
 import '../constants/colors_constant.dart';
+import '../services/firebase_sensordata.dart';
+import 'option_screen.dart';
 
 class VideoStreamScreen extends StatefulWidget {
   const VideoStreamScreen({super.key});
@@ -17,7 +20,7 @@ class _VideoStreamScreenState extends State<VideoStreamScreen> {
   late  WebViewController _controller;
   bool isLoading = true;
   bool isPlaying = false;
-  final String streamUrl = 'http://192.168.100.55/'; // Your ESP32 IP
+  final String streamUrl = 'http://192.168.212.191';//'http://192.168.100.55/'; // Your ESP32 IP
 
   @override
   void initState() {
@@ -82,7 +85,7 @@ class _VideoStreamScreenState extends State<VideoStreamScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (builder) => const SettingScreen(),
+                              builder: (builder) => const OptionScreen(),
                             ),
                           );
                         },
@@ -103,13 +106,24 @@ class _VideoStreamScreenState extends State<VideoStreamScreen> {
                   const SizedBox(
                     height: 6,
                   ),
-                  const Text(
-                    'Cradle : Modelx-FYP203',
-                    style: TextStyle(
-                      color: AppColorCode.White_shade,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  StreamBuilder<CradleModelData>(
+                    stream: CradleModelService.getCradleModel(),
+                    builder: (context, snapshot) {
+                      String modelName = '...';
+                      if (snapshot.hasData) {
+                        modelName = snapshot.data!.model;
+                      } else if (snapshot.hasError) {
+                        modelName = 'Error';
+                      }
+                      return Text(
+                        'Cradle : $modelName',
+                        style: const TextStyle(
+                          color: AppColorCode.White_shade,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(
                     height: 6,
@@ -209,14 +223,38 @@ class _VideoStreamScreenState extends State<VideoStreamScreen> {
                       final newController = WebViewController()
                         ..setJavaScriptMode(JavaScriptMode.unrestricted)
                         ..setNavigationDelegate(
+                          // NavigationDelegate(
+                          //   onPageStarted: (url) {
+                          //     setState(() {
+                          //       isLoading = true;
+                          //     });
+                          //   },
+                          //   onPageFinished: (url) {
+                          //     // Always show loader for at least 3 sec
+                          //     Future.delayed(const Duration(seconds: 3), () {
+                          //       if (mounted) {
+                          //         setState(() {
+                          //           isLoading = false;
+                          //         });
+                          //       }
+                          //     });
+                          //   },
+                          //   onWebResourceError: (error) {
+                          //     if (mounted) {
+                          //       setState(() {
+                          //         isLoading = false;
+                          //       });
+                          //     }
+                          //     print("Stream error: ${error.description}");
+                          //   },
+                          // ),
                           NavigationDelegate(
                             onPageStarted: (url) {
                               setState(() {
                                 isLoading = true;
                               });
-                            },
-                            onPageFinished: (url) {
-                              // Always show loader for at least 3 sec
+
+                              // Manually hide loader after 2.5 seconds (arbitrary, tweak as needed)
                               Future.delayed(const Duration(seconds: 3), () {
                                 if (mounted) {
                                   setState(() {
