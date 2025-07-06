@@ -129,11 +129,11 @@ class HomeScreen extends StatelessWidget {
                     icon: const Icon(Icons.arrow_forward,
                         color: Colors.white, size: 18),
                     label: const Text(
-                      'Connected',
+                      'Connect',
                       style: TextStyle(color: Colors.white),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColorCode.secondaryColor_500,
+                      backgroundColor: Colors.grey,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
@@ -254,7 +254,7 @@ class HomeScreen extends StatelessWidget {
                               contentPadding: EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 10),
                               title: Text(
-                                'Enabled it in setting',
+                                'Enable it in setting',
                                 style: const TextStyle(
                                   color: Colors.white60,
                                   fontSize: 20,
@@ -414,7 +414,7 @@ class HomeScreen extends StatelessWidget {
                               contentPadding: EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 10),
                               title: Text(
-                                'Enabled it in setting',
+                                'Enable it in setting',
                                 style: const TextStyle(
                                   color: Colors.white60,
                                   fontSize: 20,
@@ -581,7 +581,7 @@ class HomeScreen extends StatelessWidget {
                               contentPadding: EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 10),
                               title: Text(
-                                "Enabled it in Setting",
+                                "Enable it in Setting",
                                 style: const TextStyle(
                                   color: Colors.white60,
                                   fontSize: 20,
@@ -746,7 +746,7 @@ class HomeScreen extends StatelessWidget {
                               contentPadding: EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 10),
                               title: Text(
-                                "Enabled it in setting",
+                                "Enable it in setting",
                                 style: const TextStyle(
                                   color: Colors.white60,
                                   fontSize: 20,

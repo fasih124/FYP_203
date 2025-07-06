@@ -20,7 +20,7 @@ class _VideoStreamScreenState extends State<VideoStreamScreen> {
   late  WebViewController _controller;
   bool isLoading = true;
   bool isPlaying = false;
-  final String streamUrl = 'http://192.168.100.55/'; // Your ESP32 IP
+  final String streamUrl = 'http://192.168.212.191';//'http://192.168.100.55/'; // Your ESP32 IP
 
   @override
   void initState() {
