@@ -285,56 +285,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
           const SizedBox(
             height: 12,
           ),
-          // Align(
-          //   alignment: Alignment.topRight,
-          //   child: Padding(
-          //     padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          //     child: OutlinedButton.icon(
-          //       style: OutlinedButton.styleFrom(
-          //         side: const BorderSide(color: AppColorCode.primaryColor_500, width: 4), // 🔴 Outline color
-          //         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          //         shape: RoundedRectangleBorder(
-          //           borderRadius: BorderRadius.circular(12),
-          //         ),
-          //       ),
-          //       icon:  const Icon(Icons.delete_sweep, color: AppColorCode.primaryColor_500),
-          //       label: const Text(
-          //       "Clear Old Notifications",
-          //       style: TextStyle(color: AppColorCode.primaryColor_500),
-          //     ),
-          //       // tooltip: 'Clear old notifications',
-          //       onPressed: () async {
-          //         final confirm = await showDialog<bool>(
-          //           context: context,
-          //           builder: (context) => AlertDialog(
-          //             title: const Text("Clear Old Notifications"),
-          //             content: const Text(
-          //               "Do you want to delete all but the latest 10 notifications?",
-          //             ),
-          //             actions: [
-          //               TextButton(
-          //                 child: const Text("Cancel"),
-          //                 onPressed: () => Navigator.of(context).pop(false),
-          //               ),
-          //               TextButton(
-          //                 child: const Text("Delete"),
-          //                 onPressed: () => Navigator.of(context).pop(true),
-          //               ),
-          //             ],
-          //           ),
-          //         );
-          //
-          //         if (confirm == true) {
-          //           await deleteOldNotifications(10); // ✅ keep 10 latest
-          //           ScaffoldMessenger.of(context).showSnackBar(
-          //             const SnackBar(content: Text("Old notifications deleted")),
-          //           );
-          //         }
-          //       },
-          //     ),
-          //   ),
-          // ),
-
           const SizedBox(
             height: 15,
           ),
@@ -437,6 +387,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                     onPressed: () {
                                       deleteNotification(notif.firebaseKey); // 🔴 Use firebaseKey here
                                     },
+                                    hoverColor: Colors.white60,
                                   ),
                                 ),
                               );
