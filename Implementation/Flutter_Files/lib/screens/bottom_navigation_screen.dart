@@ -157,21 +157,30 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
                 if (_unreadCount > 0)
                   Positioned(
                     right: 0,
+                    top: 0,
                     child: Container(
-                      padding: const EdgeInsets.all(4),
+                      width: 10, // Size of the red dot
+                      height: 10,
                       decoration: const BoxDecoration(
                         color: Colors.red,
                         shape: BoxShape.circle,
                       ),
-                      child: Text(
-                        '$_unreadCount',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
                     ),
+                    // child: Container(
+                    //   padding: const EdgeInsets.all(4),
+                    //   decoration: const BoxDecoration(
+                    //     color: Colors.red,
+                    //     shape: BoxShape.circle,
+                    //   ),
+                    //   child: Text(
+                    //     '$_unreadCount',
+                    //     style: const TextStyle(
+                    //       color: Colors.white,
+                    //       fontSize: 12,
+                    //       fontWeight: FontWeight.bold,
+                    //     ),
+                    //   ),
+                    // ),
                   ),
               ],
             ),
