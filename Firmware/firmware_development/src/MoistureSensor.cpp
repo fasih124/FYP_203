@@ -1,8 +1,8 @@
 #include <Arduino.h>
 
-#define HW_Pin 5
+#define HW_Pin 15
 
-int susuThreshold = 1000; // Greater value, clean environment. Less value, more moist
+int susuThreshold = 5; // Greater value, clean environment. Less value, more moist
 int sensorValue = 0;
 
 void init_Moisture_Sensor()

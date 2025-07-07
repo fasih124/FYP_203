@@ -14,11 +14,13 @@ Things to do in main.cpp when integrating a new module:
 #include "WifiConnection.h" // WiFi Connection
 #include "AQISensor.h"      // AQI Sensor
 #include "MoistureSensor.h" // Moisture Sensor
+#include "ToggleDiaper.h"   //Diaper Moisture Detection
 #include "ProbeSensor.h"    // Probe Temperature Sensor
 #include "ultrasonic.h"     // Ultrasonic Sensor
 #include "WeightSensor.h"   // Weight Sensor
 #include "BabyDetection.h"  // Baby Detection Module
 #include "MicSensor.h"      // Crying Detection using Mic
+#include "ToggleCry.h"      //Crying flag
 #include "dfplayer.h"       // Mp3 module
 
 
@@ -47,16 +49,16 @@ unsigned long prevTimeLullabyPlayed = 0;
 
 // Intervals
 int aqiInterval = 30000;
-int moistureInterval = 30000;
+int moistureInterval = 500;
 int probeInterval = 30000;
 int detectionInterval = 10000;
-int micInterval = 100;       // Adjusted to actual interval used in MicSensor
+int micInterval = 300;       // Adjusted to actual interval used in MicSensor
 int lullabyInterval = 60000; // wont repeat within 1 min duration if flag fluctuates from true to false & then false to true
 
 bool signupCheck = false;
 bool lullabyCurrentlyPlaying = false;
 
-bool babyIsCrying = false; // already defined in MicSensor file for global access
+bool mainBabyCryingVar = false; // already defined in MicSensor file for global access
 
 String firebaseCradleID = "cradle1"; // Change this to your cradle ID
 
@@ -82,6 +84,8 @@ bool babyCryingAlertSent = false;
 unsigned long lastBabyCryingAlertTime = 0;
 int babyCryingAlertCooldown = 10 * 60 * 1000; // 10 minutes
 //////////////////////////////////////////////////////////////////variable for notifications//////////////////////////////////////////////////////////////////////////
+
+
 void setup()
 {
     Serial.begin(115200);
@@ -100,29 +104,31 @@ void setup()
 
     // After Wi-Fi is connected
     
-    // configTime(0, 0, "pool.ntp.org", "time.nist.gov");
+    configTime(0, 0, "pool.ntp.org", "time.nist.gov");
 
-    // Serial.println("Waiting for NTP time sync...");
-    // time_t now = time(nullptr);
-    // while (now < 100000)
-    // {
-    //     delay(500);
-    //     Serial.print(".");
-    //     now = time(nullptr);
-    // }
-    // Serial.println("\nNTP time synced!");
+    Serial.println("Waiting for NTP time sync...");
+    time_t now = time(nullptr);
+    while (now < 100000)
+    {
+        delay(500);
+        Serial.print(".");
+        now = time(nullptr);
+    }
+    Serial.println("\nNTP time synced!");
 
-    // // Serial.println("Using Cradle ID: ");
-    // Serial.println(firebaseCradleID);
-    // Serial.println("******************************************************");
-    // Serial.println("******************************************************");
+    // Serial.println("Using Cradle ID: ");
+    Serial.println(firebaseCradleID);
+    Serial.println("******************************************************");
+
 
     // contains wifi ok audio
     init_AQI_sensor();
     init_Moisture_Sensor();
+    init_Toggle_Diaper();
     init_Probe_Sensor();
     init_Baby_Detection_Sensors();
     init_Mic();
+    init_Toggle_Cry();
 
     config.api_key = API_KEY;
     config.database_url = DB_URL;
@@ -387,13 +393,15 @@ void loop()
         presencePath.concat("/babyPresence");
         presencePath.concat("/ispresent");
 
+        bool babyPresent = baby_Detection_Flag();   //being used by detection algo and mic
+
         // Baby detection (Weight and Ultrasonic)
         if (currentMillis - prevTimeBabyDetectionSentData > detectionInterval || prevTimeBabyDetectionSentData == 0)
         {
 
             prevTimeBabyDetectionSentData = currentMillis;
 
-            bool babyPresent = baby_Detection_Flag();
+            // bool babyPresent = baby_Detection_Flag();
             Serial.print("Baby Detection Flag:  "); Serial.println(babyPresent);
             //Serial.print("Ultrasonic Distance: "); Serial.println(get_Distance());
 
@@ -424,33 +432,44 @@ void loop()
         cryingPath.concat("/value");
 
         // Cry detection (Mic)
-        if (currentMillis - prevTimeMicSentData > micInterval || prevTimeMicSentData == 0)
+        //baby needs to be present to detect cry
+        if ((currentMillis - prevTimeMicSentData > micInterval || prevTimeMicSentData == 0) /*&& babyPresent*/)
         {
             prevTimeMicSentData = currentMillis;
 
-            babyIsCrying = process_Sound_And_Detect_Cry();
+            if(babyPresent)
+            {
+                mainBabyCryingVar = process_Cry();
+            }
+            else
+            {
+                turn_Off_Cry_LED();
+                mainBabyCryingVar = false;
+            }
+            
 
-            // pushDataToFirebase("sensors/BabyCrying", "Baby Crying", Firebase.RTDB.setBool(&fbdo, "sensors/BabyCrying", babyIsCrying/*babyCrying*/ /*process_Sound_And_Detect_Cry()*/));
-            pushDataToFirebase(cryingPath, "Baby Crying", Firebase.RTDB.setBool(&fbdo, cryingPath, babyIsCrying /*babyCrying*/ /*process_Sound_And_Detect_Cry()*/));
+            // pushDataToFirebase("sensors/BabyCrying", "Baby Crying", Firebase.RTDB.setBool(&fbdo, "sensors/BabyCrying", mainBabyCryingVar/*babyCrying*/ /*process_Sound_And_Detect_Cry()*/));
+            pushDataToFirebase(cryingPath, "Baby Crying", Firebase.RTDB.setBool(&fbdo, cryingPath, mainBabyCryingVar /*babyCrying*/ /*process_Sound_And_Detect_Cry()*/));
             
 
             // initially mic raw values will be fluctuating greatly, they'll stabilize after some minutes of execution.
-            Serial.print("-------------");
-            Serial.print(mic_Raw_Value());
-            Serial.println("-------------");
-            Serial.print("Cry Status: ");
-            Serial.println(babyIsCrying);
+            // Serial.print("-------------"); Serial.print(mic_Raw_Value()); Serial.println("-------------");
+            // Serial.print(babyCrying); Serial.println(" ------  ");
+            
+            // toggel cry detection
+            Serial.print("Cry Status: ");  Serial.print(mainBabyCryingVar); Serial.print(", With Value: "); Serial.println(read_Cry_Raw_Value());
+            
             
             // for checking if baby is present or not (only for debugging purpose, not the part of the logic)
             //Serial.print("Baby Flag: "); Serial.println(baby_Detection_Flag());
 
-            if (babyIsCrying && (!babyCryingAlertSent || (currentMillis - lastBabyCryingAlertTime > babyCryingAlertCooldown)))
+            if (mainBabyCryingVar && (!babyCryingAlertSent || (currentMillis - lastBabyCryingAlertTime > babyCryingAlertCooldown)))
             {
                 pushBabyCryingNotification();
                 babyCryingAlertSent = true;
                 lastBabyCryingAlertTime = currentMillis;
             }
-            else if (!babyIsCrying)
+            else if (!mainBabyCryingVar)
             {
                 babyCryingAlertSent = false; // Reset when baby stops crying
             }
@@ -487,22 +506,34 @@ void loop()
                 aqiAlertSent = false; // Reset flag if air quality improves
             }
         }
-        /////////////////////////////////////////////////////////moisture sensory///////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////// moisture sensor ///////////////////////////////////////////////////////////
         String moisturePath = "sensors/";
         moisturePath.concat(firebaseCradleID);
         moisturePath.concat("/MositureSensor");
         moisturePath.concat("/value");
 
         // Diaper sensor
-        if (currentMillis - prevTimeMoistureSentData > moistureInterval || prevTimeMoistureSentData == 0)
+        if (/*babyPresent &&*/ (currentMillis - prevTimeMoistureSentData > moistureInterval || prevTimeMoistureSentData == 0))
         {
             prevTimeMoistureSentData = currentMillis;
             // pushDataToFirebase(moisturePath, "Diaper Condition", Firebase.RTDB.setString(&fbdo, moisturePath, diaper_Condition()));
-
-            String diaperStatus = diaper_Condition();
+            String diaperStatus = " ";
+            
+            if(babyPresent)
+            {
+                diaperStatus = process_Diaper();
+            }
+            else
+            {
+                diaperStatus = "Diaper Clean";
+                turn_Off_Diaper_LED();
+            }
 
             // Push to Firebase
             pushDataToFirebase(moisturePath, "Diaper Condition", Firebase.RTDB.setString(&fbdo, moisturePath, diaperStatus));
+
+            //Serial Debugging
+            Serial.print("Moisture Status: ");  Serial.print(diaperStatus); Serial.print(", With Value: "); Serial.println(read_Diaper_Raw_Value());
 
             // Notification logic with cooldown
             if (diaperStatus == "Change Diaper" && (!moistureAlertSent || (currentMillis - lastMoistureAlertTime > moistureAlertCooldown)))
@@ -555,7 +586,7 @@ void loop()
     
     //un-comment following region for lullaby playing
      #pragma region 
-    // if (babyIsCrying) 
+    // if (mainBabyCryingVar) 
     // {
 
     //     if (currentMillis - prevTimeLullabyPlayed > lullabyInterval) {
