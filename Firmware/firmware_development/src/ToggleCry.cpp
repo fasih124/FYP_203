@@ -7,6 +7,7 @@ bool lastTouchState = false;
 
 void init_Toggle_Cry() {
   pinMode(LED_PIN, OUTPUT);
+  delay(50);
   baselineTouchValue = touchRead(T4_PIN);
 }
 

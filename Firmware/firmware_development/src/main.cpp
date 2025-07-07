@@ -18,6 +18,7 @@ Things to do in main.cpp when integrating a new module:
 #include "ProbeSensor.h"    // Probe Temperature Sensor
 #include "ultrasonic.h"     // Ultrasonic Sensor
 #include "WeightSensor.h"   // Weight Sensor
+#include "ToggleWeight.h"   //weight flags
 #include "BabyDetection.h"  // Baby Detection Module
 #include "MicSensor.h"      // Crying Detection using Mic
 #include "ToggleCry.h"      //Crying flag
@@ -50,9 +51,9 @@ unsigned long prevTimeLullabyPlayed = 0;
 // Intervals
 int aqiInterval = 30000;
 int moistureInterval = 500;
-int probeInterval = 30000;
-int detectionInterval = 10000;
-int micInterval = 300;       // Adjusted to actual interval used in MicSensor
+int probeInterval = 10000;
+int detectionInterval = 300;
+int micInterval = 200;       // Adjusted to actual interval used in MicSensor
 int lullabyInterval = 60000; // wont repeat within 1 min duration if flag fluctuates from true to false & then false to true
 
 bool signupCheck = false;
@@ -104,6 +105,7 @@ void setup()
 
     // After Wi-Fi is connected
     
+    //NTP Sync.
     configTime(0, 0, "pool.ntp.org", "time.nist.gov");
 
     Serial.println("Waiting for NTP time sync...");
@@ -401,15 +403,18 @@ void loop()
 
             prevTimeBabyDetectionSentData = currentMillis;
 
+
             // bool babyPresent = baby_Detection_Flag();
             Serial.print("Baby Detection Flag:  "); Serial.println(babyPresent);
             //Serial.print("Ultrasonic Distance: "); Serial.println(get_Distance());
-
+            
+            Serial.print("Weight Flag: -------> "); Serial.println(process_Weight_OK());
+            
             // Push presence status to Firebase
             pushDataToFirebase(presencePath, "Baby Detection", Firebase.RTDB.setBool(&fbdo, presencePath, babyPresent));
             
             // Serial.print("WEIGHT: "); Serial.println(measure_WeightChange());
-            // Serial.print("TEMPERATURE:  "); Serial.println(get_Average_IRTemp());
+            
                         
             
             // Notification logic: alert if baby is NOT detected
@@ -533,7 +538,7 @@ void loop()
             pushDataToFirebase(moisturePath, "Diaper Condition", Firebase.RTDB.setString(&fbdo, moisturePath, diaperStatus));
 
             //Serial Debugging
-            Serial.print("Moisture Status: ");  Serial.print(diaperStatus); Serial.print(", With Value: "); Serial.println(read_Diaper_Raw_Value());
+            //Serial.print("Moisture Status: ");  Serial.print(diaperStatus); Serial.print(", With Value: "); Serial.println(read_Diaper_Raw_Value());
 
             // Notification logic with cooldown
             if (diaperStatus == "Change Diaper" && (!moistureAlertSent || (currentMillis - lastMoistureAlertTime > moistureAlertCooldown)))
@@ -586,16 +591,16 @@ void loop()
     
     //un-comment following region for lullaby playing
      #pragma region 
-    // if (mainBabyCryingVar) 
-    // {
+    if (mainBabyCryingVar) 
+    {
 
-    //     if (currentMillis - prevTimeLullabyPlayed > lullabyInterval) {
-    //         myDFPlayer.play(8); // Play the lullaby track
-    //         prevTimeLullabyPlayed = currentMillis; // Update the timestamp for the next cooldown check
+        if (currentMillis - prevTimeLullabyPlayed > lullabyInterval) {
+            myDFPlayer.play(8); // Play the lullaby track
+            prevTimeLullabyPlayed = currentMillis; // Update the timestamp for the next cooldown check
             
-    //         Serial.println("Baby crying detected, starting/restarting lullaby.");
-    //     }
-    // }
+            Serial.println("Baby crying detected, starting/restarting lullaby.");
+        }
+    }
     #pragma endregion
         myDFPlayer.available(); // Just check for availability to clear the buffer
     }
