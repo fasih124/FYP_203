@@ -1,5 +1,4 @@
 #include <Arduino.h>
-//#include <IRSensor.h>   // for flag input
 #include <WeightSensor.h>   //for flag input
 #include <ultrasonic.h> //for flag input
 
