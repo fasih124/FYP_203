@@ -49,10 +49,10 @@ unsigned long prevTimeMicSentData = 0;
 unsigned long prevTimeLullabyPlayed = 0;
 
 // Intervals
-int aqiInterval = 30000;
-int moistureInterval = 500;
-int probeInterval = 10000;
-int detectionInterval = 300;
+int aqiInterval = 60000;
+int moistureInterval = 2000;
+int probeInterval = 15000;
+int detectionInterval = 1000;
 int micInterval = 200;       // Adjusted to actual interval used in MicSensor
 int lullabyInterval = 60000; // wont repeat within 1 min duration if flag fluctuates from true to false & then false to true
 
