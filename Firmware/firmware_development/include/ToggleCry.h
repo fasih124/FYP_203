@@ -4,8 +4,8 @@
 #include <Arduino.h>
 
 #define T4_PIN T4
-#define LED_PIN 11
-#define CHANGE_THRESHOLD 20000
+#define LED_PIN 13
+#define CHANGE_THRESHOLD 30000
 
 extern int touchRawValue;
 extern int baselineTouchValue;
