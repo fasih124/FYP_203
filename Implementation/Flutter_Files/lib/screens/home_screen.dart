@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp_203/Model/CradleSensorModel.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
@@ -11,11 +12,78 @@ import '../Model/BabyPresenceModel.dart';
 import '../Model/CardelModel.dart';
 import '../Model/SoundSensorModel.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String? cradleModel;
+  bool isLoading = true;
+  String? modelName;
+
+  @override
+  void initState() {
+    super.initState();
+    loadCradleModel();
+  }
+
+
+  Future<void> loadCradleModel() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId != null) {
+      final modelKey = await CradleService.getCradleModelForUser(userId);
+      if (modelKey != null) {
+        final fetchedModelName = await CradleService.getModelNameForCradle(modelKey);
+        setState(() {
+          cradleModel = modelKey;
+          modelName = fetchedModelName;
+          isLoading = false;
+        });
+        return;
+      }
+    }
+
+    // If no user or cradle found
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  // Future<void> loadCradleModel() async {
+  //   final userId = FirebaseAuth.instance.currentUser?.uid;
+  //   print("Firebase userId: $userId"); // ✅ Add this for debugging
+  //
+  //   if (userId != null) {
+  //     final model = await CradleService.getCradleModelForUser(userId);
+  //     print("Cradle model from DB: $model"); // ✅ Log cradle model
+  //     setState(() {
+  //       cradleModel = model;
+  //       isLoading = false;
+  //     });
+  //   } else {
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //   }
+  // }
+
+  @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (cradleModel == null) {
+      return const Scaffold(
+        body: Center(child: Text("No cradle model found")),
+      );
+    }
+
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,42 +147,29 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(
                     height: 16,
                   ),
-
-                  StreamBuilder<CradleModelData>(
-                    stream: CradleModelService.getCradleModel(),
-                    builder: (context, snapshot) {
-                      String modelName = 'Loading...';
-                      if (snapshot.hasData) {
-                        modelName = snapshot.data!.model;
-                      } else if (snapshot.hasError) {
-                        modelName = 'Error';
-                      }
-
-                      return RichText(
-                        text: TextSpan(
-                          children: [
-                            const TextSpan(
-                              text: 'Cradle : ',
-                              style: TextStyle(
-                                color: AppColorCode.primaryColor_500,
-                                fontSize: 24,
-                                fontWeight: FontWeight.w700,
-                                fontFamily: 'Poppins',
-                              ),
-                            ),
-                            TextSpan(
-                              text: modelName,
-                              style: const TextStyle(
-                                color: Colors.black54,
-                                fontSize: 24,
-                                fontWeight: FontWeight.w700,
-                                fontFamily: 'Poppins',
-                              ),
-                            ),
-                          ],
+                  RichText(
+                    text: TextSpan(
+                      children: [
+                        const TextSpan(
+                          text: 'Cradle : ',
+                          style: TextStyle(
+                            color: AppColorCode.primaryColor_500,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'Poppins',
+                          ),
                         ),
-                      );
-                    },
+                        TextSpan(
+                          text: modelName ?? 'Unknown',
+                          style: const TextStyle(
+                            color: Colors.black54,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'Poppins',
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(
                     height: 8,
@@ -142,40 +197,8 @@ class HomeScreen extends StatelessWidget {
                   const SizedBox(
                     height: 32,
                   ),
-                  // Container(
-                  //     padding: const EdgeInsets.symmetric(
-                  //         horizontal: 16, vertical: 8),
-                  //     decoration: BoxDecoration(
-                  //       color: Colors.white,
-                  //       borderRadius: BorderRadius.circular(12),
-                  //       border: Border.all(
-                  //           color: AppColorCode.primaryColor_500, width: 4),
-                  //     ),
-                  //     child: const Row(
-                  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //       children: [
-                  //         Text(
-                  //           'Baby Presence :',
-                  //           style: TextStyle(
-                  //             color: AppColorCode.Black_shade,
-                  //             fontFamily: 'Poppins',
-                  //             fontSize: 16,
-                  //             fontWeight: FontWeight.bold,
-                  //           ),
-                  //         ),
-                  //         Text(
-                  //           'PRESENT',
-                  //           style: TextStyle(
-                  //             color: AppColorCode.secondaryColor_500,
-                  //             fontFamily: 'Poppins',
-                  //             fontSize: 16,
-                  //             fontWeight: FontWeight.bold,
-                  //           ),
-                  //         ),
-                  //       ],
-                  //     )),
                   StreamBuilder<BabyPresenceSensorData>(
-                    stream: BabyPresenceSensorService.getBabyPresenceSensorData(),
+                    stream: BabyPresenceSensorService.getBabyPresenceSensorData(cradleModel!),
                     builder: (context, snapshot) {
                       String status = 'Loading...';
                       Color statusColor = Colors.grey;
@@ -236,7 +259,7 @@ class HomeScreen extends StatelessWidget {
               children: [
                 // temperature
                 StreamBuilder<CradleSensorData>(
-                  stream: TemperatureSensorService.getTemperatureSensorData(),
+                  stream: TemperatureSensorService.getTemperatureSensorData(cradleModel!),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       final data = snapshot.data!;
@@ -394,7 +417,7 @@ class HomeScreen extends StatelessWidget {
 
                 // _buildCard('Moisture', 'DRY', 'assets/icons_img/Droplet.png'),
                 StreamBuilder<CradleSensorData>(
-                  stream: MoistureSensorService.getMoistureSensorData(),
+                  stream: MoistureSensorService.getMoistureSensorData(cradleModel!),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       final data = snapshot.data!;
@@ -560,7 +583,7 @@ class HomeScreen extends StatelessWidget {
                 // _buildCard('Air Quality', '200 AQI','assets/icons_img/aqi_icon.png' ),
                 // AQI
                 StreamBuilder<CradleSensorData>(
-                  stream: AQISensorService.getAQISensorData(),
+                  stream: AQISensorService.getAQISensorData(cradleModel!),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       final data = snapshot.data!;
@@ -726,7 +749,7 @@ class HomeScreen extends StatelessWidget {
                 // _buildCard('Sound', '500 DB','assets/icons_img/sound_icon.png' ),
                 // sound
                 StreamBuilder<SoundSensorData>(
-                  stream: SoundSensorService.getSoundSensorData(),
+                  stream: SoundSensorService.getSoundSensorData(cradleModel!),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       final data = snapshot.data!;
@@ -891,92 +914,4 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-Widget _buildCard(String title, Text sensorText, String path) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10),
-    child: Container(
-      decoration: BoxDecoration(
-        color: AppColorCode.neutralColor_50,
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            blurRadius: 5,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
-      child: Row(
-        // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        // crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(
-            width: 10,
-          ),
-          Container(
-            decoration: const BoxDecoration(
-              color: AppColorCode.primaryColor_500,
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(14),
-                topLeft: Radius.circular(14),
-                bottomRight: Radius.circular(14),
-                topRight: Radius.circular(14),
-                // Radius.circular(4),
-              ),
-            ),
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10.0, vertical: 15),
-              child: Image.asset(
-                path,
-                width: 30,
-                height: 30,
-              ),
-              // child: Column(
-              //   mainAxisAlignment: MainAxisAlignment.center,
-              //   crossAxisAlignment: CrossAxisAlignment.center,
-              //   children: [
-              //     Image.asset(
-              //       path,
-              //       width: 35,
-              //       height: 33,
-              //     ), // Icon(icon, color: AppColorCode.White_shade),
-              //     // Text(
-              //     //   title,
-              //     //   style: const TextStyle(
-              //     //     color: AppColorCode.White_shade,
-              //     //     fontSize: 16,
-              //     //     fontWeight: FontWeight.bold,
-              //     //   ),
-              //     // ),
-              //     // const SizedBox(width: 30),
-              //   ],
-              // ),
-            ),
-          ),
-          const SizedBox(width: 20),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Text(
-              //   title,
-              //   style: const TextStyle(
-              //     color: Colors.black87,
-              //     fontSize: 24,
-              //     fontWeight: FontWeight.bold,
-              //   ),
-              // ),
-              sensorText,
-            ],
-          ),
-          const SizedBox(
-            height: 2,
-          ),
-        ],
-      ),
-    ),
-  );
 }

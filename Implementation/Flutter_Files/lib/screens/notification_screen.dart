@@ -49,11 +49,24 @@ class NotificationScreen extends StatefulWidget {
 
 class _NotificationScreenState extends State<NotificationScreen> {
   late Future<List<NotificationModel>> _notificationFuture;
+  String? cradleModel;
+  bool isModelLoading = true;
+
+  Future<void> loadCradleModel() async {
+    final model = await CradleService.getCradleModelForUser(widget.parentId);
+    setState(() {
+      cradleModel = model;
+      isModelLoading = false;
+    });
+  }
+
+
 
   @override
   void initState() {
     super.initState();
     _notificationFuture = getNotificationsForParent(widget.parentId);
+    loadCradleModel(); // ← add thi
   }
 
   Future<void> deleteNotification(String firebaseKey) async {
@@ -207,26 +220,38 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   Row(
                     mainAxisAlignment:MainAxisAlignment.spaceBetween,
                     children: [
-                      StreamBuilder<CradleModelData>(
-                        stream: CradleModelService.getCradleModel(),
-                        builder: (context, snapshot) {
-                          String modelName = '...';
-                          if (snapshot.hasData) {
-                            modelName = snapshot.data!.model;
-                          } else if (snapshot.hasError) {
-                            modelName = 'Error';
-                          }
-
-                          return Text(
-                            'Cradle : $modelName',
-                            style: const TextStyle(
-                              color: AppColorCode.White_shade,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          );
-                        },
+                      // StreamBuilder<CradleModelData>(
+                      //   stream: CradleModelService.getCradleModel(),
+                      //   builder: (context, snapshot) {
+                      //     String modelName = '...';
+                      //     if (snapshot.hasData) {
+                      //       modelName = snapshot.data!.model;
+                      //     } else if (snapshot.hasError) {
+                      //       modelName = 'Error';
+                      //     }
+                      //
+                      //     return Text(
+                      //       'Cradle : $modelName',
+                      //       style: const TextStyle(
+                      //         color: AppColorCode.White_shade,
+                      //         fontSize: 18,
+                      //         fontWeight: FontWeight.w500,
+                      //       ),
+                      //     );
+                      //   },
+                      // ),
+                      isModelLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : Text(
+                        'Cradle : ${cradleModel ?? "Not Found"}',
+                        style: const TextStyle(
+                          color: AppColorCode.White_shade,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
+
+
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4.0),
                         child: OutlinedButton.icon(

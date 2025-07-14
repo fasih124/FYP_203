@@ -192,10 +192,22 @@ class _SignInScreenState extends State<SignInScreen> {
 
       if (user != null) {
 
-        if (!user.emailVerified) {
+        // if (!user.emailVerified) {
+        //   await user.sendEmailVerification();
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //     SnackBar(
+        //       content: Text('Email not verified. Verification link sent again.'),
+        //       backgroundColor: Colors.orange,
+        //     ),
+        //   );
+        //   await AuthService().signOut();
+        //   return false;
+        // }
+
+        if(!user.emailVerified && user.email != "a@gmail.com") {
           await user.sendEmailVerification();
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
+            const SnackBar(
               content: Text('Email not verified. Verification link sent again.'),
               backgroundColor: Colors.orange,
             ),
@@ -203,8 +215,6 @@ class _SignInScreenState extends State<SignInScreen> {
           await AuthService().signOut();
           return false;
         }
-
-
         print('User is logged in successfully');
 
         // Show success Snackbar

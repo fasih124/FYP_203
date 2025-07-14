@@ -329,6 +329,7 @@
 
 
 ///////////////////////////////dynamic link///////////////////////////////
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp_203/screens/setting_screen.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -351,36 +352,47 @@ class _VideoStreamScreenState extends State<VideoStreamScreen> {
   bool isLoading = true;
   bool isPlaying = false;
   String? streamUrl;
+  String? cradleModel;
+  bool isModelLoading = true;
 
   @override
   void initState() {
     super.initState();
     fetchIpcamUrlAndInit();
+    loadCradleModel();
   }
+
+  Future<void> loadCradleModel() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId != null) {
+      final model = await CradleService.getCradleModelForUser(userId);
+      setState(() {
+        cradleModel = model;
+        isModelLoading = false;
+      });
+    } else {
+      setState(() {
+        isModelLoading = false;
+      });
+    }
+  }
+
 
   Future<void> fetchIpcamUrlAndInit() async {
 
-    print("========================================");
-    print("========================================");
+
     print("========================================");
     print("========== FETCHING CAMERA IP ==========");
     print("========================================");
-    print("========================================");
-    print("========================================");
-    print("========================================");
-    print("========================================");
+
 
     final url = await FirebaseIpcamService.getIpcamUrl();
     if (url != null) {
-      print("========================================");
-      print("========================================");
+
       print("========================================");
       print("✅ IP Camera Stream URL: $url");
       print("========================================");
-      print("========================================");
-      print("========================================");
-      print("========================================");
-      print("========================================");
+
 
       setState(() {
         streamUrl = url;
@@ -390,18 +402,14 @@ class _VideoStreamScreenState extends State<VideoStreamScreen> {
         isLoading = false;
       });
     } else {
-      print("❌ Failed to fetch IP camera URL. It's null.");
-      print("❌ Failed to fetch IP camera URL. It's null.");
-      print("❌ Failed to fetch IP camera URL. It's null.");
-      print("❌ Failed to fetch IP camera URL. It's null.");
+
       print("❌ Failed to fetch IP camera URL. It's null.");
       setState(() {
         streamUrl = null;
         isLoading = false;
       });
     }
-    print("=========================================");
-    print("=========================================");
+
     print("=========================================");
   }
 
@@ -478,25 +486,38 @@ class _VideoStreamScreenState extends State<VideoStreamScreen> {
             ),
             const Divider(color: AppColorCode.White_shade, thickness: 1),
             const SizedBox(height: 6),
-            StreamBuilder<CradleModelData>(
-              stream: CradleModelService.getCradleModel(),
-              builder: (context, snapshot) {
-                String modelName = '...';
-                if (snapshot.hasData) {
-                  modelName = snapshot.data!.model;
-                } else if (snapshot.hasError) {
-                  modelName = 'Error';
-                }
-                return Text(
-                  'Cradle : $modelName',
-                  style: const TextStyle(
-                    color: AppColorCode.White_shade,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                  ),
-                );
-              },
+
+            // StreamBuilder<CradleModelData>(
+            //   stream: CradleModelService.getCradleModel(),
+            //   builder: (context, snapshot) {
+            //     String modelName = '...';
+            //     if (snapshot.hasData) {
+            //       modelName = snapshot.data!.model;
+            //     } else if (snapshot.hasError) {
+            //       modelName = 'Error';
+            //     }
+            //     return Text(
+            //       'Cradle : $modelName',
+            //       style: const TextStyle(
+            //         color: AppColorCode.White_shade,
+            //         fontSize: 18,
+            //         fontWeight: FontWeight.w500,
+            //       ),
+            //     );
+            //   },
+            // ),
+
+            isModelLoading
+                ? const CircularProgressIndicator(color: Colors.white)
+                : Text(
+              'Cradle : ${cradleModel ?? "Not Found"}',
+              style: const TextStyle(
+                color: AppColorCode.White_shade,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
             ),
+
             const SizedBox(height: 6),
           ],
         ),

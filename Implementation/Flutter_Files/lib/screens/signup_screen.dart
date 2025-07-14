@@ -46,6 +46,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             databaseURL:
                 'https://fpy-203-default-rtdb.asia-southeast1.firebasedatabase.app',
           ).ref("parents/${user.uid}");
+
           await userRef.set({
             "username": usernameController.text.trim(),
             "email": emailController.text.trim(),
