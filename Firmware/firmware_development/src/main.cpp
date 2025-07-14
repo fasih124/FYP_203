@@ -538,7 +538,7 @@ void loop()
             FirebaseJson json;
             json.set("value", mainBabyCryingVar);
             json.set("isplaying", true);
-            json.set("timestamp", time(nullptr));
+            json.set("timestamp", 1234);
             json.set("type", "sound");
             json.set("enable", true);
             pushDataToFirebase(cryingPath, "Baby Crying", Firebase.RTDB.setJSON(&fbdo, cryingPath.c_str(), &json));
@@ -590,7 +590,7 @@ void loop()
             // pushDataToFirebase(AQIPath, "AQI Grade", Firebase.RTDB.setString(&fbdo, AQIPath, aqiStatus));
             FirebaseJson json;
             json.set("value", aqiStatus);
-            json.set("timestamp", time(nullptr));
+            json.set("timestamp", 1234);
             json.set("type", "Air Quality Index");
             json.set("enable", true);
             pushDataToFirebase(AQIPath, "AQI Grade", Firebase.RTDB.setJSON(&fbdo, AQIPath.c_str(), &json));
@@ -634,7 +634,7 @@ void loop()
             // pushDataToFirebase(moisturePath, "Diaper Condition", Firebase.RTDB.setString(&fbdo, moisturePath, diaperStatus));
             FirebaseJson json;
             json.set("value", diaperStatus);
-            json.set("timestamp", time(nullptr));
+            json.set("timestamp", 1234);
             json.set("type", "moisture");
             json.set("enable", true);
             pushDataToFirebase(moisturePath, "Diaper Condition", Firebase.RTDB.setJSON(&fbdo, moisturePath.c_str(), &json));
@@ -673,7 +673,7 @@ void loop()
             // pushDataToFirebase(tempPath, "Probe Temperature", Firebase.RTDB.setFloat(&fbdo, tempPath, currentTemp));
             FirebaseJson json;
             json.set("value", currentTemp);
-            json.set("timestamp", time(nullptr));
+            json.set("timestamp", 1234);
             json.set("type", "temperature");
             json.set("enable", true);
             pushDataToFirebase(tempPath, "Probe Temperature", Firebase.RTDB.setJSON(&fbdo, tempPath.c_str(), &json));
