@@ -171,10 +171,11 @@ void setup()
         myDFPlayer.play(6); // DB failed audio
         delay(5000);
     }
-    fetchParentIdFromFirebase(firebaseCradleID);
+    // fetchParentIdFromFirebase(firebaseCradleID);
     config.token_status_callback = tokenStatusCallback;
     Firebase.begin(&config, &auth);
     Firebase.reconnectWiFi(true);
+      fetchParentIdFromFirebase(firebaseCradleID);
 
     myDFPlayer.play(7); // all system checks ok
 
