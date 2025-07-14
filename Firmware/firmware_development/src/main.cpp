@@ -61,9 +61,11 @@ bool lullabyCurrentlyPlaying = false;
 
 bool mainBabyCryingVar = false; // already defined in MicSensor file for global access
 
-String firebaseCradleID = "cradle1"; // Change this to your cradle ID
+String firebaseCradleID = "Modelx-FYP203"; // Change this to your cradle ID
 
 //////////////////////////////////////////////////////////////////variable for notifications//////////////////////////////////////////////////////////////////////////
+String dynamicParentId = ""; // Global variable
+
 // for temp notification
 bool tempAlertSent = false;
 unsigned long lastTempAlertTime = 0;
@@ -86,9 +88,28 @@ unsigned long lastBabyCryingAlertTime = 0;
 int babyCryingAlertCooldown = 10 * 60 * 1000; // 10 minutes
 //////////////////////////////////////////////////////////////////variable for notifications//////////////////////////////////////////////////////////////////////////
 
+void fetchParentIdFromFirebase(String cradleId) {
+
+    String path = "/cradles/";
+    path.concat(cradleId); 
+    path.concat("/parentId");
+
+    if (Firebase.RTDB.getString(&fbdo, path)) {
+        dynamicParentId = fbdo.stringData();
+        Serial.print("✅ Parent ID fetched: ");
+        Serial.println(dynamicParentId);
+    } else {
+        Serial.print("❌ Failed to fetch parentId: ");
+        Serial.println(fbdo.errorReason());
+    }
+}
+
 
 void setup()
 {
+
+
+
     Serial.begin(115200);
     delay(500);
     init_Dfplayer(); // call before using its play() functions
@@ -151,7 +172,7 @@ void setup()
         myDFPlayer.play(6); // DB failed audio
         delay(5000);
     }
-
+    fetchParentIdFromFirebase(firebaseCradleID);
     config.token_status_callback = tokenStatusCallback;
     Firebase.begin(&config, &auth);
     Firebase.reconnectWiFi(true);
@@ -179,14 +200,53 @@ void pushDataToFirebase(const String &path, const String &type, bool success)
     }
 }
 
+// void pushTemperatureNotification(float tempValue)
+// {
+//     String parentId = "F6hVlGjbukP96l0hWAgi2RkjcFE2"; // Can be replaced with actual Firebase UID
+//     String path = "/notifications/";
+//     FirebaseJson json;
+//     // Build the message using concat (no `+`)
+//     String msg;
+//     msg.concat("Baby's temperature is high! Current: ");
+//     msg.concat(String(tempValue, 1));
+//     msg.concat("°F");
+//     json.set("message", msg);
+//     json.set("timestamp", time(nullptr)); // UNIX timestamp
+//     json.set("type", "temperature_alert");
+//     json.set("acknowledged", false);
+//     json.set("parentId", parentId);
+//     if (Firebase.RTDB.pushJSON(&fbdo, path.c_str(), &json))
+//     {
+//         String notificationId = fbdo.pushName();
+//         Serial.print("Notification ID: ");
+//         Serial.println(notificationId);
+//         // Add notificationId using concat
+//         FirebaseJson updateJson;
+//         updateJson.set("notificationId", notificationId);
+//         String finalPath;
+//         finalPath.concat(path);
+//         finalPath.concat(notificationId);
+//         Firebase.RTDB.updateNode(&fbdo, finalPath.c_str(), &updateJson);
+//     }
+//     else
+//     {
+//         Serial.print("Push failed: ");
+//         Serial.println(fbdo.errorReason());
+//     }
+// }
+
+
 void pushTemperatureNotification(float tempValue)
 {
-    String parentId = "F6hVlGjbukP96l0hWAgi2RkjcFE2"; // Can be replaced with actual Firebase UID
+    if (dynamicParentId == "") {
+        Serial.println("⚠️ Parent ID not set. Skipping notification.");
+        return;
+    }
+
     String path = "/notifications/";
 
     FirebaseJson json;
 
-    // Build the message using concat (no `+`)
     String msg;
     msg.concat("Baby's temperature is high! Current: ");
     msg.concat(String(tempValue, 1));
@@ -196,34 +256,41 @@ void pushTemperatureNotification(float tempValue)
     json.set("timestamp", time(nullptr)); // UNIX timestamp
     json.set("type", "temperature_alert");
     json.set("acknowledged", false);
-    json.set("parentId", parentId);
+    json.set("parentId", dynamicParentId); // ✅ dynamic!
 
     if (Firebase.RTDB.pushJSON(&fbdo, path.c_str(), &json))
     {
         String notificationId = fbdo.pushName();
-        Serial.print("Notification ID: ");
+        Serial.print("✅ Notification pushed: ");
         Serial.println(notificationId);
 
-        // Add notificationId using concat
         FirebaseJson updateJson;
         updateJson.set("notificationId", notificationId);
 
-        String finalPath;
+        // String finalPath = path + notificationId;
+
+
+        String finalPath="";
         finalPath.concat(path);
         finalPath.concat(notificationId);
-
         Firebase.RTDB.updateNode(&fbdo, finalPath.c_str(), &updateJson);
     }
     else
     {
-        Serial.print("Push failed: ");
+        Serial.print("❌ Push failed: ");
         Serial.println(fbdo.errorReason());
     }
 }
 
 void pushMoistureNotification()
 {
-    String parentId = "F6hVlGjbukP96l0hWAgi2RkjcFE2"; // Replace with actual UID if dynamic
+
+ if (dynamicParentId == "") {
+        Serial.println("⚠️ Parent ID not set. Skipping notification.");
+        return;
+    }
+
+    // String parentId = "F6hVlGjbukP96l0hWAgi2RkjcFE2"; // Replace with actual UID if dynamic
     String path = "/notifications/";
 
     FirebaseJson json;
@@ -236,7 +303,7 @@ void pushMoistureNotification()
     json.set("timestamp", time(nullptr)); // UNIX timestamp
     json.set("type", "moisture_alert");
     json.set("acknowledged", false);
-    json.set("parentId", parentId);
+    json.set("parentId", dynamicParentId);
 
     if (Firebase.RTDB.pushJSON(&fbdo, path.c_str(), &json))
     {
@@ -262,7 +329,12 @@ void pushMoistureNotification()
 
 void pushAqiNotification()
 {
-    String parentId = "F6hVlGjbukP96l0hWAgi2RkjcFE2"; // Replace with dynamic UID if needed
+     if (dynamicParentId == "") {
+        Serial.println("⚠️ Parent ID not set. Skipping notification.");
+        return;
+    }
+    // String parentId = "F6hVlGjbukP96l0hWAgi2RkjcFE2"; // Replace with dynamic UID if needed
+
     String path = "/notifications/";
 
     FirebaseJson json;
@@ -274,7 +346,7 @@ void pushAqiNotification()
     json.set("timestamp", time(nullptr)); // UNIX timestamp
     json.set("type", "aqi_alert");
     json.set("acknowledged", false);
-    json.set("parentId", parentId);
+    json.set("parentId", dynamicParentId);
 
     if (Firebase.RTDB.pushJSON(&fbdo, path.c_str(), &json))
     {
@@ -300,7 +372,11 @@ void pushAqiNotification()
 
 void pushBabyAbsentNotification()
 {
-    String parentId = "F6hVlGjbukP96l0hWAgi2RkjcFE2"; // Replace with actual UID if needed
+     if (dynamicParentId == "") {
+        Serial.println("⚠️ Parent ID not set. Skipping notification.");
+        return;
+    }
+    // String parentId = "F6hVlGjbukP96l0hWAgi2RkjcFE2"; // Replace with actual UID if needed
     String path = "/notifications/";
 
     FirebaseJson json;
@@ -312,8 +388,7 @@ void pushBabyAbsentNotification()
     json.set("timestamp", time(nullptr)); // UNIX timestamp
     json.set("type", "baby_absent_alert");
     json.set("acknowledged", false);
-    json.set("parentId", parentId);
-
+    json.set("parentId", dynamicParentId);
     if (Firebase.RTDB.pushJSON(&fbdo, path.c_str(), &json))
     {
         String notificationId = fbdo.pushName();
@@ -338,7 +413,11 @@ void pushBabyAbsentNotification()
 
 void pushBabyCryingNotification()
 {
-    String parentId = "F6hVlGjbukP96l0hWAgi2RkjcFE2"; // Replace with actual UID if needed
+     if (dynamicParentId == "") {
+        Serial.println("⚠️ Parent ID not set. Skipping notification.");
+        return;
+    }
+    // String parentId = "F6hVlGjbukP96l0hWAgi2RkjcFE2"; // Replace with actual UID if needed
     String path = "/notifications/";
 
     FirebaseJson json;
@@ -350,7 +429,7 @@ void pushBabyCryingNotification()
     json.set("timestamp", time(nullptr)); // UNIX timestamp
     json.set("type", "crying_alert");
     json.set("acknowledged", false);
-    json.set("parentId", parentId);
+   json.set("parentId", dynamicParentId);
 
     if (Firebase.RTDB.pushJSON(&fbdo, path.c_str(), &json))
     {

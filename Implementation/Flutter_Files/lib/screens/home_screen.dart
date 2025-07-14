@@ -30,13 +30,13 @@ class _HomeScreenState extends State<HomeScreen> {
     loadCradleModel();
   }
 
-
   Future<void> loadCradleModel() async {
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId != null) {
       final modelKey = await CradleService.getCradleModelForUser(userId);
       if (modelKey != null) {
-        final fetchedModelName = await CradleService.getModelNameForCradle(modelKey);
+        final fetchedModelName =
+            await CradleService.getModelNameForCradle(modelKey);
         setState(() {
           cradleModel = modelKey;
           modelName = fetchedModelName;
@@ -52,24 +52,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // Future<void> loadCradleModel() async {
-  //   final userId = FirebaseAuth.instance.currentUser?.uid;
-  //   print("Firebase userId: $userId"); // ✅ Add this for debugging
-  //
-  //   if (userId != null) {
-  //     final model = await CradleService.getCradleModelForUser(userId);
-  //     print("Cradle model from DB: $model"); // ✅ Log cradle model
-  //     setState(() {
-  //       cradleModel = model;
-  //       isLoading = false;
-  //     });
-  //   } else {
-  //     setState(() {
-  //       isLoading = false;
-  //     });
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
@@ -79,8 +61,137 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     if (cradleModel == null) {
-      return const Scaffold(
-        body: Center(child: Text("No cradle model found")),
+      // return const Scaffold(
+      //       //   body: Center(child: Text("No cradle model found")),
+      //       // );
+      return Scaffold(
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.only(top: 16.0),
+              decoration: const BoxDecoration(
+                color: AppColorCode.neutralColor_500,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(25), // Rounded bottom-left corner
+                  bottomRight: Radius.circular(25), // Rounded bottom-right corner
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0x402E5077), // Shadow color
+                    blurRadius: 10, // Softness of the shadow
+                    spreadRadius: 2, // Spread of the shadow
+                    offset: Offset(0, 4), // Shadow offset (horizontal, vertical)
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding:
+                const EdgeInsets.symmetric(vertical: 16.0, horizontal: 20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'HOME',
+                          style: TextStyle(
+                            color: AppColorCode.primaryColor_500,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (builder) => const OptionScreen(),
+                              ),
+                            );
+                          },
+                          child: Image.asset(
+                            'assets/icons_img/gear_icon.png',
+                            width: 25,
+                            height: 23,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Divider(
+                        color: AppColorCode.secondaryColor_500, // Line color
+                        thickness: 1, // Line thickness
+                        indent: 0, // Start padding
+                        endIndent: 0 // End padding
+                    ),
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    RichText(
+                      text: TextSpan(
+                        children: [
+                          const TextSpan(
+                            text: 'Cradle : ',
+                            style: TextStyle(
+                              color: AppColorCode.primaryColor_500,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'Poppins',
+                            ),
+                          ),
+                          TextSpan(
+                            text: modelName ?? 'Unknown',
+                            style: const TextStyle(
+                              color: Colors.black54,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                              fontFamily: 'Poppins',
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        await  Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                              return const ConnectCradleScreen();
+                            }));
+
+                        setState(() {
+                          isLoading = true;
+                        });
+                        await loadCradleModel();
+                      },
+                      icon: const Icon(Icons.arrow_forward,
+                          color: Colors.white, size: 18),
+                      label: const Text(
+                        'Connect',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColorCode.secondaryColor_500,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 32,
+                    ),
+                  ],
+                ),
+              ),
+            ),const SizedBox(
+              height: 40,
+            ),
+            Center(child: Text("No cradle model found"),),
+          ],
+        ),
       );
     }
 
@@ -106,7 +217,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0,horizontal: 20.0),
+              padding:
+                  const EdgeInsets.symmetric(vertical: 16.0, horizontal: 20.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -175,11 +287,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 8,
                   ),
                   ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.push(context,
+                    onPressed: () async {
+                      await  Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
                         return const ConnectCradleScreen();
                       }));
+
+                      setState(() {
+                        isLoading = true;
+                      });
+                      await loadCradleModel();
                     },
                     icon: const Icon(Icons.arrow_forward,
                         color: Colors.white, size: 18),
@@ -198,7 +315,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 32,
                   ),
                   StreamBuilder<BabyPresenceSensorData>(
-                    stream: BabyPresenceSensorService.getBabyPresenceSensorData(cradleModel!),
+                    stream: BabyPresenceSensorService.getBabyPresenceSensorData(
+                        cradleModel!),
                     builder: (context, snapshot) {
                       String status = 'Loading...';
                       Color statusColor = Colors.grey;
@@ -210,12 +328,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             ? AppColorCode.secondaryColor_500
                             : Colors.redAccent;
                       } else if (snapshot.hasError) {
-                        status = 'ERROR';
+                        status = 'Cradle not found  ';
                         statusColor = Colors.red;
                       }
 
                       return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(12),
@@ -259,7 +378,8 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 // temperature
                 StreamBuilder<CradleSensorData>(
-                  stream: TemperatureSensorService.getTemperatureSensorData(cradleModel!),
+                  stream: TemperatureSensorService.getTemperatureSensorData(
+                      cradleModel!),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       final data = snapshot.data!;
@@ -338,8 +458,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ],
                                 ),
                                 child: Image.asset(
-                                    'assets/icons_img/temp_Icon.png')
-                            ),
+                                    'assets/icons_img/temp_Icon.png')),
                           ),
                         ),
                       );
@@ -359,10 +478,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             contentPadding: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             title: Text(
-                              "Error in loading ",
+                              "Cradle not found/Error in Loading",
                               style: const TextStyle(
                                 color: Colors.white60,
-                                fontSize: 26,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -417,7 +536,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
                 // _buildCard('Moisture', 'DRY', 'assets/icons_img/Droplet.png'),
                 StreamBuilder<CradleSensorData>(
-                  stream: MoistureSensorService.getMoistureSensorData(cradleModel!),
+                  stream:
+                      MoistureSensorService.getMoistureSensorData(cradleModel!),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       final data = snapshot.data!;
@@ -427,8 +547,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 18.0),
                           child: Card(
-                            color:
-                            AppColorCode.primaryColor_600,
+                            color: AppColorCode.primaryColor_600,
                             elevation: 3,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -451,8 +570,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   color: Colors.grey[300],
                                 ),
                               ),
-                              trailing: Image.asset(
-                                  'assets/icons_img/Droplet.png'),
+                              trailing:
+                                  Image.asset('assets/icons_img/Droplet.png'),
                             ),
                           ),
                         );
@@ -498,20 +617,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ],
                                 ),
                                 child: Image.asset(
-                                    'assets/icons_img/Droplet.png')
-                            ),
+                                    'assets/icons_img/Droplet.png')),
                           ),
                         ),
                       );
                     } else if (snapshot.hasError) {
                       print('Stream error: ${snapshot.error}');
 
-
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 18.0),
                         child: Card(
-                          color:
-                          AppColorCode.primaryColor_600,
+                          color: AppColorCode.primaryColor_600,
                           elevation: 3,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -520,10 +636,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             contentPadding: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             title: Text(
-                              'Error in loading',
+                              'Cradle not found/Error in Loading',
                               style: const TextStyle(
                                 color: Colors.white60,
-                                fontSize: 20,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -534,20 +650,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: Colors.grey[300],
                               ),
                             ),
-                            trailing: Image.asset(
-                                'assets/icons_img/Droplet.png'),
+                            trailing:
+                                Image.asset('assets/icons_img/Droplet.png'),
                           ),
                         ),
                       );
-
-
                     } else {
-
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 18.0),
                         child: Card(
-                          color:
-                          AppColorCode.primaryColor_600,
+                          color: AppColorCode.primaryColor_600,
                           elevation: 3,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -570,12 +682,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: Colors.grey[300],
                               ),
                             ),
-                            trailing: Image.asset(
-                                'assets/icons_img/Droplet.png'),
+                            trailing:
+                                Image.asset('assets/icons_img/Droplet.png'),
                           ),
                         ),
                       );
-
                     }
                   },
                 ),
@@ -594,8 +705,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 18.0),
                           child: Card(
-                            color:
-                            AppColorCode.primaryColor_600, //Colors.blue[50],
+                            color: AppColorCode
+                                .primaryColor_600, //Colors.blue[50],
                             elevation: 3,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -618,12 +729,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                   color: Colors.grey[300],
                                 ),
                               ),
-                              trailing: Image.asset(
-                                  'assets/icons_img/aqi_icon.png'),
+                              trailing:
+                                  Image.asset('assets/icons_img/aqi_icon.png'),
                             ),
                           ),
                         );
-
                       }
                       // Sensor is enabled, show value
 
@@ -631,7 +741,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 18.0),
                         child: Card(
                           color:
-                          AppColorCode.primaryColor_500, //Colors.blue[50],
+                              AppColorCode.primaryColor_500, //Colors.blue[50],
                           elevation: 3,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -668,19 +778,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ],
                                 ),
                                 child: Image.asset(
-                                    'assets/icons_img/aqi_icon.png')
-                            ),
+                                    'assets/icons_img/aqi_icon.png')),
                           ),
                         ),
                       );
-
                     } else if (snapshot.hasError) {
                       print('Stream error: ${snapshot.error}');
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 18.0),
                         child: Card(
                           color:
-                          AppColorCode.primaryColor_600, //Colors.blue[50],
+                              AppColorCode.primaryColor_600, //Colors.blue[50],
                           elevation: 3,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -689,10 +797,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             contentPadding: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             title: Text(
-                              "Error in Loading",
+                              "Cradle not found/Error in Loading",
                               style: const TextStyle(
                                 color: Colors.white60,
-                                fontSize: 20,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -703,18 +811,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: Colors.grey[300],
                               ),
                             ),
-                            trailing: Image.asset(
-                                'assets/icons_img/aqi_icon.png'),
+                            trailing:
+                                Image.asset('assets/icons_img/aqi_icon.png'),
                           ),
                         ),
                       );
-
                     } else {
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 18.0),
                         child: Card(
                           color:
-                          AppColorCode.primaryColor_600, //Colors.blue[50],
+                              AppColorCode.primaryColor_600, //Colors.blue[50],
                           elevation: 3,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -737,8 +844,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: Colors.grey[300],
                               ),
                             ),
-                            trailing: Image.asset(
-                                'assets/icons_img/aqi_icon.png'),
+                            trailing:
+                                Image.asset('assets/icons_img/aqi_icon.png'),
                           ),
                         ),
                       );
@@ -759,8 +866,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 18.0),
                           child: Card(
-                            color:
-                            AppColorCode.primaryColor_600, //Colors.blue[50],
+                            color: AppColorCode
+                                .primaryColor_600, //Colors.blue[50],
                             elevation: 3,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -794,7 +901,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 18.0),
                         child: Card(
                           color:
-                          AppColorCode.primaryColor_500, //Colors.blue[50],
+                              AppColorCode.primaryColor_500, //Colors.blue[50],
                           elevation: 3,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -803,7 +910,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             contentPadding: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             title: Text(
-                              (data.value.toLowerCase() == "true" ? "Crying" : "Calm"),
+                              (data.value.toLowerCase() == "true"
+                                  ? "Crying"
+                                  : "Calm"),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 26,
@@ -831,19 +940,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ],
                                 ),
                                 child: Image.asset(
-                                    'assets/icons_img/sound_icon.png')
-                            ),
+                                    'assets/icons_img/sound_icon.png')),
                           ),
                         ),
                       );
-
                     } else if (snapshot.hasError) {
                       print('Stream error: ${snapshot.error}');
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 18.0),
                         child: Card(
                           color:
-                          AppColorCode.primaryColor_600, //Colors.blue[50],
+                              AppColorCode.primaryColor_600, //Colors.blue[50],
                           elevation: 3,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -852,10 +959,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             contentPadding: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 10),
                             title: Text(
-                              "Error in Loading",
+                              "Cradle not found/Error in Loading",
                               style: const TextStyle(
                                 color: Colors.white60,
-                                fontSize: 20,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -866,8 +973,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: Colors.grey[300],
                               ),
                             ),
-                            trailing: Image.asset(
-                                'assets/icons_img/sound_icon.png'),
+                            trailing:
+                                Image.asset('assets/icons_img/sound_icon.png'),
                           ),
                         ),
                       );
@@ -876,7 +983,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 18.0),
                         child: Card(
                           color:
-                          AppColorCode.primaryColor_600, //Colors.blue[50],
+                              AppColorCode.primaryColor_600, //Colors.blue[50],
                           elevation: 3,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -899,8 +1006,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: Colors.grey[300],
                               ),
                             ),
-                            trailing: Image.asset(
-                                'assets/icons_img/sound_icon.png'),
+                            trailing:
+                                Image.asset('assets/icons_img/sound_icon.png'),
                           ),
                         ),
                       );
