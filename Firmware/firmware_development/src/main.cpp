@@ -514,7 +514,7 @@ void loop()
         String cryingPath = "sensors/";
         cryingPath.concat(firebaseCradleID);
         cryingPath.concat("/SoundSensor");
-        cryingPath.concat("/value");
+        // cryingPath.concat("/value");
 
         // Cry detection (Mic)
         // baby needs to be present to detect cry
@@ -572,7 +572,7 @@ void loop()
         String AQIPath = "sensors/";
         AQIPath.concat(firebaseCradleID);
         AQIPath.concat("/AQISensor");
-        AQIPath.concat("/value");
+        // AQIPath.concat("/value");
 
         // AQI sensor
         if (currentMillis - prevTimeAQISentData > aqiInterval || prevTimeAQISentData == 0)
@@ -609,7 +609,7 @@ void loop()
         String moisturePath = "sensors/";
         moisturePath.concat(firebaseCradleID);
         moisturePath.concat("/MositureSensor");
-        moisturePath.concat("/value");
+        // moisturePath.concat("/value");
 
         // Diaper sensor
         if (/*babyPresent &&*/ (currentMillis - prevTimeMoistureSentData > moistureInterval || prevTimeMoistureSentData == 0))
@@ -657,7 +657,7 @@ void loop()
         String tempPath = "sensors/";
         tempPath.concat(firebaseCradleID);
         tempPath.concat("/TempSensor");
-        tempPath.concat("/value");
+        // tempPath.concat("/value");
         // Probe sensor
         if (currentMillis - prevTimeProbeSentData > probeInterval || prevTimeProbeSentData == 0)
         {
