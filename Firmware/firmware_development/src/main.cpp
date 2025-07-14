@@ -541,7 +541,8 @@ void loop()
             json.set("type", "sound");
             json.set("enable", true);
             pushDataToFirebase(cryingPath, "Baby Crying", Firebase.RTDB.setJSON(&fbdo, cryingPath.c_str(), &json));
-            pushDataToFirebase(cryingPath, "Baby Crying", Firebase.RTDB.setBool(&fbdo, cryingPath, mainBabyCryingVar /*babyCrying*/ /*process_Sound_And_Detect_Cry()*/));
+
+            // pushDataToFirebase(cryingPath, "Baby Crying", Firebase.RTDB.setBool(&fbdo, cryingPath, mainBabyCryingVar /*babyCrying*/ /*process_Sound_And_Detect_Cry()*/));
 
             // initially mic raw values will be fluctuating greatly, they'll stabilize after some minutes of execution.
             // Serial.print("-------------"); Serial.print(mic_Raw_Value()); Serial.println("-------------");
