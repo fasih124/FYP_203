@@ -220,26 +220,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   Row(
                     mainAxisAlignment:MainAxisAlignment.spaceBetween,
                     children: [
-                      // StreamBuilder<CradleModelData>(
-                      //   stream: CradleModelService.getCradleModel(),
-                      //   builder: (context, snapshot) {
-                      //     String modelName = '...';
-                      //     if (snapshot.hasData) {
-                      //       modelName = snapshot.data!.model;
-                      //     } else if (snapshot.hasError) {
-                      //       modelName = 'Error';
-                      //     }
-                      //
-                      //     return Text(
-                      //       'Cradle : $modelName',
-                      //       style: const TextStyle(
-                      //         color: AppColorCode.White_shade,
-                      //         fontSize: 18,
-                      //         fontWeight: FontWeight.w500,
-                      //       ),
-                      //     );
-                      //   },
-                      // ),
+
                       isModelLoading
                           ? const CircularProgressIndicator(color: Colors.white)
                           : Text(
