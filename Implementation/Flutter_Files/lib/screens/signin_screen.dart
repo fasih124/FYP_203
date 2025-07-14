@@ -166,6 +166,7 @@ import 'package:fyp_203/screens/signup_screen.dart';
 import 'package:fyp_203/services/firebase_auth.dart';
 
 import '../Component/text_feild_component.dart';
+import 'forget_password_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -190,6 +191,20 @@ class _SignInScreenState extends State<SignInScreen> {
 
 
       if (user != null) {
+
+        if (!user.emailVerified) {
+          await user.sendEmailVerification();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Email not verified. Verification link sent again.'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+          await AuthService().signOut();
+          return false;
+        }
+
+
         print('User is logged in successfully');
 
         // Show success Snackbar
@@ -275,7 +290,12 @@ class _SignInScreenState extends State<SignInScreen> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const ForgetPasswordScreen()),
+                          );
+                        },
                         child: Text(
                           'Forget Password?',
                           style: AppTextStyle.Small_text_1.copyWith(

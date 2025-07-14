@@ -25,7 +25,7 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
   @override
 
   void _listenToNotifications(String parentId) {
-    print('Firebase UID: $parentId');
+    // print('Firebase UID: $parentId');
     // _notifRef = FirebaseDatabase.instance.ref("notifications");
     _notifRef = FirebaseDatabase.instanceFor(
       app: Firebase.app(),
