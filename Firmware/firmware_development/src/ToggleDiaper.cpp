@@ -1,13 +1,13 @@
 #include "ToggleDiaper.h"
 
-int diaperTouchRawValue = 0;
-int diaperBaselineTouchValue = 0;
+int diaperRawValue = 0;
+int diaperBaselineValue = 0;
 bool diaperFlag = false;
-bool diaperLastTouchState = false;
+bool diaperLastState = false;
 
 void init_Toggle_Diaper() {
   pinMode(DIAPER_LED_PIN, OUTPUT);
-  diaperBaselineTouchValue = touchRead(T1_PIN);
+  diaperBaselineValue = touchRead(T1_PIN);
 }
 
 int read_Diaper_Raw_Value() {
@@ -15,22 +15,22 @@ int read_Diaper_Raw_Value() {
 }
 
 String process_Diaper() {
-  diaperTouchRawValue = read_Diaper_Raw_Value();
-  int difference = abs(diaperTouchRawValue - diaperBaselineTouchValue);
+  diaperRawValue = read_Diaper_Raw_Value();
+  int difference = abs(diaperRawValue - diaperBaselineValue);
 
-  bool currentTouchState = (difference > DIAPER_CHANGE_THRESHOLD);
+  bool currentTcState = (difference > DIAPER_CHANGE_THRESHOLD);
 
-  if (currentTouchState && !diaperLastTouchState) {
+  if (currentTcState && !diaperLastState) {
     diaperFlag = !diaperFlag;
     if (diaperFlag) {
       digitalWrite(DIAPER_LED_PIN, HIGH);
     } else {
       digitalWrite(DIAPER_LED_PIN, LOW);
     }
-  } else if (!currentTouchState) {
-    diaperBaselineTouchValue = diaperTouchRawValue;
+  } else if (!currentTcState) {
+    diaperBaselineValue = diaperRawValue;
   }
-  diaperLastTouchState = currentTouchState;
+  diaperLastState = currentTcState;
 
   if (diaperFlag) {
     return "Change Diaper";

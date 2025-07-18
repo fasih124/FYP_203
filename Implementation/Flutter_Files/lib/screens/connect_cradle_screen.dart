@@ -1,62 +1,9 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:fyp_203/constants/colors_constant.dart';
-// class ConnectCradleScreen extends StatefulWidget {
-//   const ConnectCradleScreen({super.key});
-//
-//   @override
-//   State<ConnectCradleScreen> createState() => _ConnectCradleScreenState();
-// }
-//
-// class _ConnectCradleScreenState extends State<ConnectCradleScreen> {
-//
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Padding(
-//         padding: const EdgeInsets.only(top: 30.0),
-//         child: Column(
-//           children: [
-//             Container(
-//               margin: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-//               child: Row(
-//                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                 children: [
-//                   CircleAvatar(
-//                     backgroundColor: AppColorCode.primaryNeutralColor_600,
-//                     child: IconButton(
-//                       icon: const Icon(Icons.arrow_back_ios_new_rounded,
-//                           size: 18, color: Colors.black),
-//                       onPressed: () {
-//                         Navigator.pop(context);
-//                       },
-//                     ),
-//                   ),
-//                   Text(
-//                     'How to connect',
-//                     style: TextStyle(
-//                       fontSize: 24,
-//                       fontWeight: FontWeight.w700,
-//                       fontFamily: 'Poppins',
-//                       color: Colors.black54,
-//                     ),
-//                   ),
-//                   SizedBox(
-//                     width: 2,
-//                   )
-//                 ],
-//               ),
-//             ),
-//             // const SizedBox(height: 24),
-//             const SizedBox(height: 24),
-//
-//             // add code here for instruction
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:intl/intl.dart';
 
 class ConnectCradleScreen extends StatefulWidget {
   const ConnectCradleScreen({super.key});
@@ -66,6 +13,9 @@ class ConnectCradleScreen extends StatefulWidget {
 }
 
 class _ConnectCradleScreenState extends State<ConnectCradleScreen> {
+  final TextEditingController cradleModelController = TextEditingController();
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -102,7 +52,94 @@ class _ConnectCradleScreenState extends State<ConnectCradleScreen> {
               ),
             ),
 
-            const SizedBox(height: 12),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0,horizontal: 16),
+              child: TextField(
+                controller: cradleModelController,
+                decoration: const InputDecoration(
+                  labelText: "Enter Cradle Model",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            ElevatedButton(
+
+              onPressed: () async {
+                final model = cradleModelController.text.trim();
+                debugPrint("DEBUG: Cradle model entered: '$model'");
+
+                if (model.isEmpty) {
+                  debugPrint("DEBUG: No cradle model entered");
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Please enter Cradle Model"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+
+                final user = FirebaseAuth.instance.currentUser;
+                if (user == null) {
+                  debugPrint("DEBUG: FirebaseAuth user is null (not logged in)");
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("User not logged in"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
+
+                final date = DateFormat('yyyy-MM-dd').format(DateTime.now());
+                debugPrint("DEBUG: Formatted date is $date");
+
+                try {
+                  final cradleRef = FirebaseDatabase.instanceFor(
+                    app: Firebase.app(),
+                    databaseURL: 'https://fpy-203-default-rtdb.asia-southeast1.firebasedatabase.app',
+                  ).ref("cradles/$model");
+
+                  debugPrint("DEBUG: Writing to cradles/$model for user ${user.uid}");
+
+                  await cradleRef.set({
+                    "date": date,
+                    "parentId": user.uid,
+                    "model": model,
+                  });
+
+                  debugPrint("DEBUG: Cradle data successfully written to Firebase");
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Cradle connected successfully!"),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+
+                  Navigator.pop(context);
+                } catch (e) {
+                  debugPrint("ERROR: Failed to write cradle data — $e");
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Failed to connect cradle. Try again."),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColorCode.secondaryColor_500,
+                padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 45),
+              ),
+              child: const Text("Connect",style: TextStyle(color: Colors.white),),
+            ),
+
+            const SizedBox(height: 24),
 
             /// 👇 Instruction Section
             Expanded(
@@ -140,7 +177,15 @@ class _ConnectCradleScreenState extends State<ConnectCradleScreen> {
           ],
         ),
       ),
+
     );
+  }
+
+
+  @override
+  void dispose() {
+    cradleModelController.dispose();
+    super.dispose();
   }
 
   Widget instructionStep(String title, String detail) {
@@ -179,4 +224,7 @@ class _ConnectCradleScreenState extends State<ConnectCradleScreen> {
 
     );
   }
+
+
 }
+

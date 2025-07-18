@@ -40,29 +40,45 @@ class _SignUpScreenState extends State<SignUpScreen> {
         if (user != null) {
           print('User is registered successfully');
 
-          // Store username in Realtime Database under the user's UID
-          DatabaseReference userRef =
-
-              FirebaseDatabase.instanceFor(
+          // Store username
+          DatabaseReference userRef = FirebaseDatabase.instanceFor(
             app: Firebase.app(),
             databaseURL:
                 'https://fpy-203-default-rtdb.asia-southeast1.firebasedatabase.app',
           ).ref("parents/${user.uid}");
+
           await userRef.set({
             "username": usernameController.text.trim(),
             "email": emailController.text.trim(),
           });
 
-          // Show success Snackbar
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Registration successful!"),
-              backgroundColor: AppColorCode.secondaryColor_500,
-              duration: Duration(seconds: 2),
+          // ✅ Show verify dialog
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Verify Your Email'),
+              content: const Text(
+                  'A verification link has been sent to your email. Please verify it before logging in. Check your email inbox/spam for the verification link.'),
+              actions: [
+                TextButton(
+                  // onPressed: () {
+                  //   Navigator.pop(context); // just close dialog
+                  // },
+                  onPressed: () {
+                    Navigator.pop(context); // close dialog
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => const SignInScreen()),
+                    );
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
             ),
           );
 
-          return true; // Registration successful
+          return true;
+
         } else {
           print('User registration failed');
           ScaffoldMessenger.of(context).showSnackBar(
@@ -199,12 +215,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           onPressed: () async {
                             bool isRegistered = await registerUser(context);
                             if (isRegistered) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const SignInScreen(),
-                                ),
-                              );
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) => const SignInScreen(),
+                              //   ),
+                              // );
                             } else {
                               print("Error occurred!!!");
                             }

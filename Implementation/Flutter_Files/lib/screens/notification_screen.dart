@@ -49,11 +49,24 @@ class NotificationScreen extends StatefulWidget {
 
 class _NotificationScreenState extends State<NotificationScreen> {
   late Future<List<NotificationModel>> _notificationFuture;
+  String? cradleModel;
+  bool isModelLoading = true;
+
+  Future<void> loadCradleModel() async {
+    final model = await CradleService.getCradleModelForUser(widget.parentId);
+    setState(() {
+      cradleModel = model;
+      isModelLoading = false;
+    });
+  }
+
+
 
   @override
   void initState() {
     super.initState();
     _notificationFuture = getNotificationsForParent(widget.parentId);
+    loadCradleModel(); // ← add thi
   }
 
   Future<void> deleteNotification(String firebaseKey) async {
@@ -207,31 +220,24 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   Row(
                     mainAxisAlignment:MainAxisAlignment.spaceBetween,
                     children: [
-                      StreamBuilder<CradleModelData>(
-                        stream: CradleModelService.getCradleModel(),
-                        builder: (context, snapshot) {
-                          String modelName = '...';
-                          if (snapshot.hasData) {
-                            modelName = snapshot.data!.model;
-                          } else if (snapshot.hasError) {
-                            modelName = 'Error';
-                          }
 
-                          return Text(
-                            'Cradle : $modelName',
-                            style: const TextStyle(
-                              color: AppColorCode.White_shade,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          );
-                        },
+                      isModelLoading
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : Text(
+                        'Cradle : ${cradleModel ?? "Not Found"}',
+                        style: const TextStyle(
+                          color: AppColorCode.White_shade,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
+
+
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 4.0),
                         child: OutlinedButton.icon(
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: AppColorCode.neutralColor_600, width: 4), // 🔴 Outline color
+                            side: const BorderSide(color: AppColorCode.neutralColor_600, width: 4),
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -365,10 +371,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                       fontSize: 16,
                                       fontFamily: 'Poppins',
                                       fontWeight: FontWeight.w500,
-                                      // decoration: TextDecoration.underline,
-                                      // decorationColor: Colors.white,
                                       color: Colors.white,
-                                      // decorationThickness: 2
                                     ),
                                   ),
                                   title: Text(
@@ -385,7 +388,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                   trailing: IconButton(
                                     icon: const Icon(Icons.close_rounded, color: Colors.white),
                                     onPressed: () {
-                                      deleteNotification(notif.firebaseKey); // 🔴 Use firebaseKey here
+                                      deleteNotification(notif.firebaseKey); //
                                     },
                                     hoverColor: Colors.white60,
                                   ),

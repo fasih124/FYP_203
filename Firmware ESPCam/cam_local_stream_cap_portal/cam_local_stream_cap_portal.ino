@@ -8,6 +8,15 @@
 #include "soc/soc.h"
 #include "soc/rtc_cntl_reg.h"
 #include "esp_http_server.h"
+#include <Firebase_ESP_Client.h>
+
+#define DB_URL "https://fpy-203-default-rtdb.asia-southeast1.firebasedatabase.app/" 
+#define API_KEY "AIzaSyDgpAMZvSibox-INAbPeTfOlroY-LTs9eE"           
+
+FirebaseData fbdo;
+FirebaseAuth auth;
+FirebaseConfig firebaseConfig;
+
 
 #define PART_BOUNDARY "123456789000000000000987654321"
 
@@ -35,6 +44,10 @@
   #error "Camera model not selected"
 #endif
 
+
+bool stream_busy = false;
+
+
 static const char* _STREAM_CONTENT_TYPE = "multipart/x-mixed-replace;boundary=" PART_BOUNDARY;
 static const char* _STREAM_BOUNDARY = "\r\n--" PART_BOUNDARY "\r\n";
 static const char* _STREAM_PART = "Content-Type: image/jpeg\r\nContent-Length: %u\r\n\r\n";
@@ -42,6 +55,15 @@ static const char* _STREAM_PART = "Content-Type: image/jpeg\r\nContent-Length: %
 httpd_handle_t stream_httpd = NULL;
 
 static esp_err_t stream_handler(httpd_req_t *req){
+  if (stream_busy) {
+  httpd_resp_send_500(req);
+  return ESP_FAIL;
+  }
+  stream_busy = true;
+
+  
+  
+  Serial.println("New stream connection");
   camera_fb_t * fb = NULL;
   esp_err_t res = ESP_OK;
   size_t _jpg_buf_len = 0;
@@ -95,11 +117,16 @@ static esp_err_t stream_handler(httpd_req_t *req){
     }
     delay(100); // Limit frame rate
   }
+
+  stream_busy = false;
+  Serial.println("Stream connection closed");
   return res;
 }
 
 void startCameraServer(){
   httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+  config.max_open_sockets = 2;  // Limit to 2 connections max
+  config.backlog_conn = 1;      // Queue only 1 extra connection
   config.server_port = 80;
 
   httpd_uri_t index_uri = {
@@ -176,6 +203,30 @@ void setup() {
     Serial.println("WiFi connected");
   }
 
+firebaseConfig.api_key = API_KEY;
+firebaseConfig.database_url = DB_URL;
+       
+
+
+if (Firebase.signUp(&firebaseConfig, &auth, "", "")) {
+  Serial.println("Firebase signUp OK");
+} else {
+  Serial.println("Firebase signUp Failed");
+  Serial.println(firebaseConfig.signer.signupError.message.c_str());
+}
+
+Firebase.begin(&firebaseConfig, &auth);
+Firebase.reconnectWiFi(true);
+
+String camLink = "http://" + WiFi.localIP().toString();
+if (Firebase.RTDB.setString(&fbdo, "/camlink", camLink)) {
+  Serial.println("Cam URL sent to Firebase:");
+  Serial.println(camLink);
+} else {
+  Serial.println(fbdo.errorReason());
+}
+
+
   Serial.print("Camera Stream Ready! Go to: http://");
   Serial.println(WiFi.localIP());
 
@@ -185,3 +236,6 @@ void setup() {
 void loop() {
   delay(1);
 }
+
+
+

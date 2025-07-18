@@ -8,14 +8,14 @@ import '../Model/CardelModel.dart';
 import '../Model/SoundSensorModel.dart';
 
 class MoistureSensorService  {
-  static  Stream<CradleSensorData> getMoistureSensorData() {
+  static  Stream<CradleSensorData> getMoistureSensorData(String cradleModel) {
 
     final database = FirebaseDatabase.instanceFor(
       app: Firebase.app(),
       databaseURL: 'https://fpy-203-default-rtdb.asia-southeast1.firebasedatabase.app',
     );
 
-    final DatabaseReference _dbRef = database.ref('sensors/cradle1/MositureSensor');
+    final DatabaseReference _dbRef = database.ref('sensors/$cradleModel/MositureSensor');
 
     return _dbRef.onValue.map((event) {
       final data = event.snapshot.value;
@@ -31,14 +31,14 @@ class MoistureSensorService  {
 
 
 class TemperatureSensorService  {
-  static  Stream<CradleSensorData> getTemperatureSensorData() {
+  static  Stream<CradleSensorData> getTemperatureSensorData(String cradleModel) {
 
     final database = FirebaseDatabase.instanceFor(
       app: Firebase.app(),
       databaseURL: 'https://fpy-203-default-rtdb.asia-southeast1.firebasedatabase.app',
     );
 
-    final DatabaseReference _dbRef = database.ref('sensors/cradle1/TempSensor');
+    final DatabaseReference _dbRef = database.ref('sensors/$cradleModel/TempSensor');
 
     return _dbRef.onValue.map((event) {
       final data = event.snapshot.value;
@@ -54,14 +54,14 @@ class TemperatureSensorService  {
 
 
 class AQISensorService  {
-  static  Stream<CradleSensorData> getAQISensorData() {
+  static  Stream<CradleSensorData> getAQISensorData(String cradleModel) {
 
     final database = FirebaseDatabase.instanceFor(
       app: Firebase.app(),
       databaseURL: 'https://fpy-203-default-rtdb.asia-southeast1.firebasedatabase.app',
     );
 
-    final DatabaseReference _dbRef = database.ref('sensors/cradle1/AQISensor');
+    final DatabaseReference _dbRef = database.ref('sensors/$cradleModel/AQISensor');
 
     return _dbRef.onValue.map((event) {
       final data = event.snapshot.value;
@@ -76,14 +76,14 @@ class AQISensorService  {
 }
 
 class SoundSensorService  {
-  static  Stream<SoundSensorData> getSoundSensorData() {
+  static  Stream<SoundSensorData> getSoundSensorData(String cradleModel) {
 
     final database = FirebaseDatabase.instanceFor(
       app: Firebase.app(),
       databaseURL: 'https://fpy-203-default-rtdb.asia-southeast1.firebasedatabase.app',
     );
 
-    final DatabaseReference _dbRef = database.ref('sensors/cradle1/SoundSensor');
+    final DatabaseReference _dbRef = database.ref('sensors/$cradleModel/SoundSensor');
 
     return _dbRef.onValue.map((event) {
       final data = event.snapshot.value;
@@ -98,14 +98,15 @@ class SoundSensorService  {
 }
 
 
+
 class BabyPresenceSensorService {
-  static Stream<BabyPresenceSensorData> getBabyPresenceSensorData() {
+  static Stream<BabyPresenceSensorData> getBabyPresenceSensorData(String cradleModel) {
     final database = FirebaseDatabase.instanceFor(
       app: Firebase.app(),
       databaseURL: 'https://fpy-203-default-rtdb.asia-southeast1.firebasedatabase.app',
     );
 
-    final DatabaseReference _dbRef = database.ref('sensors/cradle1/babyPresence');
+    final DatabaseReference _dbRef = database.ref('sensors/$cradleModel/babyPresence');
 
     return _dbRef.onValue.map((event) {
       final data = event.snapshot.value;
@@ -117,6 +118,7 @@ class BabyPresenceSensorService {
     });
   }
 }
+
 
 
 class CradleModelService {
@@ -136,5 +138,49 @@ class CradleModelService {
         throw Exception('Invalid cradle model data');
       }
     });
+  }
+}
+
+
+class CradleService {
+  static Future<String?> getModelNameForCradle(String cradleKey) async {
+    final database = FirebaseDatabase.instanceFor(
+      app: Firebase.app(),
+      databaseURL: 'https://fpy-203-default-rtdb.asia-southeast1.firebasedatabase.app',
+    );
+
+    final modelRef = database.ref("cradles/$cradleKey/model");
+    final snapshot = await modelRef.get();
+
+    if (snapshot.exists && snapshot.value is String) {
+      return snapshot.value as String;
+    }
+    return null;
+  }
+
+
+  static Future<String?> getCradleModelForUser(String userId) async {
+    final database = FirebaseDatabase.instanceFor(
+      app: Firebase.app(),
+      databaseURL: 'https://fpy-203-default-rtdb.asia-southeast1.firebasedatabase.app',
+    );
+
+    final cradlesRef = database.ref("cradles");
+
+    final snapshot = await cradlesRef.get();
+
+    if (snapshot.exists && snapshot.value is Map) {
+      final cradleMap = Map<String, dynamic>.from(snapshot.value as Map);
+
+      for (var entry in cradleMap.entries) {
+        final cradleData = Map<String, dynamic>.from(entry.value);
+
+        if (cradleData["parentId"] == userId) {
+          return entry.key; // This is the cradle model name (e.g., "cradle1")
+        }
+      }
+    }
+
+    return null;
   }
 }
